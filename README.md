@@ -14,6 +14,9 @@ It is one plugin with all features built in.
 - Text size, line height, letter spacing, word spacing and line width have no fixed list of values. Each has
   − and + buttons (hold one to keep stepping), a field where you can type a number and press Enter, and a
   _Site default_ button. Changes show at once and are saved a moment after the last one.
+- Under a colour scheme, links are coloured by purpose: navigation, menus, tabs, buttons and titles take the text
+  colour, and links in text keep the link colour and an underline. Activity icons keep their purpose colour but
+  are lifted or lowered in lightness until they reach APCA Lc 75 against the scheme's surfaces.
 - The panel follows your own text size, font, spacing and colours. Alignment, line width, link and image
   options and the reading guide are not applied to the panel itself.
 - Profiles: one-click bundles of settings (Dyslexia, Focus, Low vision, Seizure-safe).

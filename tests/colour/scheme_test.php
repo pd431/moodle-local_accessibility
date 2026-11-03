@@ -223,4 +223,39 @@ final class scheme_test extends \advanced_testcase {
         $css = scheme::presets()['cream']->css_properties();
         $this->assertMatchesRegularExpression('/^(--a11y-[a-z0-9-]+:#[0-9a-f]{6};)+$/', $css);
     }
+
+    /**
+     * Every preset's six activity icon colours reach APCA Lc 75 on page, surface1 and surface2, keep Boost's hue,
+     * and are emitted as --a11y-icon-<purpose>.
+     */
+    public function test_icon_colours(): void {
+        foreach (scheme::presets() as $id => $s) {
+            $colours = $s->icon_colours();
+            $this->assertSame(purpose::ids(), array_keys($colours), $id);
+            $surfaces = [$s->ramp['page'], $s->ramp['surface1'], $s->ramp['surface2']];
+            foreach ($colours as $p => $hex) {
+                $this->assertGreaterThanOrEqual(purpose::TARGET, contrast::apca_worst($hex, $surfaces), "$id $p");
+                [, $c, $h] = oklch::from_hex($hex);
+                [, , $boosth] = oklch::from_hex(purpose::BOOST[$p]);
+                $diff = abs($h - $boosth);
+                $this->assertLessThan(3, min($diff, 360 - $diff), "$id $p keeps the hue");
+                $this->assertGreaterThan(0.03, $c, "$id $p keeps some chroma");
+                $this->assertStringContainsString("--a11y-icon-$p:$hex;", $s->css_properties(), $id);
+            }
+            $this->assertCount(6, array_unique($colours), "$id icon colours are distinct");
+        }
+    }
+
+    /**
+     * A purpose colour that already reaches the target is left as Boost made it; one no lightness of its hue can
+     * bring to the target falls back to the text colour.
+     */
+    public function test_icon_colours_untouched_or_fallback(): void {
+        $white = ['page' => '#ffffff', 'surface1' => '#ffffff', 'surface2' => '#ffffff'];
+        $this->assertSame('#8d3d1b', purpose::colours($white, '#000000')['interactivecontent'], 'Lc 85 on white');
+        $grey = ['page' => '#808080', 'surface1' => '#808080', 'surface2' => '#808080'];
+        foreach (purpose::colours($grey, '#101010') as $p => $hex) {
+            $this->assertSame('#101010', $hex, "$p falls back to the text colour on mid grey");
+        }
+    }
 }

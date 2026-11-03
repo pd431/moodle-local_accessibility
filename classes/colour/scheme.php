@@ -285,14 +285,26 @@ final class scheme {
     }
 
     /**
+     * Activity purpose colours under this scheme (see purpose).
+     *
+     * @return array<string, string> purpose => normalised colour
+     */
+    public function icon_colours(): array {
+        return purpose::colours($this->ramp, $this->text);
+    }
+
+    /**
      * Custom properties for the html style attribute. Only validated hex values are emitted; the extra tokens only
-     * when the scheme declares them.
+     * when the scheme declares them. The icon colours are --a11y-icon-<purpose>, read by the panel's SVG filters.
      *
      * @return string e.g. "--a11y-page:#fbf3df;..."
      */
     public function css_properties(): string {
         $props = $this->ramp + ['text' => $this->text, 'link' => $this->link, 'border' => $this->border,
             'focus' => $this->focus, 'selection' => $this->selection, 'selection-text' => $this->selectiontext];
+        foreach ($this->icon_colours() as $id => $hex) {
+            $props['icon-' . $id] = $hex;
+        }
         $out = '';
         foreach ($props as $name => $hex) {
             if ($hex !== null) {

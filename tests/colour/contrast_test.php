@@ -73,6 +73,45 @@ final class contrast_test extends \advanced_testcase {
     }
 
     /**
+     * APCA reference pairs published with SAPC-4 0.0.98G (apcacontrast.com, "Test values").
+     *
+     * @return array
+     */
+    public static function apca_pairs(): array {
+        return [
+            'grey on white' => ['#888888', '#ffffff', 63.056],
+            'white on grey' => ['#ffffff', '#888888', -68.541],
+            'black on light grey' => ['#000000', '#aaaaaa', 58.146],
+            'light grey on black' => ['#aaaaaa', '#000000', -56.241],
+            'navy on pale blue' => ['#112233', '#ddeeff', 91.668],
+            'pale blue on navy' => ['#ddeeff', '#112233', -93.068],
+        ];
+    }
+
+    /**
+     * Lc matches the published values to two decimals, with the sign of the polarity.
+     *
+     * @dataProvider apca_pairs
+     * @param string $fg
+     * @param string $bg
+     * @param float $expected
+     */
+    public function test_apca(string $fg, string $bg, float $expected): void {
+        $this->assertEqualsWithDelta($expected, contrast::apca($fg, $bg), 0.01);
+    }
+
+    /**
+     * Boost's purpose colours on black: WCAG 2 passes most of them, APCA none at Lc 60. The reason the icon colours
+     * are measured with APCA (see purpose).
+     */
+    public function test_apca_sees_what_wcag_misses(): void {
+        $this->assertGreaterThan(6.0, contrast::ratio('#da58ef', '#000000'));
+        $this->assertLessThan(45, abs(contrast::apca('#da58ef', '#000000')));
+        $this->assertEqualsWithDelta(0.0, contrast::apca('#808080', '#8a8a8a'), 0.001, 'within the noise floor');
+        $this->assertEqualsWithDelta(16.7, contrast::apca_worst('#8d3d1b', ['#000000', '#ffffff']), 0.1);
+    }
+
+    /**
      * The worst ratio is the minimum over the backgrounds.
      */
     public function test_worst(): void {

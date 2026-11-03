@@ -457,4 +457,21 @@ final class styles_test extends \advanced_testcase {
         $bodies = implode(' ', array_column($scheme, 1));
         $this->assertStringNotContainsString('color: var(--a11y-link) !important', $bodies, 'no rule paints every anchor');
     }
+
+    /**
+     * Activity icons: one filter rule per purpose, Boost's selector shape, pointing at the panel's SVG filter.
+     *
+     * @covers ::styles
+     */
+    public function test_activity_icon_filters(): void {
+        $rules = self::rules_with('.activityiconcontainer.');
+        $this->assertCount(6, $rules);
+        foreach ($rules as [$selector, $body]) {
+            $shape = '/^html\[data-a11y-colour\] body \.activityiconcontainer\.([a-z]+):not\(\.isbranded\) '
+                . ':is\(\.activityicon, \.icon\):not\(\.nofilter\)$/';
+            $this->assertMatchesRegularExpression($shape, $selector);
+            preg_match('/\.activityiconcontainer\.([a-z]+)/', $selector, $m);
+            $this->assertSame('filter: url("#la-icon-' . $m[1] . '");', trim($body));
+        }
+    }
 }

@@ -193,6 +193,12 @@ final class hook_callbacks_test extends \advanced_testcase {
         $this->assertStringContainsString('data-state="', $html);
         // Tiles state their value in words: no value dots.
         $this->assertStringNotContainsString('la-dots', $html);
+        // One SVG filter per activity purpose, flooding with the scheme's icon colour.
+        $this->assertSame(6, substr_count($html, '<filter id="la-icon-'));
+        $this->assertStringContainsString('<filter id="la-icon-content" color-interpolation-filters="sRGB">', $html);
+        $this->assertStringContainsString('<feFlood style="flood-color: var(--a11y-icon-content)"/>', $html);
+        $this->assertStringContainsString('<feComposite in2="SourceAlpha" operator="in"/>', $html);
+        $this->assertStringContainsString('<svg id="la-icon-filters" width="0" height="0" aria-hidden="true"', $html);
     }
 
     /**

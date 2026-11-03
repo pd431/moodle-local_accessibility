@@ -9,6 +9,10 @@
   block link in or around a heading (section titles, course cards) takes the text colour with no forced underline.
   Every other anchor, on every page, keeps the link colour and underline. Before, every anchor but buttons was
   painted in the link colour, so the navbar, the course index and the tabs read as a wall of links.
+- Under a colour scheme, activity icons keep their purpose colour (Boost's six) but are lifted or lowered in
+  lightness, hue kept, until they reach APCA Lc 75 against the page and card surfaces. Before, Boost's own colours
+  stayed as they are, which on a black page is Lc 13 to 43 (brown and violet are the worst). APCA is used for the
+  icons only, because WCAG 2 over-rates saturated colour on a dark page; text and links keep their 7:1 ratios.
 - Colour schemes can now declare a border, a focus and a selection colour. The page lists the ones a scheme declares
   in a data-a11y-tokens attribute, and the stylesheet keys on those tokens. Schemes without them paint exactly as
   before.

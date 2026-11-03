@@ -16,6 +16,7 @@
 
 namespace local_accessibility\output;
 
+use local_accessibility\colour\purpose;
 use local_accessibility\colour\scheme;
 use local_accessibility\feature\base;
 use local_accessibility\feature\colour;
@@ -93,6 +94,8 @@ class panel implements \renderable, \templatable {
             // Guests and secure-layout pages have no user menu, so they always get the floating launcher (R16).
             'floating' => $mode !== 'menu' || preferences::uses_cookie() || $PAGE->pagelayout === 'secure',
             'profiles' => \local_accessibility\profiles::for_template(),
+            // One SVG filter per activity purpose; each floods the icon with the scheme's --a11y-icon-<purpose>.
+            'purposes' => array_map(fn(string $id): array => ['id' => $id], purpose::ids()),
             // Exact custom colours under 7:1 (R18): the tile's warning icon is toggled by its hidden attribute.
             'lowcontrast' => isset(preferences::html_attributes()['data-a11y-lowcontrast']),
         ];

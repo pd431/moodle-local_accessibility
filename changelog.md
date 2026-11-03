@@ -10,6 +10,12 @@
   `var(--la-anchor-line, underline)`. Buttons and the active page or menu item stay excluded as before.
 
 ### Added
+- `colour\purpose`: Boost 4.5's six activity purpose colours and `colours($ramp, $text)`, each moved in OKLCH
+  lightness with `adjust::towards()` until `contrast::apca_worst()` reaches `purpose::TARGET` (Lc 75) on page,
+  surface1 and surface2, falling back to the text colour. `contrast::apca()` is SAPC-4 0.0.98G. `scheme::icon_colours()`
+  and `--a11y-icon-<purpose>` custom properties; the panel template carries six `<filter id="la-icon-<purpose>">`
+  (feFlood of that property, composited into the icon's alpha) and `styles.css` section 7 points each
+  `.activityiconcontainer.<purpose>` icon at its filter with Boost's own selector shape.
 - Colour scheme "Dark high contrast (VS Code)" (`vscodehc`): Visual Studio Code's Dark High Contrast palette. Black
   surfaces (floating widgets #0c141f, hover #111111) told apart by the #6fc3df contrast border, white text, #21a6ff
   links, an #f38518 focus ring and #f3f518 on black selection. Built with `scheme::fixed()`, so the colours are kept

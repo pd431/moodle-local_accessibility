@@ -71,6 +71,52 @@ final class contrast {
     }
 
     /**
+     * APCA lightness contrast (SAPC-4 0.0.98G): Lc, signed. Positive for dark text on a light background, negative
+     * for light text on a dark background; 0 when the pair is within the algorithm's noise. Used for the activity
+     * icon colours only, because WCAG 2 over-rates saturated colour on a dark page (Boost's purpose colours reach
+     * 3:1 to 7:1 on black by WCAG 2 and Lc 13 to 43 by APCA); text and links keep WCAG 2 ratios throughout.
+     *
+     * @param string $fg normalised colour (the icon or text)
+     * @param string $bg normalised colour (what is behind it)
+     * @return float Lc, -108..106
+     */
+    public static function apca(string $fg, string $bg): float {
+        $ytxt = self::apca_y($fg);
+        $ybg = self::apca_y($bg);
+        if ($ybg > $ytxt) {
+            $sapc = ($ybg ** 0.56 - $ytxt ** 0.57) * 1.14;
+            return $sapc < 0.1 ? 0.0 : ($sapc - 0.027) * 100;
+        }
+        $sapc = ($ybg ** 0.65 - $ytxt ** 0.62) * 1.14;
+        return $sapc > -0.1 ? 0.0 : ($sapc + 0.027) * 100;
+    }
+
+    /**
+     * Smallest |Lc| of a foreground against several backgrounds.
+     *
+     * @param string $fg normalised colour
+     * @param string[] $backgrounds normalised colours
+     * @return float
+     */
+    public static function apca_worst(string $fg, array $backgrounds): float {
+        return min(array_map(fn(string $bg): float => abs(self::apca($fg, $bg)), $backgrounds));
+    }
+
+    /**
+     * APCA's estimated screen luminance, with its black soft clamp.
+     *
+     * @param string $hex normalised colour
+     * @return float
+     */
+    private static function apca_y(string $hex): float {
+        $y = 0.0;
+        foreach ([1 => 0.2126729, 3 => 0.7151522, 5 => 0.0721750] as $i => $w) {
+            $y += $w * ((hexdec(substr($hex, $i, 2)) / 255) ** 2.4);
+        }
+        return $y < 0.022 ? $y + (0.022 - $y) ** 1.414 : $y;
+    }
+
+    /**
      * Lowest ratio of a foreground against several backgrounds.
      *
      * @param string $fg normalised colour
