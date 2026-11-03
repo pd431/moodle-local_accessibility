@@ -1,5 +1,20 @@
 # Changelog
 
+## [3.1.0] - 2026-11-03
+
+### Added
+- Colour scheme "Dark high contrast (VS Code)" (`vscodehc`): Visual Studio Code's Dark High Contrast palette. Black
+  surfaces (floating widgets #0c141f, hover #111111) told apart by the #6fc3df contrast border, white text, #21a6ff
+  links, an #f38518 focus ring and #f3f518 on black selection. Built with `scheme::fixed()`, so the colours are kept
+  exactly; the preset passes 7:1 on every shade and never sets `data-a11y-lowcontrast`.
+- Scheme model: optional `border`, `focus`, `selection` and `selectiontext` colours, `scheme::fixed()` for presets
+  designed as a whole, and `scheme::tokens()`. A scheme that declares any of them gets `data-a11y-tokens` on the
+  html element (space-separated: `border focus selection`) and the matching `--a11y-*` custom properties.
+- styles.css: a 1px border in `--a11y-border` on surfaces, fields, table cells and controls under the border token;
+  a focus outline in `--a11y-focus` under the focus token (2px, or the Focus ring tile's 3px and 5px with the halo in
+  the page colour); `::selection` under the selection token. `--bs-border-color` and the panel's edges take
+  `--a11y-border` when present and fall back to `--a11y-text` as before.
+
 ## [3.0.7] - 2026-10-29
 
 ### Fixed
