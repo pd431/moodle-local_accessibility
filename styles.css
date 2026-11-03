@@ -182,10 +182,20 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         background-color: var(--a11y-page);
         color: var(--a11y-text);
     }
-    /* The current page in pagination and the active menu item keep the theme's white on primary (5.36:1). */
+    /* Links by purpose. An anchor is a control, painted in the text colour with no underline, when it sits in a
+       navigation landmark or a menu, tab, tree or toolbar widget, is itself a control (tab, menu item, dropdown
+       item, page link, nav link, badge, a sort link in a table head), or is a block link in or around a heading
+       (section titles, course cards). Every other anchor is a link: link colour and underline, on every page.
+       The control list is stated once, as --la-anchor, and the one anchor rule below reads it. Buttons keep
+       their own rules, and the current page in pagination and the active menu item keep the theme's white on
+       primary (5.36:1). */
+    html[data-a11y-colour] body :where(nav, [role="navigation"], [role="menu"], [role="menubar"], [role="tablist"], [role="tree"], [role="toolbar"], h1, h2, h3, h4, h5, h6, thead th, a:is([role="button"], [role="tab"], [role="menuitem"], .dropdown-item, .page-link, .nav-link, .badge), a:has(> :is(h1, h2, h3, h4, h5, h6))) {
+        --la-anchor: var(--a11y-text);
+        --la-anchor-line: none;
+    }
     html[data-a11y-colour] body :where(a:not(.btn, .qnbutton, .nav-link.active, .page-item.active .page-link, .dropdown-item.active, .dropdown-item:active)):where(:not(.la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
-        color: var(--a11y-link) !important; /* stylelint-disable-line declaration-no-important */
-        text-decoration: underline !important; /* stylelint-disable-line declaration-no-important */
+        color: var(--la-anchor, var(--a11y-link)) !important; /* stylelint-disable-line declaration-no-important */
+        text-decoration: var(--la-anchor-line, underline) !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Mop-up: hardcoded surfaces (spec §6.4). Grows during Task 22's manual pass. */
     html[data-a11y-colour] body :where(#page, #page-wrapper, .drawer, .navbar, .card, .card-header, .card-footer, .list-group-item, .dropdown-menu, .modal-content, .popover, .table, .form-control, .form-select, .custom-select, .activity-item, .course-content .section, .bg-white, .bg-light, .bg-body, #page-footer, .footer-dark, .secondary-navigation, .secondary-navigation .navigation, .nav-tabs, .nav-tabs .nav-link.active, .section-item, .section-content-inner):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {

@@ -2,6 +2,13 @@
 
 ## [3.1.0] - 2026-11-03
 
+### Changed
+- Links by purpose under a colour scheme (`styles.css` section 7). The control list is stated once as the
+  `--la-anchor` / `--la-anchor-line` custom properties on `nav`, `[role=navigation|menu|menubar|tablist|tree|toolbar]`,
+  `h1`..`h6`, `thead th`, anchors with `role=button|tab|menuitem` or `.dropdown-item`, `.page-link`, `.nav-link`,
+  `.badge`, and `a:has(> h1..h6)`; the single anchor rule paints `var(--la-anchor, var(--a11y-link))` and
+  `var(--la-anchor-line, underline)`. Buttons and the active page or menu item stay excluded as before.
+
 ### Added
 - Colour scheme "Dark high contrast (VS Code)" (`vscodehc`): Visual Studio Code's Dark High Contrast palette. Black
   surfaces (floating widgets #0c141f, hover #111111) told apart by the #6fc3df contrast border, white text, #21a6ff

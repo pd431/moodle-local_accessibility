@@ -4,6 +4,11 @@
   surface is black and told apart by a cyan border, text is white, links are VS Code's blue, keyboard focus shows an
   orange ring whatever the Focus ring tile says (Ring and Extra thick keep their thickness), and selected text is
   yellow on black. Every text and link pair is at or above 7:1.
+- Under a colour scheme, links are coloured by purpose. An anchor in a navigation landmark or a menu, tab, tree or
+  toolbar widget, a tab, menu item, dropdown item, page link, nav link or badge, a sort link in a table head, or a
+  block link in or around a heading (section titles, course cards) takes the text colour with no forced underline.
+  Every other anchor, on every page, keeps the link colour and underline. Before, every anchor but buttons was
+  painted in the link colour, so the navbar, the course index and the tabs read as a wall of links.
 - Colour schemes can now declare a border, a focus and a selection colour. The page lists the ones a scheme declares
   in a data-a11y-tokens attribute, and the stylesheet keys on those tokens. Schemes without them paint exactly as
   before.

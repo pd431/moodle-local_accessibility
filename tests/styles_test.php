@@ -428,4 +428,33 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringContainsString('--la-edge: var(--a11y-border, var(--a11y-text, ', $panel);
         $this->assertStringContainsString('border: 1px solid var(--la-edge)', $panel);
     }
+
+    /**
+     * Links by purpose: the control list is stated once (--la-anchor) and the single anchor rule reads it.
+     *
+     * @covers ::styles
+     */
+    public function test_links_by_purpose(): void {
+        $controls = array_values(array_filter(self::rules(), fn($r) => str_contains($r[1], '--la-anchor: var(--a11y-text)')));
+        $this->assertCount(1, $controls, 'the control list is stated once');
+        $selector = $controls[0][0];
+        $this->assertStringStartsWith('html[data-a11y-colour] body :where(', $selector);
+        $parts = ['nav', '[role="navigation"]', '[role="menu"]', '[role="menubar"]', '[role="tablist"]', '[role="tree"]',
+            '[role="toolbar"]', 'h1', 'h6', 'thead th', '[role="button"]', '[role="tab"]', '[role="menuitem"]',
+            '.dropdown-item', '.page-link', '.nav-link', '.badge', 'a:has(> :is(h1, h2, h3, h4, h5, h6))'];
+        foreach ($parts as $part) {
+            $this->assertStringContainsString($part, $selector, $part);
+        }
+        $this->assertStringContainsString('--la-anchor-line: none', $controls[0][1]);
+        $anchors = array_values(array_filter(self::rules(), fn($r) => str_contains($r[1], 'var(--la-anchor, var(--a11y-link))')));
+        $this->assertCount(1, $anchors, 'one anchor rule');
+        $this->assertStringContainsString('text-decoration: var(--la-anchor-line, underline) !important', $anchors[0][1]);
+        // Buttons and the active page or menu item stay out of it, as before.
+        foreach (['.btn', '.qnbutton', '.nav-link.active', '.page-item.active .page-link', '.dropdown-item.active'] as $part) {
+            $this->assertStringContainsString($part, $anchors[0][0], $part);
+        }
+        $scheme = array_filter(self::rules(), fn($r) => str_starts_with($r[0], 'html[data-a11y-colour] body'));
+        $bodies = implode(' ', array_column($scheme, 1));
+        $this->assertStringNotContainsString('color: var(--a11y-link) !important', $bodies, 'no rule paints every anchor');
+    }
 }
