@@ -30,7 +30,7 @@ Feature: VS Code dark high contrast colour scheme
     And I log in as "student1"
     When the main region contains core controls
     And the HTML "<div id='la-card' class='card'><div class='card-body'>Card</div></div><button id='la-btn' class='btn btn-secondary'>Secondary</button>" is added to the main region
-    Then the page root should have attribute "data-a11y-tokens" with value "border focus selection"
+    Then the page root should have attribute "data-a11y-tokens" with value "border focus selection active"
     And the computed "background-color" of "#la-card" should be "rgb(0, 0, 0)"
     And the computed "border-top-color" of "#la-card" should be "rgb(111, 195, 223)"
     And the computed "border-top-color" of "#la-test-text" should be "rgb(111, 195, 223)"

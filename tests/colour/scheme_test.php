@@ -74,12 +74,15 @@ final class scheme_test extends \advanced_testcase {
         $this->assertSame('#21a6ff', $s->link);
         $this->assertSame('#6fc3df', $s->border);
         $this->assertSame('#f38518', $s->focus);
+        $this->assertSame('#f38518', $s->active);
+        $this->assertGreaterThanOrEqual(3.0, contrast::worst($s->active, $s->ramp), 'active box 3:1 on every shade');
         $this->assertSame('#f3f518', $s->selection);
         $this->assertSame('#000000', $s->selectiontext);
-        $this->assertSame(['border', 'focus', 'selection'], $s->tokens());
+        $this->assertSame(['border', 'focus', 'selection', 'active'], $s->tokens());
         $css = $s->css_properties();
         $this->assertStringContainsString('--a11y-border:#6fc3df;', $css);
         $this->assertStringContainsString('--a11y-focus:#f38518;', $css);
+        $this->assertStringContainsString('--a11y-active:#f38518;', $css);
         $this->assertStringContainsString('--a11y-selection:#f3f518;--a11y-selection-text:#000000;', $css);
         $this->assertMatchesRegularExpression('/^(--a11y-[a-z0-9-]+:#[0-9a-f]{6};)+$/', $css);
         // Every other preset, and a custom scheme, declares no token and emits none.
@@ -90,6 +93,8 @@ final class scheme_test extends \advanced_testcase {
             $this->assertSame([], $o->tokens(), $id);
             $this->assertStringNotContainsString('--a11y-border', $o->css_properties(), $id);
             $this->assertStringNotContainsString('--a11y-focus', $o->css_properties(), $id);
+            $this->assertStringNotContainsString('--a11y-active', $o->css_properties(), $id);
+            $this->assertNull($o->active, $id);
             $this->assertStringNotContainsString('--a11y-selection', $o->css_properties(), $id);
         }
     }
@@ -110,6 +115,7 @@ final class scheme_test extends \advanced_testcase {
             'half selection' => fn() => scheme::fixed('t', $ramp, '#ffffff', '#21a6ff', null, null, '#f3f518'),
             'link under 7:1' => fn() => scheme::fixed('t', $ramp, '#ffffff', '#0f6cbf'),
             'text under 7:1 on hover' => fn() => scheme::fixed('t', ['hover' => '#777777'] + $ramp, '#ffffff', '#21a6ff'),
+            'active under 3:1' => fn() => scheme::fixed('t', $ramp, '#ffffff', '#21a6ff', null, null, null, null, '#333333'),
         ];
         foreach ($cases as $name => $case) {
             try {

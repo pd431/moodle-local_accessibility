@@ -194,7 +194,8 @@ final class preferences_test extends \advanced_testcase {
         preferences::set('colour', 'vscodehc');
         $attrs = preferences::html_attributes();
         $this->assertSame('vscodehc', $attrs['data-a11y-colour']);
-        $this->assertSame('border focus selection', $attrs['data-a11y-tokens']);
+        $this->assertSame('border focus selection active', $attrs['data-a11y-tokens']);
+        $this->assertStringContainsString('--a11y-active:#f38518', $attrs['style']);
         $this->assertSame('dark', $attrs['data-bs-theme']);
         $this->assertArrayNotHasKey('data-a11y-lowcontrast', $attrs);
         $this->assertStringContainsString('--a11y-border:#6fc3df', $attrs['style']);

@@ -255,6 +255,13 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     html[data-a11y-tokens~="border"] body :where(.card, .card-header, .card-footer, .list-group-item, .dropdown-menu, .modal-content, .popover, .form-control, .form-select, .custom-select, select, textarea, .table td, .table th, .btn-secondary, .btn-light, .btn-outline-secondary, .btn-outline-primary, .btn-icon, .nav-tabs .nav-link, .activity-item, .section-item):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
         border: 1px solid var(--a11y-border) !important; /* stylelint-disable-line declaration-no-important */
     }
+    /* Active token: the current item, boxed in the scheme's active colour (VS Code's contrastActiveBorder). Drawn
+       inside with a shadow, so nothing moves and the keyboard focus outline, which sits outside, shows on top. Every
+       "current" mark Moodle makes gets it, so they agree: the top and secondary nav, the course index, a dropdown's
+       current item and pagination. */
+    html[data-a11y-tokens~="active"] body :where(.nav-link.active, .nav-link[aria-current], .courseindex-item.pageitem, .courseindex-item.active, .dropdown-item[aria-current], .page-item.active .page-link) {
+        box-shadow: inset 0 0 0 2px var(--a11y-active) !important; /* stylelint-disable-line declaration-no-important */
+    }
     /* Hardcoded theme text colours (Task 22): muted text and the active navigation item. */
     html[data-a11y-colour] body :where(.text-muted, .text-secondary, .text-body-secondary, .dimmed_text, .categoryname, .progress-text, .collapsemenu-text, .mds-switch-label, .nav-link.active):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */

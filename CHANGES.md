@@ -13,7 +13,11 @@
   lightness, hue kept, until they reach APCA Lc 75 against the page and card surfaces. Before, Boost's own colours
   stayed as they are, which on a black page is Lc 13 to 43 (brown and violet are the worst). APCA is used for the
   icons only, because WCAG 2 over-rates saturated colour on a dark page; text and links keep their 7:1 ratios.
-- Colour schemes can now declare a border, a focus and a selection colour. The page lists the ones a scheme declares
+- Dark high contrast (VS Code) boxes the current item in orange, as VS Code's contrastActiveBorder does: the current
+  page in the top nav, the current course tab, the current activity or section in the course index, the current
+  item in a dropdown and the current page in pagination. The box is drawn inside the item, so the keyboard focus ring
+  still shows around it.
+- Colour schemes can now declare a border, a focus, a selection and an active colour. The page lists the ones a scheme declares
   in a data-a11y-tokens attribute, and the stylesheet keys on those tokens. Schemes without them paint exactly as
   before.
 

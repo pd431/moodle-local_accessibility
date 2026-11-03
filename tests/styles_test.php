@@ -417,6 +417,14 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringContainsString('outline-width: 3px !important', $focus[1][1]);
         $this->assertStringContainsString('[data-a11y-focus="thick"]', $focus[2][0]);
         $this->assertStringContainsString('outline-width: 5px !important', $focus[2][1]);
+        $active = self::rules_with('html[data-a11y-tokens~="active"]');
+        $this->assertCount(1, $active);
+        $this->assertStringContainsString('box-shadow: inset 0 0 0 2px var(--a11y-active) !important', $active[0][1]);
+        $marks = ['.nav-link.active', '.nav-link[aria-current]', '.courseindex-item.pageitem', '.dropdown-item[aria-current]',
+            '.page-item.active .page-link'];
+        foreach ($marks as $part) {
+            $this->assertStringContainsString($part, $active[0][0], $part);
+        }
         $selection = self::rules_with('html[data-a11y-tokens~="selection"]');
         $this->assertCount(1, $selection);
         $this->assertStringContainsString('::selection', $selection[0][0]);

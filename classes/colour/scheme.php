@@ -39,6 +39,7 @@ final class scheme {
      * @param string|null $focus keyboard focus ring colour
      * @param string|null $selection background of selected text
      * @param string|null $selectiontext colour of selected text
+     * @param string|null $active box around the current navigation item (VS Code's contrastActiveBorder)
      */
     private function __construct(
         /** @var string Preset id or "custom". */
@@ -61,6 +62,8 @@ final class scheme {
         public readonly ?string $selection = null,
         /** @var string|null Selected text colour, or null for the browser's. */
         public readonly ?string $selectiontext = null,
+        /** @var string|null Current-item box colour, or null for the theme's own current marks. */
+        public readonly ?string $active = null,
     ) {
     }
 
@@ -79,8 +82,9 @@ final class scheme {
      * @param string|null $focus
      * @param string|null $selection selected text background; needs $selectiontext
      * @param string|null $selectiontext
+     * @param string|null $active box around the current navigation item; must reach 3:1 on every shade
      * @return self
-     * @throws invalid_parameter_exception invalid hex, or text or link below 7:1 on a shade
+     * @throws invalid_parameter_exception invalid hex, text or link below 7:1 on a shade, active below 3:1
      */
     public static function fixed(
         string $id,
@@ -91,9 +95,10 @@ final class scheme {
         ?string $focus = null,
         ?string $selection = null,
         ?string $selectiontext = null,
+        ?string $active = null,
     ): self {
         $colours = $ramp + ['text' => $text, 'link' => $link, 'border' => $border, 'focus' => $focus,
-            'selection' => $selection, 'selectiontext' => $selectiontext];
+            'selection' => $selection, 'selectiontext' => $selectiontext, 'active' => $active];
         foreach ($colours as $name => $hex) {
             if ($hex === null) {
                 continue;
@@ -122,10 +127,14 @@ final class scheme {
             $colours['border'],
             $colours['focus'],
             $colours['selection'],
-            $colours['selectiontext']
+            $colours['selectiontext'],
+            $colours['active']
         );
         if ($s->worst_text() < contrast::AAA || $s->worst_link() < contrast::AAA) {
             throw new invalid_parameter_exception('A fixed preset must reach 7:1 on every shade');
+        }
+        if ($s->active !== null && contrast::worst($s->active, $s->ramp) < 3.0) {
+            throw new invalid_parameter_exception('The active colour must reach 3:1 on every shade');
         }
         return $s;
     }
@@ -192,8 +201,9 @@ final class scheme {
             'highcontrast' => self::custom('#000000', '#ffffff', '#ffff00', false, 'highcontrast'),
             'yellowblack' => self::custom('#000000', '#ffff00', '#00ffff', false, 'yellowblack'),
             // Visual Studio Code's Dark High Contrast theme (vscode: themes/hc_black.json and the hcDark defaults of
-            // platform/theme/common/colors): black everywhere, told apart by contrastBorder; textLink, focusBorder and
-            // the editor selection colours. Floating widgets take editorWidget.background; hover is a 7% white, the
+            // platform/theme/common/colors): black everywhere, told apart by contrastBorder; textLink, focusBorder,
+            // the editor selection colours, and contrastActiveBorder (the same orange) around the current item.
+            // Floating widgets take editorWidget.background; hover is a 7% white, the
             // most that keeps the link at 7:1 (VS Code's own list hover is 10%).
             'vscodehc' => self::fixed(
                 'vscodehc',
@@ -204,7 +214,8 @@ final class scheme {
                 '#6fc3df',
                 '#f38518',
                 '#f3f518',
-                '#000000'
+                '#000000',
+                '#f38518'
             ),
             'blackwhite' => self::custom('#ffffff', '#000000', '#0000c0', false, 'blackwhite'),
             'cream' => self::custom('#fbf3df', '#1f1f1f', '#0b4f8a', false, 'cream'),
@@ -281,6 +292,9 @@ final class scheme {
         if ($this->selection !== null) {
             $tokens[] = 'selection';
         }
+        if ($this->active !== null) {
+            $tokens[] = 'active';
+        }
         return $tokens;
     }
 
@@ -301,7 +315,8 @@ final class scheme {
      */
     public function css_properties(): string {
         $props = $this->ramp + ['text' => $this->text, 'link' => $this->link, 'border' => $this->border,
-            'focus' => $this->focus, 'selection' => $this->selection, 'selection-text' => $this->selectiontext];
+            'focus' => $this->focus, 'selection' => $this->selection, 'selection-text' => $this->selectiontext,
+            'active' => $this->active];
         foreach ($this->icon_colours() as $id => $hex) {
             $props['icon-' . $id] = $hex;
         }

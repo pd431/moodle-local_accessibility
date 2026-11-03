@@ -10,6 +10,10 @@
   `var(--la-anchor-line, underline)`. Buttons and the active page or menu item stay excluded as before.
 
 ### Added
+- Scheme model: optional `active` colour (`scheme::fixed()` refuses one under 3:1 on any shade), token `active`,
+  `--a11y-active`; vscodehc sets `#f38518`. `styles.css` section 7: `html[data-a11y-tokens~="active"]` draws an inset
+  2px box-shadow on `.nav-link.active`, `.nav-link[aria-current]`, `.courseindex-item.pageitem`,
+  `.courseindex-item.active`, `.dropdown-item[aria-current]` and `.page-item.active .page-link`.
 - `colour\purpose`: Boost 4.5's six activity purpose colours and `colours($ramp, $text)`, each moved in OKLCH
   lightness with `adjust::towards()` until `contrast::apca_worst()` reaches `purpose::TARGET` (Lc 75) on page,
   surface1 and surface2, falling back to the text colour. `contrast::apca()` is SAPC-4 0.0.98G. `scheme::icon_colours()`
