@@ -396,4 +396,36 @@ final class styles_test extends \advanced_testcase {
             }
         }
     }
+
+    /**
+     * The scheme tokens (border, focus, selection) each have their rules once, keyed on data-a11y-tokens and never on a
+     * scheme id; edges fall back to the text colour where no border colour is declared.
+     */
+    public function test_scheme_token_rules(): void {
+        $css = self::css();
+        $this->assertStringNotContainsString('vscodehc', $css, 'no rule keyed on a scheme id');
+        $border = self::rules_with('html[data-a11y-tokens~="border"]');
+        $this->assertCount(1, $border);
+        $this->assertStringContainsString('border: 1px solid var(--a11y-border) !important', $border[0][1]);
+        foreach (['.card', '.form-control', '.table td', '.btn-secondary', '.dropdown-menu', '.modal-content'] as $part) {
+            $this->assertStringContainsString($part, $border[0][0], $part);
+        }
+        $focus = self::rules_with('html[data-a11y-tokens~="focus"]');
+        $this->assertCount(3, $focus);
+        $this->assertStringContainsString('outline: 2px solid var(--a11y-focus) !important', $focus[0][1]);
+        $this->assertStringContainsString('[data-a11y-focus="ring"]', $focus[1][0]);
+        $this->assertStringContainsString('outline-width: 3px !important', $focus[1][1]);
+        $this->assertStringContainsString('[data-a11y-focus="thick"]', $focus[2][0]);
+        $this->assertStringContainsString('outline-width: 5px !important', $focus[2][1]);
+        $selection = self::rules_with('html[data-a11y-tokens~="selection"]');
+        $this->assertCount(1, $selection);
+        $this->assertStringContainsString('::selection', $selection[0][0]);
+        $this->assertStringContainsString('var(--a11y-selection) !important', $selection[0][1]);
+        $this->assertStringContainsString('var(--a11y-selection-text) !important', $selection[0][1]);
+        // Edges fall back to the text colour, as before the border token existed.
+        $this->assertStringContainsString('--bs-border-color: var(--a11y-border, var(--a11y-text))', $css);
+        $panel = implode(' ', array_column(array_filter(self::rules(), fn($r) => $r[0] === '.local-accessibility-panel'), 1));
+        $this->assertStringContainsString('--la-edge: var(--a11y-border, var(--a11y-text, ', $panel);
+        $this->assertStringContainsString('border: 1px solid var(--la-edge)', $panel);
+    }
 }

@@ -174,7 +174,7 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         --bs-secondary-color: var(--a11y-text);
         --bs-secondary-bg: var(--a11y-surface1);
         --bs-tertiary-bg: var(--a11y-hover);
-        --bs-border-color: var(--a11y-text);
+        --bs-border-color: var(--a11y-border, var(--a11y-text));
         --bs-link-color: var(--a11y-link);
         --bs-link-hover-color: var(--a11y-link);
         --bs-link-color-rgb: initial;
@@ -211,11 +211,17 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     /* Theme-coloured controls (Task 22 browser pass): secondary, outline and icon buttons take the scheme. */
     html[data-a11y-colour] body :where(.btn-secondary, .btn-light, .btn-outline-secondary, .btn-outline-primary, .btn-icon, .btn-footer-popover, .icons-collapse-expand, .mds-nav-pill--selected, .mds-nav-pill.active):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
         background-color: var(--a11y-surface2) !important; /* stylelint-disable-line declaration-no-important */
-        border-color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+        border-color: var(--a11y-border, var(--a11y-text)) !important; /* stylelint-disable-line declaration-no-important */
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
     }
     html[data-a11y-colour] body :where(.btn-secondary, .btn-light, .btn-outline-secondary, .btn-outline-primary, .btn-icon, .btn-footer-popover, .icons-collapse-expand, .mds-nav-pill--selected, .mds-nav-pill.active):where(:hover, :focus, .active, [aria-expanded="true"]):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
         background-color: var(--a11y-hover) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* Border token (data-a11y-tokens): a scheme whose surfaces share one shade, such as VS Code dark high contrast,
+       tells them apart by a 1px edge in its border colour on every surface, field, table cell and control. Schemes
+       without the token keep the theme's edges. */
+    html[data-a11y-tokens~="border"] body :where(.card, .card-header, .card-footer, .list-group-item, .dropdown-menu, .modal-content, .popover, .form-control, .form-select, .custom-select, select, textarea, .table td, .table th, .btn-secondary, .btn-light, .btn-outline-secondary, .btn-outline-primary, .btn-icon, .nav-tabs .nav-link, .activity-item, .section-item):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
+        border: 1px solid var(--a11y-border) !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Hardcoded theme text colours (Task 22): muted text and the active navigation item. */
     html[data-a11y-colour] body :where(.text-muted, .text-secondary, .text-body-secondary, .dimmed_text, .categoryname, .progress-text, .collapsemenu-text, .mds-switch-label, .nav-link.active):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
@@ -323,6 +329,29 @@ html[data-a11y-focus="thick"] :focus-visible {
     }
 }
 
+/* 11a. Focus token (data-a11y-tokens): the scheme's own focus colour. A 2px ring where the Focus ring tile is off;
+   "ring" and "thick" keep their thickness, with the halo in the page colour so the ring reads on any surface. Never
+   in forced colours, where the system draws focus. */
+@media (forced-colors: none) {
+    html[data-a11y-tokens~="focus"] :focus-visible {
+        outline: 2px solid var(--a11y-focus) !important; /* stylelint-disable-line declaration-no-important */
+        outline-offset: 2px !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-tokens~="focus"][data-a11y-focus="ring"] :focus-visible {
+        outline-width: 3px !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: 0 0 0 5px var(--a11y-page) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-tokens~="focus"][data-a11y-focus="thick"] :focus-visible {
+        outline-width: 5px !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: 0 0 0 9px var(--a11y-page) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* Selection token: selected text in the scheme's own pair. */
+    html[data-a11y-tokens~="selection"] ::selection {
+        background-color: var(--a11y-selection) !important; /* stylelint-disable-line declaration-no-important */
+        color: var(--a11y-selection-text) !important; /* stylelint-disable-line declaration-no-important */
+    }
+}
+
 /* 11b. Cursor: "large" 48px, "xlarge" 96px (browsers cap CSS cursors at 128px). Text entry keeps its own cursor. */
 html[data-a11y-cursor="large"],
 html[data-a11y-cursor="large"] :where(*:not(input, textarea, select, [contenteditable], input *, textarea *, select *, [contenteditable] *)) {
@@ -379,7 +408,9 @@ html[data-a11y-motion="on"] *::after {
     text-align: start;
     background: var(--a11y-page, var(--mds-bg-surface-default, var(--bs-body-bg, #fff)));
     color: var(--a11y-text, var(--mds-text-default, var(--bs-body-color, #1d2125)));
-    border: 1px solid var(--a11y-text, var(--mds-border-interactive-primary-default, var(--bs-primary, #0f6cbf)));
+    /* Edge: the scheme's border colour, else its text, else the theme's primary. */
+    --la-edge: var(--a11y-border, var(--a11y-text, var(--mds-border-interactive-primary-default, var(--bs-primary, #0f6cbf))));
+    border: 1px solid var(--la-edge);
     border-radius: 0.625rem;
     box-shadow: 0 4px 18px rgb(0 0 0 / 25%);
     /* Accent for selected states: the scheme's link colour (contrast-checked against its page), else primary. */
@@ -417,7 +448,7 @@ html[data-a11y-colour] .local-accessibility-panel {
     font-size: var(--la-head-size);
     background: var(--a11y-surface2, var(--bs-primary, #0f6cbf));
     color: var(--a11y-text, #fff);
-    border-block-end: 1px solid var(--a11y-text, var(--bs-primary, #0f6cbf));
+    border-block-end: 1px solid var(--a11y-border, var(--a11y-text, var(--bs-primary, #0f6cbf)));
 }
 /* The header wraps rather than push Close past a narrow screen's edge at large text sizes; the title may break inside
    its word as a last resort.
@@ -909,7 +940,9 @@ html[data-a11y-colour] .local-accessibility-panel {
     text-align: start;
     background: var(--a11y-page, var(--mds-bg-surface-default, var(--bs-body-bg, #fff)));
     color: var(--a11y-text, var(--mds-text-default, var(--bs-body-color, #1d2125)));
-    border: 1px solid var(--a11y-text, var(--mds-border-interactive-primary-default, var(--bs-primary, #0f6cbf)));
+    /* Edge: the scheme's border colour, else its text, else the theme's primary. */
+    --la-edge: var(--a11y-border, var(--a11y-text, var(--mds-border-interactive-primary-default, var(--bs-primary, #0f6cbf))));
+    border: 1px solid var(--la-edge);
     border-radius: 0.625rem;
 }
 .la-readbar[hidden],

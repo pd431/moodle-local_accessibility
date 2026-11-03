@@ -54,6 +54,7 @@ $string['feature_colour_custom'] = 'Custom';
 $string['feature_colour_dark'] = 'Dark';
 $string['feature_colour_default'] = 'Site default';
 $string['feature_colour_highcontrast'] = 'High contrast';
+$string['feature_colour_vscodehc'] = 'Dark high contrast (VS Code)';
 $string['feature_colour_yellowblack'] = 'Yellow on black';
 $string['feature_cursor'] = 'Cursor';
 $string['feature_cursor_large'] = 'Large';

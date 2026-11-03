@@ -27,7 +27,7 @@ use invalid_parameter_exception;
  */
 final class scheme {
     /**
-     * Constructor; use custom() or presets().
+     * Constructor; use custom(), fixed() or presets().
      *
      * @param string $id preset id or 'custom'
      * @param string $mode 'light' or 'dark'
@@ -35,6 +35,10 @@ final class scheme {
      * @param string $text
      * @param string $link
      * @param bool $exact true when the user chose exact colours over auto-adjust
+     * @param string|null $border edge colour that tells surfaces apart, for a scheme whose tiers share one shade
+     * @param string|null $focus keyboard focus ring colour
+     * @param string|null $selection background of selected text
+     * @param string|null $selectiontext colour of selected text
      */
     private function __construct(
         /** @var string Preset id or "custom". */
@@ -49,7 +53,81 @@ final class scheme {
         public readonly string $link,
         /** @var bool True when exact colours were chosen. */
         public readonly bool $exact,
+        /** @var string|null Border colour, or null when edges take the text colour as before. */
+        public readonly ?string $border = null,
+        /** @var string|null Focus ring colour, or null for the Focus ring tile's own colours. */
+        public readonly ?string $focus = null,
+        /** @var string|null Selected text background, or null for the browser's. */
+        public readonly ?string $selection = null,
+        /** @var string|null Selected text colour, or null for the browser's. */
+        public readonly ?string $selectiontext = null,
     ) {
+    }
+
+    /**
+     * Build a preset from fixed colours: no auto-adjust and no derived ramp. For palettes designed as a whole, such as
+     * an editor's high-contrast theme, whose surfaces share one shade and are told apart by a border.
+     *
+     * Every colour is checked as #rrggbb. The text and link must reach 7:1 on every ramp shade: a fixed preset
+     * promises what auto-adjust guarantees for the others.
+     *
+     * @param string $id preset id
+     * @param array $ramp page, surface1, surface2, field, hover
+     * @param string $text
+     * @param string $link
+     * @param string|null $border
+     * @param string|null $focus
+     * @param string|null $selection selected text background; needs $selectiontext
+     * @param string|null $selectiontext
+     * @return self
+     * @throws invalid_parameter_exception invalid hex, or text or link below 7:1 on a shade
+     */
+    public static function fixed(
+        string $id,
+        array $ramp,
+        string $text,
+        string $link,
+        ?string $border = null,
+        ?string $focus = null,
+        ?string $selection = null,
+        ?string $selectiontext = null,
+    ): self {
+        $colours = $ramp + ['text' => $text, 'link' => $link, 'border' => $border, 'focus' => $focus,
+            'selection' => $selection, 'selectiontext' => $selectiontext];
+        foreach ($colours as $name => $hex) {
+            if ($hex === null) {
+                continue;
+            }
+            $colours[$name] = contrast::normalise($hex);
+            if ($colours[$name] === null) {
+                throw new invalid_parameter_exception("$name must be #rrggbb");
+            }
+        }
+        foreach (['page', 'surface1', 'surface2', 'field', 'hover'] as $tier) {
+            if (!isset($colours[$tier])) {
+                throw new invalid_parameter_exception("Ramp needs $tier");
+            }
+        }
+        if (($colours['selection'] === null) !== ($colours['selectiontext'] === null)) {
+            throw new invalid_parameter_exception('Selection needs both a background and a text colour');
+        }
+        $ramp = array_intersect_key($colours, array_flip(['page', 'surface1', 'surface2', 'field', 'hover']));
+        $s = new self(
+            $id,
+            adjust::mode($ramp['page']),
+            $ramp,
+            $colours['text'],
+            $colours['link'],
+            true,
+            $colours['border'],
+            $colours['focus'],
+            $colours['selection'],
+            $colours['selectiontext']
+        );
+        if ($s->worst_text() < contrast::AAA || $s->worst_link() < contrast::AAA) {
+            throw new invalid_parameter_exception('A fixed preset must reach 7:1 on every shade');
+        }
+        return $s;
     }
 
     /**
@@ -113,6 +191,21 @@ final class scheme {
         return $cache ??= [
             'highcontrast' => self::custom('#000000', '#ffffff', '#ffff00', false, 'highcontrast'),
             'yellowblack' => self::custom('#000000', '#ffff00', '#00ffff', false, 'yellowblack'),
+            // Visual Studio Code's Dark High Contrast theme (vscode: themes/hc_black.json and the hcDark defaults of
+            // platform/theme/common/colors): black everywhere, told apart by contrastBorder; textLink, focusBorder and
+            // the editor selection colours. Floating widgets take editorWidget.background; hover is a 7% white, the
+            // most that keeps the link at 7:1 (VS Code's own list hover is 10%).
+            'vscodehc' => self::fixed(
+                'vscodehc',
+                ['page' => '#000000', 'surface1' => '#000000', 'surface2' => '#0c141f', 'field' => '#000000',
+                    'hover' => '#111111'],
+                '#ffffff',
+                '#21a6ff',
+                '#6fc3df',
+                '#f38518',
+                '#f3f518',
+                '#000000'
+            ),
             'blackwhite' => self::custom('#ffffff', '#000000', '#0000c0', false, 'blackwhite'),
             'cream' => self::custom('#fbf3df', '#1f1f1f', '#0b4f8a', false, 'cream'),
             'dark' => self::custom('#14202b', '#e8eef3', '#8cc8ff', false, 'dark'),
@@ -172,15 +265,39 @@ final class scheme {
     }
 
     /**
-     * Custom properties for the html style attribute. Only validated hex values are emitted.
+     * The extra colours this scheme declares beyond page, text and link: 'border', 'focus' and 'selection', in that
+     * order. The page's data-a11y-tokens attribute lists them, so the stylesheet keys on the token, never on an id.
+     *
+     * @return string[]
+     */
+    public function tokens(): array {
+        $tokens = [];
+        if ($this->border !== null) {
+            $tokens[] = 'border';
+        }
+        if ($this->focus !== null) {
+            $tokens[] = 'focus';
+        }
+        if ($this->selection !== null) {
+            $tokens[] = 'selection';
+        }
+        return $tokens;
+    }
+
+    /**
+     * Custom properties for the html style attribute. Only validated hex values are emitted; the extra tokens only
+     * when the scheme declares them.
      *
      * @return string e.g. "--a11y-page:#fbf3df;..."
      */
     public function css_properties(): string {
-        $props = $this->ramp + ['text' => $this->text, 'link' => $this->link];
+        $props = $this->ramp + ['text' => $this->text, 'link' => $this->link, 'border' => $this->border,
+            'focus' => $this->focus, 'selection' => $this->selection, 'selection-text' => $this->selectiontext];
         $out = '';
         foreach ($props as $name => $hex) {
-            $out .= '--a11y-' . $name . ':' . $hex . ';';
+            if ($hex !== null) {
+                $out .= '--a11y-' . $name . ':' . $hex . ';';
+            }
         }
         return $out;
     }

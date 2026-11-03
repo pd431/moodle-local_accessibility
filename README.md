@@ -27,7 +27,7 @@ It is one plugin with all features built in.
 | Spacing: letter spacing | Site default, or any value from −5 to 5 em in steps of 0.01 em |
 | Spacing: word spacing | Site default, or any value from −10 to 10 em in steps of 0.02 em |
 | Alignment | Site default, Left, Centre, Right, Justified |
-| Colours | Site default, High contrast, Yellow on black, Black on white, Cream, Dark, the site's own schemes, and Custom (your own background, text and link colours, adjusted to a 7:1 contrast ratio unless you keep your exact colours) |
+| Colours | Site default, High contrast, Yellow on black, Dark high contrast (VS Code), Black on white, Cream, Dark, the site's own schemes, and Custom (your own background, text and link colours, adjusted to a 7:1 contrast ratio unless you keep your exact colours) |
 | Line width | Full width, or any width from 1 to 300 characters in steps of 5 |
 | Links | Off, Underlined, Underline and outline, Highlighted |
 | Images | Shown, Dimmed, Hidden (alt text shown); this includes photos shown as background images, such as Tiles course format tiles and Dashboard course cards |

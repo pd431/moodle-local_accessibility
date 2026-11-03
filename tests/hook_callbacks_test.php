@@ -128,7 +128,8 @@ final class hook_callbacks_test extends \advanced_testcase {
         $this->assertSame('light', $attrs['data-bs-theme']);
         $this->assertSame('light', $attrs['data-colourmode']);
 
-        foreach (['yellowblack' => 'dark', 'highcontrast' => 'dark', 'cream' => 'light'] as $colour => $mode) {
+        $modes = ['yellowblack' => 'dark', 'highcontrast' => 'dark', 'vscodehc' => 'dark', 'cream' => 'light'];
+        foreach ($modes as $colour => $mode) {
             preferences::set('colour', $colour);
             $attrs = $this->dispatch_html_attributes();
             $this->assertSame($colour, $attrs['data-a11y-colour'], $colour);

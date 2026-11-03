@@ -86,7 +86,7 @@ final class registry_test extends \advanced_testcase {
         $this->assertSame(['off', 'ring', 'thick'], registry::get('focus')->values());
         $this->assertSame(['off', 'large', 'xlarge'], registry::get('cursor')->values());
         $this->assertSame(
-            ['default', 'highcontrast', 'yellowblack', 'blackwhite', 'cream', 'dark', 'custom'],
+            ['default', 'highcontrast', 'yellowblack', 'vscodehc', 'blackwhite', 'cream', 'dark', 'custom'],
             registry::get('colour')->values()
         );
     }
@@ -341,7 +341,7 @@ final class registry_test extends \advanced_testcase {
         $colour = registry::get('colour');
         $this->assertTrue($colour->validate('site_0'));
         $this->assertFalse($colour->validate('site_1'));
-        $expected = ['default', 'highcontrast', 'yellowblack', 'blackwhite', 'cream', 'dark', 'custom'];
+        $expected = ['default', 'highcontrast', 'yellowblack', 'vscodehc', 'blackwhite', 'cream', 'dark', 'custom'];
         $this->assertSame($expected, $colour->values());
     }
 }
