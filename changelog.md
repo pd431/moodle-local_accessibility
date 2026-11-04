@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Removed
+- `.github/workflows/camp-release.yml`, `.github/workflows/moodle-release.yml` and `.camp/` (listing manifest and
+  screenshots); the `.camp` export-ignore rule. `tag-on-merge.yml` loses its "Start the publish workflows" step and
+  `actions: write`. GitHub Actions now runs Moodle Plugin CI and Tag release only.
+
 ## [3.1.1] - 2026-11-04
 
 ### Changed
