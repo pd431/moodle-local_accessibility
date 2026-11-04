@@ -1,5 +1,8 @@
 # 3.1.1
 
+- Dark high contrast (VS Code) on Moodle 5.3: the top navigation and the course menu are now design-system pills,
+  and the current pill gets the same solid orange box, with its fill and dot removed; hovered and pressed pills lose
+  their fill and show the dashed ring. Pills are not boxed in cyan: they are not tabs, and the bar keeps its line.
 - A Tag release workflow tags main with the plugin's release after a green CI run, or on demand from the Actions
   tab, and starts the publish workflows. Tags are never moved: a merge that keeps the release makes no tag.
 

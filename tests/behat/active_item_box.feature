@@ -24,10 +24,10 @@ Feature: The current navigation item is boxed in the scheme's active colour
       | student1 | local_accessibility_colour | vscodehc |
     And I log in as "student1"
     Then the page root should have attribute "data-a11y-tokens" with value "border focus selection active"
-    And the computed "box-shadow" of ".primary-navigation .nav-link[aria-current]" should be "rgb(243, 133, 24) 0px 0px 0px 2px inset"
+    And the computed "box-shadow" of ".primary-navigation [aria-current]" should be "rgb(243, 133, 24) 0px 0px 0px 2px inset"
     When I am on the "C1" course page
-    Then the computed "box-shadow" of ".secondary-navigation .nav-link.active" should be "rgb(243, 133, 24) 0px 0px 0px 1px inset"
-    And the computed "border-top-color" of ".secondary-navigation .nav-link.active" should be "rgb(243, 133, 24)"
+    Then the computed "box-shadow" of ".secondary-navigation :is(.nav-link.active, .mds-nav-pill--selected)" should contain "rgb(243, 133, 24)"
+    And the computed "background-color" of ".secondary-navigation :is(.nav-link.active, .mds-nav-pill--selected)" should be "rgba(0, 0, 0, 0)"
     When I am on the "Page 1" "page activity" page
     Then the computed "box-shadow" of ".courseindex-item.pageitem" should be "rgb(243, 133, 24) 0px 0px 0px 2px inset"
 
@@ -36,9 +36,9 @@ Feature: The current navigation item is boxed in the scheme's active colour
       | user     | preference                 | value    |
       | student1 | local_accessibility_colour | vscodehc |
     And I log in as "student1"
-    Then the ".primary-navigation .nav-link[aria-current]" element should show a keyboard focus indicator
-    And the computed "outline-color" of ".primary-navigation .nav-link[aria-current]:focus-visible" should be "rgb(243, 133, 24)"
-    And the computed "box-shadow" of ".primary-navigation .nav-link[aria-current]:focus-visible" should be "rgb(243, 133, 24) 0px 0px 0px 2px inset"
+    Then the ".primary-navigation [aria-current]" element should show a keyboard focus indicator
+    And the computed "outline-color" of ".primary-navigation [aria-current]:focus-visible" should be "rgb(243, 133, 24)"
+    And the computed "box-shadow" of ".primary-navigation [aria-current]:focus-visible" should be "rgb(243, 133, 24) 0px 0px 0px 2px inset"
 
   Scenario: Other schemes declare no active colour and paint as before
     Given the following "user preferences" exist:
@@ -46,4 +46,4 @@ Feature: The current navigation item is boxed in the scheme's active colour
       | student1 | local_accessibility_colour | highcontrast |
     And I log in as "student1"
     Then the page root should not have attribute "data-a11y-tokens"
-    And the computed "box-shadow" of ".primary-navigation .nav-link[aria-current]" should be "none"
+    And the computed "box-shadow" of ".primary-navigation [aria-current]" should be "none"

@@ -29,11 +29,11 @@ Feature: Current, focus and hover each have one mark under the VS Code scheme
 
   Scenario: Keyboard focus is a dashed ring inside the item, and a current item keeps its solid box around it
     Given I log in as "student1"
-    When I give ".primary-navigation .nav-link[aria-current]" keyboard focus
-    Then the computed "outline-style" of ".primary-navigation .nav-link[aria-current]" should be "dashed"
-    And the computed "outline-color" of ".primary-navigation .nav-link[aria-current]" should be "rgb(243, 133, 24)"
-    And the computed "outline-offset" of ".primary-navigation .nav-link[aria-current]" should be "-4px"
-    And the computed "box-shadow" of ".primary-navigation .nav-link[aria-current]" should be "rgb(243, 133, 24) 0px 0px 0px 2px inset"
+    When I give ".primary-navigation [aria-current]" keyboard focus
+    Then the computed "outline-style" of ".primary-navigation [aria-current]" should be "dashed"
+    And the computed "outline-color" of ".primary-navigation [aria-current]" should be "rgb(243, 133, 24)"
+    And the computed "outline-offset" of ".primary-navigation [aria-current]" should be "-4px"
+    And the computed "box-shadow" of ".primary-navigation [aria-current]" should be "rgb(243, 133, 24) 0px 0px 0px 2px inset"
     When the main region contains core controls
     Then the "#la-test-link" element should show a keyboard focus indicator
     When I give "#la-test-link" keyboard focus
@@ -50,7 +50,8 @@ Feature: Current, focus and hover each have one mark under the VS Code scheme
     Then the computed "outline-style" of "#la-test-submit" should be "dashed"
 
   Scenario: The course tabs are boxed in cyan, neighbours share one edge, and the current tab is boxed in orange alone
-    Given I am on the "C1" course page logged in as "student1"
+    Given the site is running Moodle version 5.2 or lower
+    And I am on the "C1" course page logged in as "student1"
     Then the computed "border-top-color" of ".secondary-navigation .nav-tabs .nav-link:not(.active)" should be "rgb(111, 195, 223)"
     And the computed "border-right-color" of ".secondary-navigation .nav-tabs .nav-link:not(.active)" should be "rgb(111, 195, 223)"
     And the computed "border-bottom-color" of ".secondary-navigation .nav-tabs" should be "rgb(111, 195, 223)"
@@ -58,6 +59,18 @@ Feature: Current, focus and hover each have one mark under the VS Code scheme
     And the computed "border-top-color" of ".secondary-navigation .nav-link.active" should be "rgb(243, 133, 24)"
     And the computed "box-shadow" of ".secondary-navigation .nav-link.active" should be "rgb(243, 133, 24) 0px 0px 0px 1px inset"
     And the computed "background-color" of ".secondary-navigation .nav-link.active" should be "rgba(0, 0, 0, 0)"
+
+  Scenario: On Moodle 5.3 the current navigation pill is boxed in orange with no fill and no dot
+    Given the site is running Moodle version 5.3 or higher
+    And I am on the "C1" course page logged in as "student1"
+    Then the computed "box-shadow" of ".secondary-navigation .mds-nav-pill--selected" should be "rgb(243, 133, 24) 0px 0px 0px 2px inset"
+    And the computed "background-color" of ".secondary-navigation .mds-nav-pill--selected" should be "rgba(0, 0, 0, 0)"
+    And the computed "color" of ".secondary-navigation .mds-nav-pill--selected" should be "rgb(255, 255, 255)"
+    And the computed "display" of ".secondary-navigation .mds-nav-pill--selected .mds-nav-pill__indicator" should be "none"
+    And the computed "color" of ".secondary-navigation .mds-nav-pill:not(.mds-nav-pill--selected)" should be "rgb(255, 255, 255)"
+    When I hover ".secondary-navigation .mds-nav-pill:not(.mds-nav-pill--selected)" "css_element"
+    Then the computed "outline-style" of ".secondary-navigation .mds-nav-pill:not(.mds-nav-pill--selected)" should be "dashed"
+    And the computed "background-color" of ".secondary-navigation .mds-nav-pill:not(.mds-nav-pill--selected)" should be "rgba(0, 0, 0, 0)"
 
   Scenario: The Focus ring tile's thickness still applies, dashed
     Given the following "user preferences" exist:

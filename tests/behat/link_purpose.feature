@@ -25,8 +25,8 @@ Feature: Links are coloured by purpose under a colour scheme
     And I am on the "C1" course page logged in as "student1"
     Then the computed "color" of ".activity-item .activityname a" should be "rgb(255, 255, 255)"
     And the computed "text-decoration-line" of ".activity-item .activityname a" should be "none"
-    And the computed "color" of ".primary-navigation .nav-link" should be "rgb(255, 255, 255)"
-    And the computed "color" of ".secondary-navigation .nav-link" should be "rgb(255, 255, 255)"
+    And the computed "color" of ".primary-navigation a" should be "rgb(255, 255, 255)"
+    And the computed "color" of ".secondary-navigation a" should be "rgb(255, 255, 255)"
     And the computed "color" of ".courseindex-link" should be "rgb(255, 255, 255)"
     And the computed "text-decoration-line" of ".courseindex-link" should be "none"
     And the computed "color" of ".sectionname a" should be "rgb(255, 255, 255)"
@@ -64,7 +64,7 @@ Feature: Links are coloured by purpose under a colour scheme
       | student1 | local_accessibility_colour | <colour> |
     And I am on the "Page 1" "page activity" page logged in as "student1"
     Then the "#region-main .no-overflow a" element should have a text contrast of at least 7:1
-    And the ".primary-navigation .nav-link" element should have a text contrast of at least 7:1
+    And the ".primary-navigation a" element should have a text contrast of at least 7:1
     And the ".courseindex-link" element should have a text contrast of at least 7:1
     And the "#region-main .no-overflow a" element should look different from the ".courseindex-link" element
 
