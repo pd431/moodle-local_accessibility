@@ -5,6 +5,9 @@
   their fill and show the dashed ring. Pills are not boxed in cyan: they are not tabs, and the bar keeps its line.
 - A Tag release workflow tags main with the plugin's release after a green CI run, or on demand from the Actions
   tab, and starts the publish workflows. Tags are never moved: a merge that keeps the release makes no tag.
+- Under a colour scheme on Moodle 5.2 and 5.3, the course name at the top of the course index drawer takes the
+  text colour like the index below it. Before, it was painted in the link colour, since it sits above the index's
+  navigation landmark.
 
 # 3.1.0
 

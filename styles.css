@@ -184,13 +184,13 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     }
     /* Links by purpose. An anchor is a control, painted in the text colour with no underline, when it sits in a
        navigation landmark or a menu, tab, tree or toolbar widget, is itself a control (tab, menu item, dropdown
-       item, page link, nav link, badge, a sort link in a table head), or is a block link in or around a heading
+       item, page link, nav link, badge, course index link, a sort link in a table head), or is a block link in or around a heading
        (section titles, course cards), or an activity name in course content (the card and icon already say it is
        clickable). Every other anchor is a link: link colour and underline, on every page.
        The control list is stated once, as --la-anchor, and the one anchor rule below reads it. Buttons keep
        their own rules, and the current page in pagination and the active menu item keep the theme's white on
        primary (5.36:1). */
-    html[data-a11y-colour] body :where(nav, [role="navigation"], [role="menu"], [role="menubar"], [role="tablist"], [role="tree"], [role="toolbar"], h1, h2, h3, h4, h5, h6, thead th, .activity-item .activityname, a:is([role="button"], [role="tab"], [role="menuitem"], .dropdown-item, .page-link, .nav-link, .badge), a:has(> :is(h1, h2, h3, h4, h5, h6))) {
+    html[data-a11y-colour] body :where(nav, [role="navigation"], [role="menu"], [role="menubar"], [role="tablist"], [role="tree"], [role="toolbar"], h1, h2, h3, h4, h5, h6, thead th, .activity-item .activityname, a:is([role="button"], [role="tab"], [role="menuitem"], .dropdown-item, .page-link, .nav-link, .badge, .courseindex-link), a:has(> :is(h1, h2, h3, h4, h5, h6))) {
         --la-anchor: var(--a11y-text);
         --la-anchor-line: none;
     }

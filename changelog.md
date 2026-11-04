@@ -3,6 +3,8 @@
 ## [3.1.1] - 2026-11-04
 
 ### Changed
+- `styles.css` section 7: `.courseindex-link` joins the `a:is(...)` part of the link-purpose control list, for the
+  course link in `#courseindexdrawerheading` (Moodle 5.2+), which sits outside the course index landmark.
 - `styles.css` section 7: the active token rule and the focus-and-active offset rule add `.mds-nav-pill--selected`
   and `.mds-nav-pill.active`; `html[data-a11y-tokens~="active"] body :where(.mds-nav-pill__indicator,
   .mds-nav-pill.active::before)` is `display: none`; `html[data-a11y-tokens~="focus"] body
