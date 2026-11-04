@@ -15,7 +15,7 @@ Feature: Links are coloured by purpose under a colour scheme
       | user     | course | role    |
       | student1 | C1     | student |
     And the following "activities" exist:
-      | activity | course | name   | intro                                   |
+      | activity | course | name   | content                                  |
       | page     | C1     | Page 1 | <p>See <a href="#">the notes</a> now</p> |
 
   Scenario: Activity names and navigation take the text colour
@@ -48,7 +48,7 @@ Feature: Links are coloured by purpose under a colour scheme
       | student1 | local_accessibility_colour | vscodehc |
     And I log in as "student1"
     When the main region contains core controls
-    And the HTML "<h3><a id='t-h' href='#'>Title</a></h3><a id='t-card' href='#'><h5>Card</h5></a><span class='badge'><a id='t-b' href='#'>Badge</a></span><table><thead><tr><th><a id='t-th' href='#'>Sort</a></th></tr></thead><tbody><tr><td><a id='t-td' href='#'>Cell</a></td></tr></tbody></table>" is added to the main region
+    And the HTML "<h3><a id='t-h' href='#'>Title</a></h3><a id='t-card' href='#'><h5>Card</h5></a><a id='t-b' class='badge' href='#'>Badge</a><table><thead><tr><th><a id='t-th' href='#'>Sort</a></th></tr></thead><tbody><tr><td><a id='t-td' href='#'>Cell</a></td></tr></tbody></table>" is added to the main region
     Then the computed "color" of "#t-h" should be "rgb(255, 255, 255)"
     And the computed "color" of "#t-card" should be "rgb(255, 255, 255)"
     And the computed "color" of "#t-b" should be "rgb(255, 255, 255)"

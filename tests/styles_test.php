@@ -492,7 +492,6 @@ final class styles_test extends \advanced_testcase {
     /**
      * Links by purpose: the control list is stated once (--la-anchor) and the single anchor rule reads it.
      *
-     * @covers ::styles
      */
     public function test_links_by_purpose(): void {
         $controls = array_values(array_filter(self::rules(), fn($r) => str_contains($r[1], '--la-anchor: var(--a11y-text)')));
@@ -522,7 +521,6 @@ final class styles_test extends \advanced_testcase {
     /**
      * Activity icons: one filter rule per purpose, Boost's selector shape, pointing at the panel's SVG filter.
      *
-     * @covers ::styles
      */
     public function test_activity_icon_filters(): void {
         $rules = self::rules_with('.activityiconcontainer.');

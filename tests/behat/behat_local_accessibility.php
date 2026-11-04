@@ -494,6 +494,21 @@ class behat_local_accessibility extends behat_base {
     }
 
     /**
+     * Give an element keyboard focus, so :focus-visible styles apply to the computed-style steps that follow.
+     *
+     * @When /^I give "(?P<css>[^"]*)" keyboard focus$/
+     * @param string $css
+     */
+    public function i_give_keyboard_focus(string $css): void {
+        $this->check_script('const el = document.querySelector(' . json_encode($css) . ');
+            if (!el) {
+                return "No element matches " + ' . json_encode($css) . ';
+            }
+            el.focus();
+            return el.matches(":focus-visible") ? "" : "Could not give " + ' . json_encode($css) . ' + " keyboard focus";');
+    }
+
+    /**
      * Give an element keyboard focus (it must match :focus-visible) and check its focus indicator.
      *
      * The indicator must change the element's look, and must be an outline of at least 2px with 3:1 contrast against
