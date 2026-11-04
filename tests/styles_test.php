@@ -182,6 +182,19 @@ final class styles_test extends \advanced_testcase {
     }
 
     /**
+     * The surface mop-up covers the activity header, which Boost paints light grey on every module page.
+     */
+    public function test_surface_mop_up(): void {
+        $mopup = self::rules_with('html[data-a11y-colour] body :where(#page, #page-wrapper');
+        $this->assertCount(1, $mopup, 'one rule repaints the theme\'s hardcoded surfaces');
+        $this->assertStringContainsString('background-color: var(--a11y-surface1) !important', $mopup[0][1]);
+        $parts = ['.card', '.activity-item', '.activity-header', '.course-content .section', '.table', '.dropdown-menu'];
+        foreach ($parts as $part) {
+            $this->assertStringContainsString($part . ',', $mopup[0][0] . ',', $part);
+        }
+    }
+
+    /**
      * The panel is sized in rem/em, compact on wide screens and a bottom sheet on narrow ones (spec §1, D10).
      */
     public function test_panel_sizing(): void {

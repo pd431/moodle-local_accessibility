@@ -30,6 +30,9 @@
 - Dark high contrast (VS Code): the dashed focus and hover ring is drawn inside the item's edge instead of around it,
   on the item's own surface. On a current item it sits inside the solid orange box. The Focus ring tile's Ring and
   Extra thick go inside too and drop their page-colour halo, which only framed a ring drawn outside.
+- Under a colour scheme, the activity header (the strip under the tabs on a module page that holds the completion
+  conditions, dates and description) takes the surface colour. Before, it kept Boost's light grey under every scheme,
+  so on a dark scheme it stood out and its white text was unreadable.
 - Colour schemes can now declare a border, a focus, a selection and an active colour. The page lists the ones a scheme declares
   in a data-a11y-tokens attribute, and the stylesheet keys on those tokens. Schemes without them paint exactly as
   before.
