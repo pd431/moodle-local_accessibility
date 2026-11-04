@@ -45,11 +45,14 @@ Feature: Current, focus and hover each have one mark under the VS Code scheme
     When I hover "#la-test-submit" "css_element"
     Then the computed "outline-style" of "#la-test-submit" should be "dashed"
 
-  Scenario: The course tabs are one line, with the current tab boxed and no border per tab
+  Scenario: The course tabs are boxed in cyan, neighbours share one edge, and the current tab is boxed in orange alone
     Given I am on the "C1" course page logged in as "student1"
-    Then the computed "border-right-color" of ".secondary-navigation .nav-tabs .nav-link:not(.active)" should be "rgba(0, 0, 0, 0)"
+    Then the computed "border-top-color" of ".secondary-navigation .nav-tabs .nav-link:not(.active)" should be "rgb(111, 195, 223)"
+    And the computed "border-right-color" of ".secondary-navigation .nav-tabs .nav-link:not(.active)" should be "rgb(111, 195, 223)"
     And the computed "border-bottom-color" of ".secondary-navigation .nav-tabs" should be "rgb(111, 195, 223)"
-    And the computed "box-shadow" of ".secondary-navigation .nav-link.active" should be "rgb(243, 133, 24) 0px 0px 0px 2px inset"
+    And the computed "border-left-color" of ".secondary-navigation .nav-tabs .nav-item + .nav-item .nav-link:not(.active)" should be "rgba(0, 0, 0, 0)"
+    And the computed "border-top-color" of ".secondary-navigation .nav-link.active" should be "rgb(243, 133, 24)"
+    And the computed "box-shadow" of ".secondary-navigation .nav-link.active" should be "rgb(243, 133, 24) 0px 0px 0px 1px inset"
     And the computed "background-color" of ".secondary-navigation .nav-link.active" should be "rgba(0, 0, 0, 0)"
 
   Scenario: The Focus ring tile's thickness still applies, dashed

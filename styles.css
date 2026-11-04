@@ -256,15 +256,19 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     html[data-a11y-tokens~="border"] body :where(.card, .card-header, .card-footer, .list-group-item, .dropdown-menu, .modal-content, .popover, .form-control, .form-select, .custom-select, select, textarea, .table td, .table th, .btn-secondary, .btn-light, .btn-outline-secondary, .btn-outline-primary, .btn-icon, .activity-item, .section-item):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
         border: 1px solid var(--a11y-border) !important; /* stylelint-disable-line declaration-no-important */
     }
-    /* Tabs under the border token: one line under the bar, none around each tab (neighbours would double up and the
-       current tab would show the edge outside its active box) and no fill, on hover included: the dashed ring marks
-       the pointer. */
+    /* Tabs under the border token: one line under the bar and a box around each tab. A tab after another drops its
+       left edge, so neighbours share one line; Bootstrap pulls each tab 1px onto the bar line, so the bottoms merge.
+       No fill, on hover included: the dashed ring marks the pointer. The current tab's box is drawn below, after the
+       active rule. */
     html[data-a11y-tokens~="border"] body .nav-tabs {
         border-bottom: 1px solid var(--a11y-border) !important; /* stylelint-disable-line declaration-no-important */
     }
     html[data-a11y-tokens~="border"] body .nav-tabs .nav-link {
-        border-color: transparent !important; /* stylelint-disable-line declaration-no-important */
+        border: 1px solid var(--a11y-border) !important; /* stylelint-disable-line declaration-no-important */
         background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-tokens~="border"] body .nav-tabs .nav-item + .nav-item .nav-link {
+        border-left-color: transparent !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Focus token: Boost marks a focused plain link with a pale primary fill and a two-line shadow, which the scheme's
        forced link colour turns into white on pale blue. The token's dashed ring marks focus instead, so the fill and
@@ -282,6 +286,12 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
         border-color: transparent !important; /* stylelint-disable-line declaration-no-important */
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* The current tab under both tokens: its edge turns orange and the inset line drops to 1px, so one 2px orange box
+       and no cyan around it. */
+    html[data-a11y-tokens~="border"][data-a11y-tokens~="active"] body .nav-tabs .nav-link.active {
+        border-color: var(--a11y-active) !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: inset 0 0 0 1px var(--a11y-active) !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Hardcoded theme text colours (Task 22): muted text and the active navigation item. */
     html[data-a11y-colour] body :where(.text-muted, .text-secondary, .text-body-secondary, .dimmed_text, .categoryname, .progress-text, .collapsemenu-text, .mds-switch-label, .nav-link.active):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {

@@ -12,8 +12,11 @@
 ### Changed
 - `styles.css`: the active token rule adds `background-color`, `border-color: transparent` and `color: var(--a11y-text)`;
   the focus token rule is `2px dashed` and also matches `:where(a, button, input, select, textarea, [role=button],
-  [role=tab], [role=menuitem]):hover`; `.nav-tabs .nav-link` leaves the border token list and two rules give
-  `.nav-tabs` a 1px `--a11y-border` bottom line and its links transparent border and background.
+  [role=tab], [role=menuitem]):hover`; `.nav-tabs .nav-link` leaves the border token list and three rules give
+  `.nav-tabs` a 1px `--a11y-border` bottom line, each `.nav-link` a 1px `--a11y-border` border with a transparent
+  background, and `.nav-item + .nav-item .nav-link` a transparent left edge; after the active rule,
+  `html[data-a11y-tokens~="border"][data-a11y-tokens~="active"] body .nav-tabs .nav-link.active` sets
+  `border-color: var(--a11y-active)` and `box-shadow: inset 0 0 0 1px var(--a11y-active)`.
 
 ### Added
 - Scheme model: optional `active` colour (`scheme::fixed()` refuses one under 3:1 on any shade), token `active`,

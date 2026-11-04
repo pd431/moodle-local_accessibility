@@ -410,12 +410,21 @@ final class styles_test extends \advanced_testcase {
         foreach (['.card', '.form-control', '.table td', '.btn-secondary', '.dropdown-menu', '.modal-content'] as $part) {
             $this->assertStringContainsString($part, $border[0][0], $part);
         }
-        $this->assertStringNotContainsString('.nav-tabs .nav-link', $border[0][0], 'tabs carry no border each');
+        $this->assertStringNotContainsString('.nav-tabs .nav-link', $border[0][0], 'tabs have their own rule');
         $tabs = self::rules_with('html[data-a11y-tokens~="border"] body .nav-tabs');
-        $this->assertCount(2, $tabs, 'one line under the tab bar, none around a tab');
+        $this->assertCount(3, $tabs, 'one line under the tab bar, a box per tab, a shared edge between neighbours');
         $this->assertStringContainsString('border-bottom: 1px solid var(--a11y-border) !important', $tabs[0][1]);
-        $this->assertStringContainsString('border-color: transparent !important', $tabs[1][1]);
+        $this->assertStringContainsString('border: 1px solid var(--a11y-border) !important', $tabs[1][1]);
         $this->assertStringContainsString('background-color: transparent !important', $tabs[1][1], 'no hover fill');
+        $this->assertStringContainsString('.nav-item + .nav-item .nav-link', $tabs[2][0]);
+        $this->assertStringContainsString('border-left-color: transparent !important', $tabs[2][1], 'shared edge');
+        $current = self::rules_with('[data-a11y-tokens~="active"] body .nav-tabs .nav-link.active');
+        $this->assertCount(1, $current, 'the current tab is boxed in orange alone');
+        $this->assertStringContainsString('border-color: var(--a11y-active) !important', $current[0][1]);
+        $this->assertStringContainsString('box-shadow: inset 0 0 0 1px var(--a11y-active) !important', $current[0][1]);
+        $css = self::css();
+        $activeat = strpos($css, 'data-a11y-tokens~="active"] body :where(');
+        $this->assertGreaterThan($activeat, strpos($css, '.nav-tabs .nav-link.active {'), 'after the active rule');
         $nofill = self::rules_with('html[data-a11y-tokens~="focus"] body :where(a):where(:focus, .focus)');
         $this->assertCount(1, $nofill, 'a focused link loses the theme fill and shadow');
         $this->assertStringContainsString('background-color: transparent !important', $nofill[0][1]);
