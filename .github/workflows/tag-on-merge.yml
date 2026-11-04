@@ -1,0 +1,76 @@
+# Tags main with the plugin's release after a green CI run, or on demand from the Actions tab, so publishing
+# never needs a tag by hand.
+# The tag is v<release> from version.php ($plugin->release). A merge that keeps the release makes no tag:
+# tags are never moved. A tag pushed with GITHUB_TOKEN starts no other workflow, so this one dispatches
+# the two publish workflows itself; each still needs its own secrets to publish.
+name: Tag release
+
+on:
+  workflow_run:
+    workflows: ["Moodle Plugin CI"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: "Commit on main to tag (empty: the head of main)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  tag:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.sha || github.event.workflow_run.head_sha || 'main' }}
+          fetch-depth: 0
+
+      - name: Resolve the commit to tag
+        id: commit
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Read the release from version.php
+        id: release
+        run: |
+          release=$(sed -n "s/^\$plugin->release *= *'\([^']*\)';.*/\1/p" version.php)
+          if [ -z "$release" ]; then
+            echo 'version.php has no $plugin->release' >&2
+            exit 1
+          fi
+          echo "tag=v$release" >> "$GITHUB_OUTPUT"
+
+      - name: Tag when the release is new
+        id: tag
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" > /dev/null; then
+            echo "$TAG already exists; nothing to tag." >> "$GITHUB_STEP_SUMMARY"
+            echo "created=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          notes=$(awk -v tag="${TAG#v}" '
+            $0 ~ "^# " tag "$" { on = 1; next }
+            /^# / && on { exit }
+            on { print }' CHANGES.md)
+          git tag -a "$TAG" -m "$TAG" -m "$notes" "${{ steps.commit.outputs.sha }}"
+          git push origin "refs/tags/$TAG"
+          echo "Tagged $TAG at ${{ steps.commit.outputs.sha }}." >> "$GITHUB_STEP_SUMMARY"
+          echo "created=true" >> "$GITHUB_OUTPUT"
+
+      - name: Start the publish workflows
+        if: steps.tag.outputs.created == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          gh workflow run moodle-release.yml --ref "$TAG" -f tag="$TAG"
+          gh workflow run camp-release.yml --ref "$TAG"

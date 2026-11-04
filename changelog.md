@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.1.1] - 2026-11-04
+
+### Added
+- `.github/workflows/tag-on-merge.yml`: on `workflow_run` of Moodle Plugin CI on main (success only) or
+  `workflow_dispatch` (optional `sha`), reads `$plugin->release` from version.php, creates the annotated tag
+  `v<release>` with the release's CHANGES.md section when it does not exist, and dispatches `moodle-release.yml` and
+  `camp-release.yml` for it. `permissions: contents: write, actions: write`.
+
 ## [3.1.0] - 2026-11-03
 
 ### Changed
