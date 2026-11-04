@@ -295,7 +295,36 @@ class behat_local_accessibility extends behat_base {
             }
             const actual = getComputedStyle(el, parts[1] ? "::" + parts[1] : null).getPropertyValue(' . json_encode($property) . ');
             const same = actual === ' . json_encode($value) . ';
-            return same === ' . ($not ? 'false' : 'true') . ' ? "" : ' . json_encode("$property of $css: ") . ' + actual;');
+            if (same === ' . ($not ? 'false' : 'true') . ') {
+                return "";
+            }
+            // Say where the element sits, so a miss on another Moodle version shows which ancestor differs.
+            const chain = [];
+            for (let n = el; n && n !== document.body; n = n.parentElement) {
+                const s = getComputedStyle(n);
+                const classes = typeof n.className === "string" ? n.className.trim().split(/\\s+/).slice(0, 3) : [];
+                const role = n.getAttribute("role");
+                chain.push(n.tagName.toLowerCase() + (n.id ? "#" + n.id : "") + (classes.length ? "." + classes.join(".") : "")
+                    + (role ? "[role=" + role + "]" : "") + " {--la-anchor:" + s.getPropertyValue("--la-anchor").trim() + "}");
+            }
+            return ' . json_encode("$property of $css: ") . ' + actual + " | " + chain.join(" < ");');
+    }
+
+    /**
+     * Check that a computed style contains a value, for a property whose full value differs between Moodle versions.
+     *
+     * @Then /^the computed "(?P<property>[^"]*)" of "(?P<css>[^"]*)" should contain "(?P<value>[^"]*)"$/
+     * @param string $property
+     * @param string $css
+     * @param string $value
+     */
+    public function the_computed_style_should_contain(string $property, string $css, string $value): void {
+        $this->check_script('const el = document.querySelector(' . json_encode($css) . ');
+            if (!el) {
+                return "No element matches " + ' . json_encode($css) . ';
+            }
+            const actual = getComputedStyle(el).getPropertyValue(' . json_encode($property) . ');
+            return actual.includes(' . json_encode($value) . ') ? "" : ' . json_encode("$property of $css: ") . ' + actual;');
     }
 
     /**

@@ -184,13 +184,13 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     }
     /* Links by purpose. An anchor is a control, painted in the text colour with no underline, when it sits in a
        navigation landmark or a menu, tab, tree or toolbar widget, is itself a control (tab, menu item, dropdown
-       item, page link, nav link, badge, a sort link in a table head), or is a block link in or around a heading
+       item, page link, nav link, badge, course index link, a sort link in a table head), or is a block link in or around a heading
        (section titles, course cards), or an activity name in course content (the card and icon already say it is
        clickable). Every other anchor is a link: link colour and underline, on every page.
        The control list is stated once, as --la-anchor, and the one anchor rule below reads it. Buttons keep
        their own rules, and the current page in pagination and the active menu item keep the theme's white on
        primary (5.36:1). */
-    html[data-a11y-colour] body :where(nav, [role="navigation"], [role="menu"], [role="menubar"], [role="tablist"], [role="tree"], [role="toolbar"], h1, h2, h3, h4, h5, h6, thead th, .activity-item .activityname, a:is([role="button"], [role="tab"], [role="menuitem"], .dropdown-item, .page-link, .nav-link, .badge), a:has(> :is(h1, h2, h3, h4, h5, h6))) {
+    html[data-a11y-colour] body :where(nav, [role="navigation"], [role="menu"], [role="menubar"], [role="tablist"], [role="tree"], [role="toolbar"], h1, h2, h3, h4, h5, h6, thead th, .activity-item .activityname, a:is([role="button"], [role="tab"], [role="menuitem"], .dropdown-item, .page-link, .nav-link, .badge, .courseindex-link), a:has(> :is(h1, h2, h3, h4, h5, h6))) {
         --la-anchor: var(--a11y-text);
         --la-anchor-line: none;
     }
@@ -282,15 +282,23 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
         box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
     }
+    /* Moodle 5.3's navigation pills take a fill on hover and when pressed; the dashed ring marks the pointer. */
+    html[data-a11y-tokens~="focus"] body .mds-nav-pill:where(:hover, :active) {
+        background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
+    }
     /* Active token: the current item, boxed in the scheme's active colour (VS Code's contrastActiveBorder) and nothing
        else: no fill and no theme underline, text in the text colour. Drawn inside with a shadow, so nothing moves and
        the keyboard focus outline, which sits outside, shows on top. Every "current" mark Moodle makes gets it, so
        they agree: the top and secondary nav, the course index, a dropdown's current item and pagination. */
-    html[data-a11y-tokens~="active"] body :where(.nav-link.active, .nav-link[aria-current], .courseindex-item.pageitem, .courseindex-item.active, .dropdown-item[aria-current], .page-item.active .page-link) {
+    html[data-a11y-tokens~="active"] body :where(.nav-link.active, .nav-link[aria-current], .mds-nav-pill--selected, .mds-nav-pill.active, .courseindex-item.pageitem, .courseindex-item.active, .dropdown-item[aria-current], .page-item.active .page-link) {
         box-shadow: inset 0 0 0 2px var(--a11y-active) !important; /* stylelint-disable-line declaration-no-important */
         background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
         border-color: transparent !important; /* stylelint-disable-line declaration-no-important */
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* Moodle 5.3 draws the current navigation pill with a fill and a dot; the box is the one mark. */
+    html[data-a11y-tokens~="active"] body :where(.mds-nav-pill__indicator, .mds-nav-pill.active::before) {
+        display: none !important; /* stylelint-disable-line declaration-no-important */
     }
     /* The current tab under both tokens: its edge turns orange and the inset line drops to 1px, so one 2px orange box
        and no cyan around it. */
@@ -425,7 +433,7 @@ html[data-a11y-focus="thick"] :focus-visible {
         outline-offset: -5px !important; /* stylelint-disable-line declaration-no-important */
         box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
     }
-    html[data-a11y-tokens~="focus"][data-a11y-tokens~="active"] body :where(.nav-link.active, .nav-link[aria-current], .courseindex-item.pageitem, .courseindex-item.active, .dropdown-item[aria-current], .page-item.active .page-link):where(:focus-visible, :hover) {
+    html[data-a11y-tokens~="focus"][data-a11y-tokens~="active"] body :where(.nav-link.active, .nav-link[aria-current], .mds-nav-pill--selected, .mds-nav-pill.active, .courseindex-item.pageitem, .courseindex-item.active, .dropdown-item[aria-current], .page-item.active .page-link):where(:focus-visible, :hover) {
         outline-offset: -4px !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Selection token: selected text in the scheme's own pair. */

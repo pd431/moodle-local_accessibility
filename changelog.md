@@ -2,6 +2,17 @@
 
 ## [3.1.1] - 2026-11-04
 
+### Changed
+- `styles.css` section 7: `.courseindex-link` joins the `a:is(...)` part of the link-purpose control list, for the
+  course link in `#courseindexdrawerheading` (Moodle 5.2+), which sits outside the course index landmark.
+- `styles.css` section 7: the active token rule and the focus-and-active offset rule add `.mds-nav-pill--selected`
+  and `.mds-nav-pill.active`; `html[data-a11y-tokens~="active"] body :where(.mds-nav-pill__indicator,
+  .mds-nav-pill.active::before)` is `display: none`; `html[data-a11y-tokens~="focus"] body
+  .mds-nav-pill:where(:hover, :active)` has a transparent background.
+- Behat: `the computed "X" of "Y" should contain "Z"` and `I give "X" keyboard focus` steps; a failed computed-style
+  check now lists the element's ancestors with their `--la-anchor`; navigation selectors hold on 4.5, 5.2 and 5.3,
+  with the tab box scenario on 5.2 or lower and a pill scenario on 5.3 or higher.
+
 ### Added
 - `.github/workflows/tag-on-merge.yml`: on `workflow_run` of Moodle Plugin CI on main (success only) or
   `workflow_dispatch` (optional `sha`), reads `$plugin->release` from version.php, creates the annotated tag

@@ -465,15 +465,22 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringContainsString('outline-offset: -5px !important', $focus[2][1]);
         $this->assertStringContainsString('[data-a11y-tokens~="active"]', $focus[3][0], 'a current item moves the ring in');
         $this->assertStringContainsString('.courseindex-item.pageitem', $focus[3][0]);
+        $this->assertStringContainsString('.mds-nav-pill--selected', $focus[3][0]);
         $this->assertStringContainsString('outline-offset: -4px !important', $focus[3][1]);
         $this->assertStringNotContainsString('outline-offset: 2px !important', implode('', array_column($token, 1)));
         $active = self::rules_with('html[data-a11y-tokens~="active"]');
-        $this->assertCount(1, $active);
+        $this->assertCount(2, $active, 'the box, and the pill dot hidden');
+        $this->assertStringContainsString('.mds-nav-pill__indicator', $active[1][0]);
+        $this->assertStringContainsString('.mds-nav-pill.active::before', $active[1][0]);
+        $this->assertStringContainsString('display: none !important', $active[1][1]);
+        $pillfill = self::rules_with('html[data-a11y-tokens~="focus"] body .mds-nav-pill:where(:hover, :active)');
+        $this->assertCount(1, $pillfill, 'a hovered or pressed pill loses its fill');
+        $this->assertStringContainsString('background-color: transparent !important', $pillfill[0][1]);
         $this->assertStringContainsString('box-shadow: inset 0 0 0 2px var(--a11y-active) !important', $active[0][1]);
         $this->assertStringContainsString('background-color: transparent !important', $active[0][1], 'no fill');
         $this->assertStringContainsString('border-color: transparent !important', $active[0][1], 'no theme underline');
-        $marks = ['.nav-link.active', '.nav-link[aria-current]', '.courseindex-item.pageitem', '.dropdown-item[aria-current]',
-            '.page-item.active .page-link'];
+        $marks = ['.nav-link.active', '.nav-link[aria-current]', '.mds-nav-pill--selected', '.mds-nav-pill.active',
+            '.courseindex-item.pageitem', '.dropdown-item[aria-current]', '.page-item.active .page-link'];
         foreach ($marks as $part) {
             $this->assertStringContainsString($part, $active[0][0], $part);
         }
@@ -500,7 +507,7 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringStartsWith('html[data-a11y-colour] body :where(', $selector);
         $parts = ['nav', '[role="navigation"]', '[role="menu"]', '[role="menubar"]', '[role="tablist"]', '[role="tree"]',
             '[role="toolbar"]', 'h1', 'h6', 'thead th', '[role="button"]', '[role="tab"]', '[role="menuitem"]',
-            '.dropdown-item', '.page-link', '.nav-link', '.badge', 'a:has(> :is(h1, h2, h3, h4, h5, h6))',
+            '.dropdown-item', '.page-link', '.nav-link', '.badge', '.courseindex-link', 'a:has(> :is(h1, h2, h3, h4, h5, h6))',
             '.activity-item .activityname'];
         foreach ($parts as $part) {
             $this->assertStringContainsString($part, $selector, $part);
