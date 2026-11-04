@@ -302,7 +302,10 @@ class behat_local_accessibility extends behat_base {
             const chain = [];
             for (let n = el; n && n !== document.body; n = n.parentElement) {
                 const s = getComputedStyle(n);
-                chain.push(n.tagName.toLowerCase() + (n.id ? "#" + n.id : "") + (n.className && typeof n.className === "string" ? "." + n.className.trim().split(/\\s+/).slice(0, 3).join(".") : "") + (n.getAttribute("role") ? "[role=" + n.getAttribute("role") + "]" : "") + " {--la-anchor:" + s.getPropertyValue("--la-anchor").trim() + "}");
+                const classes = typeof n.className === "string" ? n.className.trim().split(/\\s+/).slice(0, 3) : [];
+                const role = n.getAttribute("role");
+                chain.push(n.tagName.toLowerCase() + (n.id ? "#" + n.id : "") + (classes.length ? "." + classes.join(".") : "")
+                    + (role ? "[role=" + role + "]" : "") + " {--la-anchor:" + s.getPropertyValue("--la-anchor").trim() + "}");
             }
             return ' . json_encode("$property of $css: ") . ' + actual + " | " + chain.join(" < ");');
     }
