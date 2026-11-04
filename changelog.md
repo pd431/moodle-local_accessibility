@@ -21,7 +21,7 @@
   (feFlood of that property, composited into the icon's alpha) and `styles.css` section 7 points each
   `.activityiconcontainer.<purpose>` icon at its filter with Boost's own selector shape.
 - Colour scheme "Dark high contrast (VS Code)" (`vscodehc`): Visual Studio Code's Dark High Contrast palette. Black
-  surfaces (floating widgets #0c141f, hover #111111) told apart by the #6fc3df contrast border, white text, #21a6ff
+  surfaces (floating widgets #0c141f, hover #111111) told apart by the #6fc3df contrast border, white text, #8bcaff (textLink #21a6ff lifted to APCA Lc 70)
   links, an #f38518 focus ring and #f3f518 on black selection. Built with `scheme::fixed()`, so the colours are kept
   exactly; the preset passes 7:1 on every shade and never sets `data-a11y-lowcontrast`.
 - Scheme model: optional `border`, `focus`, `selection` and `selectiontext` colours, `scheme::fixed()` for presets

@@ -44,7 +44,7 @@ Feature: VS Code dark high contrast colour scheme
       | student1 | local_accessibility_colour | vscodehc |
     And I log in as "student1"
     When the main region contains core controls
-    Then the computed "color" of "#la-test-link" should be "rgb(33, 166, 255)"
+    Then the computed "color" of "#la-test-link" should be "rgb(139, 202, 255)"
     And the "#la-test-link" element should have a text contrast of at least 7:1
     And the "#la-test-item" element should have a text contrast of at least 7:1
 

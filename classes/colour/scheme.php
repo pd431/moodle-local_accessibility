@@ -202,7 +202,8 @@ final class scheme {
             'yellowblack' => self::custom('#000000', '#ffff00', '#00ffff', false, 'yellowblack'),
             // Visual Studio Code's Dark High Contrast theme (vscode: themes/hc_black.json and the hcDark defaults of
             // platform/theme/common/colors): black everywhere, told apart by contrastBorder; textLink, focusBorder,
-            // the editor selection colours, and contrastActiveBorder (the same orange) around the current item.
+            // the editor selection colours, and contrastActiveBorder (the same orange) around the current item. The
+            // link is textLink (#21a6ff, APCA Lc 51 on black) lifted in lightness to Lc 70, the same hue.
             // Floating widgets take editorWidget.background; hover is a 7% white, the
             // most that keeps the link at 7:1 (VS Code's own list hover is 10%).
             'vscodehc' => self::fixed(
@@ -210,7 +211,7 @@ final class scheme {
                 ['page' => '#000000', 'surface1' => '#000000', 'surface2' => '#0c141f', 'field' => '#000000',
                     'hover' => '#111111'],
                 '#ffffff',
-                '#21a6ff',
+                '#8bcaff',
                 '#6fc3df',
                 '#f38518',
                 '#f3f518',

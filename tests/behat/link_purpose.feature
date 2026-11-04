@@ -18,13 +18,13 @@ Feature: Links are coloured by purpose under a colour scheme
       | activity | course | name   | intro                                   |
       | page     | C1     | Page 1 | <p>See <a href="#">the notes</a> now</p> |
 
-  Scenario: Activity links and prose links take the link colour and an underline, navigation the text colour
+  Scenario: Activity names and navigation take the text colour
     Given the following "user preferences" exist:
       | user     | preference                 | value    |
       | student1 | local_accessibility_colour | vscodehc |
     And I am on the "C1" course page logged in as "student1"
-    Then the computed "color" of ".activity-item .activityname a" should be "rgb(33, 166, 255)"
-    And the computed "text-decoration-line" of ".activity-item .activityname a" should be "underline"
+    Then the computed "color" of ".activity-item .activityname a" should be "rgb(255, 255, 255)"
+    And the computed "text-decoration-line" of ".activity-item .activityname a" should be "none"
     And the computed "color" of ".primary-navigation .nav-link" should be "rgb(255, 255, 255)"
     And the computed "color" of ".secondary-navigation .nav-link" should be "rgb(255, 255, 255)"
     And the computed "color" of ".courseindex-link" should be "rgb(255, 255, 255)"
@@ -38,7 +38,7 @@ Feature: Links are coloured by purpose under a colour scheme
       | user     | preference                 | value    |
       | student1 | local_accessibility_colour | vscodehc |
     And I am on the "Page 1" "page activity" page logged in as "student1"
-    Then the computed "color" of "#region-main .no-overflow a" should be "rgb(33, 166, 255)"
+    Then the computed "color" of "#region-main .no-overflow a" should be "rgb(139, 202, 255)"
     And the computed "text-decoration-line" of "#region-main .no-overflow a" should be "underline"
     And the "#region-main .no-overflow a" element should have a text contrast of at least 7:1
 
@@ -53,20 +53,20 @@ Feature: Links are coloured by purpose under a colour scheme
     And the computed "color" of "#t-card" should be "rgb(255, 255, 255)"
     And the computed "color" of "#t-b" should be "rgb(255, 255, 255)"
     And the computed "color" of "#t-th" should be "rgb(255, 255, 255)"
-    And the computed "color" of "#t-td" should be "rgb(33, 166, 255)"
+    And the computed "color" of "#t-td" should be "rgb(139, 202, 255)"
     And the computed "color" of "#la-test-controls .page-item:not(.active) .page-link" should be "rgb(255, 255, 255)"
-    And the computed "color" of "#la-test-link" should be "rgb(33, 166, 255)"
+    And the computed "color" of "#la-test-link" should be "rgb(139, 202, 255)"
     And the "#la-test-page" element should have a text contrast of at least 4.5:1
 
   Scenario Outline: The split holds and stays readable under <colour>
     Given the following "user preferences" exist:
       | user     | preference                 | value    |
       | student1 | local_accessibility_colour | <colour> |
-    And I am on the "C1" course page logged in as "student1"
-    Then the ".activity-item .activityname a" element should have a text contrast of at least 7:1
+    And I am on the "Page 1" "page activity" page logged in as "student1"
+    Then the "#region-main .no-overflow a" element should have a text contrast of at least 7:1
     And the ".primary-navigation .nav-link" element should have a text contrast of at least 7:1
     And the ".courseindex-link" element should have a text contrast of at least 7:1
-    And the ".activity-item .activityname a" element should look different from the ".courseindex-link" element
+    And the "#region-main .no-overflow a" element should look different from the ".courseindex-link" element
 
     Examples:
       | colour       |
@@ -78,4 +78,4 @@ Feature: Links are coloured by purpose under a colour scheme
   Scenario: Without a scheme the theme paints its own links
     Given I am on the "C1" course page logged in as "student1"
     Then the page root should not have attribute "data-a11y-colour"
-    And the computed "color" of ".activity-item .activityname a" should not be "rgb(33, 166, 255)"
+    And the computed "color" of ".activity-item .activityname a" should not be "rgb(255, 255, 255)"

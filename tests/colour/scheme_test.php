@@ -71,7 +71,8 @@ final class scheme_test extends \advanced_testcase {
         $this->assertSame('#000000', $s->ramp['surface1']);
         $this->assertSame('#000000', $s->ramp['field']);
         $this->assertSame('#ffffff', $s->text);
-        $this->assertSame('#21a6ff', $s->link);
+        $this->assertSame('#8bcaff', $s->link);
+        $this->assertGreaterThanOrEqual(70, contrast::apca_worst($s->link, $s->ramp), 'link Lc 70 on every shade');
         $this->assertSame('#6fc3df', $s->border);
         $this->assertSame('#f38518', $s->focus);
         $this->assertSame('#f38518', $s->active);

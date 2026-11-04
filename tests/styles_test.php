@@ -449,7 +449,8 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringStartsWith('html[data-a11y-colour] body :where(', $selector);
         $parts = ['nav', '[role="navigation"]', '[role="menu"]', '[role="menubar"]', '[role="tablist"]', '[role="tree"]',
             '[role="toolbar"]', 'h1', 'h6', 'thead th', '[role="button"]', '[role="tab"]', '[role="menuitem"]',
-            '.dropdown-item', '.page-link', '.nav-link', '.badge', 'a:has(> :is(h1, h2, h3, h4, h5, h6))'];
+            '.dropdown-item', '.page-link', '.nav-link', '.badge', 'a:has(> :is(h1, h2, h3, h4, h5, h6))',
+            '.activity-item .activityname'];
         foreach ($parts as $part) {
             $this->assertStringContainsString($part, $selector, $part);
         }

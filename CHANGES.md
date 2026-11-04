@@ -4,6 +4,9 @@
   surface is black and told apart by a cyan border, text is white, links are VS Code's blue, keyboard focus shows an
   orange ring whatever the Focus ring tile says (Ring and Extra thick keep their thickness), and selected text is
   yellow on black. Every text and link pair is at or above 7:1.
+- Dark high contrast (VS Code): links are a lighter blue, #8bcaff. VS Code's own #21a6ff passes WCAG 2 at 7:1 but
+  reaches only APCA Lc 51 on black; the new blue is the same hue at Lc 70 (10.6:1). Activity names in course content
+  take the text colour, like the course index: the card and icon already say they are clickable.
 - Under a colour scheme, links are coloured by purpose. An anchor in a navigation landmark or a menu, tab, tree or
   toolbar widget, a tab, menu item, dropdown item, page link, nav link or badge, a sort link in a table head, or a
   block link in or around a heading (section titles, course cards) takes the text colour with no forced underline.
