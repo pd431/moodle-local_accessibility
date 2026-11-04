@@ -125,7 +125,7 @@ directory in `{your/moodle/dirroot}/local/accessibility` and run
 
 Every merge into main that raises `$plugin->release` in version.php is tagged `v<release>` by the Tag release
 workflow once the Moodle Plugin CI run on main is green; the same workflow can be run by hand from the Actions tab
-for a given commit. The tag starts the camp and Moodle plugins directory publish workflows.
+for a given commit. The tag is the release: nothing is published from it.
 
 ## Credits ##
 

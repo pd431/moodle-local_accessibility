@@ -1,8 +1,7 @@
-# Tags main with the plugin's release after a green CI run, or on demand from the Actions tab, so publishing
+# Tags main with the plugin's release after a green CI run, or on demand from the Actions tab, so a release
 # never needs a tag by hand.
 # The tag is v<release> from version.php ($plugin->release). A merge that keeps the release makes no tag:
-# tags are never moved. A tag pushed with GITHUB_TOKEN starts no other workflow, so this one dispatches
-# the two publish workflows itself; each still needs its own secrets to publish.
+# tags are never moved. The tag is the release; nothing is published from it.
 name: Tag release
 
 on:
@@ -19,7 +18,6 @@ on:
 
 permissions:
   contents: write
-  actions: write
 
 jobs:
   tag:
@@ -66,11 +64,3 @@ jobs:
           echo "Tagged $TAG at ${{ steps.commit.outputs.sha }}." >> "$GITHUB_STEP_SUMMARY"
           echo "created=true" >> "$GITHUB_OUTPUT"
 
-      - name: Start the publish workflows
-        if: steps.tag.outputs.created == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TAG: ${{ steps.release.outputs.tag }}
-        run: |
-          gh workflow run moodle-release.yml --ref "$TAG" -f tag="$TAG"
-          gh workflow run camp-release.yml --ref "$TAG"

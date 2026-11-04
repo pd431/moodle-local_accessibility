@@ -1,7 +1,6 @@
-# Keep development files out of camp distribution ZIPs (git archive semantics)
+# Keep development files out of archives built from a tag (git archive semantics)
 .github export-ignore
 .gitattributes export-ignore
 .gitignore export-ignore
-.camp export-ignore
 tests export-ignore
 node_modules export-ignore
