@@ -186,6 +186,30 @@ final class preferences_test extends \advanced_testcase {
     }
 
     /**
+     * A scheme that declares border, focus or selection colours names them in data-a11y-tokens and emits their
+     * properties; every other scheme sets neither.
+     */
+    public function test_scheme_tokens_attribute(): void {
+        $this->setUser($this->getDataGenerator()->create_user());
+        preferences::set('colour', 'vscodehc');
+        $attrs = preferences::html_attributes();
+        $this->assertSame('vscodehc', $attrs['data-a11y-colour']);
+        $this->assertSame('border focus selection active', $attrs['data-a11y-tokens']);
+        $this->assertStringContainsString('--a11y-active:#f38518', $attrs['style']);
+        $this->assertSame('dark', $attrs['data-bs-theme']);
+        $this->assertArrayNotHasKey('data-a11y-lowcontrast', $attrs);
+        $this->assertStringContainsString('--a11y-border:#6fc3df', $attrs['style']);
+        $this->assertStringContainsString('--a11y-focus:#f38518', $attrs['style']);
+        $this->assertStringContainsString('--a11y-selection:#f3f518;--a11y-selection-text:#000000', $attrs['style']);
+        preferences::set('colour', 'yellowblack');
+        $attrs = preferences::html_attributes();
+        $this->assertArrayNotHasKey('data-a11y-tokens', $attrs);
+        $this->assertStringNotContainsString('--a11y-border', $attrs['style']);
+        preferences::set_custom_scheme(scheme::custom('#14202b', '#e8eef3', '#8cc8ff', false));
+        $this->assertArrayNotHasKey('data-a11y-tokens', preferences::html_attributes());
+    }
+
+    /**
      * Without a colour scheme, the style attribute carries only the feature variables.
      */
     public function test_style_without_scheme(): void {

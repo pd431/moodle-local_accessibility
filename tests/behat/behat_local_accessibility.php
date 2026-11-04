@@ -404,6 +404,75 @@ class behat_local_accessibility extends behat_base {
     }
 
     /**
+     * Check the APCA contrast of an activity's icon, as painted by the plugin's SVG filter, against what is behind it.
+     * The filter floods the icon's shape with one colour, read from the filter's feFlood; Chrome cannot report a
+     * filtered pixel's colour.
+     *
+     * @Then /^the activity icon for "(?P<name>[^"]*)" should have an APCA contrast of at least (?P<min>[0-9.]+)$/
+     * @param string $name activity name
+     * @param string $min Lc
+     */
+    public function the_activity_icon_should_have_apca_contrast(string $name, string $min): void {
+        $this->check_script($this->activity_icon_script($name) . '
+            const m = String(getComputedStyle(icon).filter).match(/#(la-icon-[a-z]+)/);
+            if (!m) {
+                return "The icon of " + ' . json_encode($name) . ' + " does not use a plugin filter: " +
+                    getComputedStyle(icon).filter;
+            }
+            const flood = document.querySelector("#" + m[1] + " feFlood");
+            const fg = flood && parse(getComputedStyle(flood).floodColor);
+            if (!fg) {
+                return "No flood colour for " + m[1];
+            }
+            const back = behind(icon);
+            const y = (rgb) => {
+                const v = 0.2126729 * Math.pow(rgb[0] / 255, 2.4) + 0.7151522 * Math.pow(rgb[1] / 255, 2.4) +
+                    0.0721750 * Math.pow(rgb[2] / 255, 2.4);
+                return v < 0.022 ? v + Math.pow(0.022 - v, 1.414) : v;
+            };
+            const yt = y(over(fg, back));
+            const yb = y(back);
+            const s = yb > yt ? (Math.pow(yb, 0.56) - Math.pow(yt, 0.57)) * 1.14
+                : (Math.pow(yb, 0.65) - Math.pow(yt, 0.62)) * 1.14;
+            const lc = Math.abs(s) < 0.1 ? 0 : (yb > yt ? (s - 0.027) : (s + 0.027)) * 100;
+            return Math.abs(lc) >= ' . (float) $min . ' ? "" : "Lc " + lc.toFixed(1) + " (icon " +
+                getComputedStyle(flood).floodColor + " on rgb(" + back.map(Math.round).join(", ") + "))";');
+    }
+
+    /**
+     * Check which filter, if any of the plugin's, paints an activity's icon.
+     *
+     * @Then /^the activity icon for "(?P<name>[^"]*)" should (?P<not>not )?use the filter "(?P<id>[^"]*)"$/
+     * @param string $name activity name
+     * @param string $not
+     * @param string $id filter id, e.g. la-icon-content
+     */
+    public function the_activity_icon_should_use_filter(string $name, string $not, string $id): void {
+        $this->check_script($this->activity_icon_script($name) . '
+            const f = String(getComputedStyle(icon).filter);
+            const uses = f.indexOf("#" + ' . json_encode($id) . ') !== -1;
+            return uses === ' . ($not === '' ? 'true' : 'false') . ' ? "" : "The icon of " + ' . json_encode($name) . ' +
+                " has filter " + f;');
+    }
+
+    /**
+     * Script that finds an activity's icon by the activity's name, as "icon", or returns an error.
+     *
+     * @param string $name
+     * @return string
+     */
+    private function activity_icon_script(string $name): string {
+        return 'const item = Array.from(document.querySelectorAll(".activity-item")).find((el) => {
+                const n = el.querySelector(".activityname");
+                return n && n.textContent.trim().indexOf(' . json_encode($name) . ') === 0;
+            });
+            const icon = item && item.querySelector(".activityiconcontainer .activityicon, .activityiconcontainer .icon");
+            if (!icon) {
+                return "No activity icon for " + ' . json_encode($name) . ';
+            }';
+    }
+
+    /**
      * Check that an element stands out from what is behind it (non-text contrast 3:1), by its fill or its border.
      *
      * @Then /^the "(?P<css>[^"]*)" element should stand out from its background$/
@@ -422,6 +491,21 @@ class behat_local_accessibility extends behat_base {
                 edge && parseFloat(s.borderTopWidth) > 0 && s.borderTopStyle !== "none" ? ratio(over(edge, back), back) : 1);
             return best >= 3 ? "" : "Contrast " + best.toFixed(2) + ":1 (fill " + s.backgroundColor + ", border " +
                 s.borderTopWidth + " " + s.borderTopColor + " on rgb(" + back.map(Math.round).join(", ") + "))";');
+    }
+
+    /**
+     * Give an element keyboard focus, so :focus-visible styles apply to the computed-style steps that follow.
+     *
+     * @When /^I give "(?P<css>[^"]*)" keyboard focus$/
+     * @param string $css
+     */
+    public function i_give_keyboard_focus(string $css): void {
+        $this->check_script('const el = document.querySelector(' . json_encode($css) . ');
+            if (!el) {
+                return "No element matches " + ' . json_encode($css) . ';
+            }
+            el.focus();
+            return el.matches(":focus-visible") ? "" : "Could not give " + ' . json_encode($css) . ' + " keyboard focus";');
     }
 
     /**

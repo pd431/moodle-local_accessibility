@@ -292,6 +292,9 @@ final class preferences {
                     $attrs['data-colourmode'] = $s->mode;
                 }
                 array_unshift($properties, rtrim($s->css_properties(), ';'));
+                if ($s->tokens()) {
+                    $attrs['data-a11y-tokens'] = implode(' ', $s->tokens());
+                }
                 if ($s->exact && ($s->worst_text() < contrast::AAA || $s->worst_link() < contrast::AAA)) {
                     $attrs['data-a11y-lowcontrast'] = '1';
                 }

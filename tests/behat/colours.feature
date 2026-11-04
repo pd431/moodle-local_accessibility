@@ -26,6 +26,7 @@ Feature: Colour schemes
     When I press the right key
     And I press the right key
     And I press the right key
+    And I press the right key
     And I press the enter key
     And I wait until the page is ready
     Then the page root should have attribute "data-a11y-colour" with value "blackwhite"

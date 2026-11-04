@@ -1,5 +1,51 @@
 # Changelog
 
+## [3.1.0] - 2026-11-03
+
+### Changed
+- Links by purpose under a colour scheme (`styles.css` section 7). The control list is stated once as the
+  `--la-anchor` / `--la-anchor-line` custom properties on `nav`, `[role=navigation|menu|menubar|tablist|tree|toolbar]`,
+  `h1`..`h6`, `thead th`, anchors with `role=button|tab|menuitem` or `.dropdown-item`, `.page-link`, `.nav-link`,
+  `.badge`, and `a:has(> h1..h6)`; the single anchor rule paints `var(--la-anchor, var(--a11y-link))` and
+  `var(--la-anchor-line, underline)`. Buttons and the active page or menu item stay excluded as before.
+
+### Changed
+- `styles.css`: the active token rule adds `background-color`, `border-color: transparent` and `color: var(--a11y-text)`;
+  the focus token rule is `2px dashed` and also matches `:where(a, button, input, select, textarea, [role=button],
+  [role=tab], [role=menuitem]):hover`; `.nav-tabs .nav-link` leaves the border token list and three rules give
+  `.nav-tabs` a 1px `--a11y-border` bottom line, each `.nav-link` a 1px `--a11y-border` border with a transparent
+  background, and `.nav-item + .nav-item .nav-link` a transparent left edge; after the active rule,
+  `html[data-a11y-tokens~="border"][data-a11y-tokens~="active"] body .nav-tabs .nav-link.active` sets
+  `border-color: var(--a11y-active)` and `box-shadow: inset 0 0 0 1px var(--a11y-active)`.
+- `styles.css` section 11a: the focus token ring has `outline-offset: -2px`; the `ring` and `thick` variants set
+  `outline-offset` to `-3px` and `-5px` and `box-shadow: none`; a fourth rule, keyed on the focus and active tokens
+  together, gives the active rule's items `outline-offset: -4px` on `:focus-visible` and `:hover`.
+- `styles.css` section 7: `.activity-header` joins the surface mop-up list, and `html[data-a11y-colour] body
+  :where(.badge, .activityiconcontainer)` sets `mix-blend-mode: normal`.
+
+### Added
+- Scheme model: optional `active` colour (`scheme::fixed()` refuses one under 3:1 on any shade), token `active`,
+  `--a11y-active`; vscodehc sets `#f38518`. `styles.css` section 7: `html[data-a11y-tokens~="active"]` draws an inset
+  2px box-shadow on `.nav-link.active`, `.nav-link[aria-current]`, `.courseindex-item.pageitem`,
+  `.courseindex-item.active`, `.dropdown-item[aria-current]` and `.page-item.active .page-link`.
+- `colour\purpose`: Boost 4.5's six activity purpose colours and `colours($ramp, $text)`, each moved in OKLCH
+  lightness with `adjust::towards()` until `contrast::apca_worst()` reaches `purpose::TARGET` (Lc 75) on page,
+  surface1 and surface2, falling back to the text colour. `contrast::apca()` is SAPC-4 0.0.98G. `scheme::icon_colours()`
+  and `--a11y-icon-<purpose>` custom properties; the panel template carries six `<filter id="la-icon-<purpose>">`
+  (feFlood of that property, composited into the icon's alpha) and `styles.css` section 7 points each
+  `.activityiconcontainer.<purpose>` icon at its filter with Boost's own selector shape.
+- Colour scheme "Dark high contrast (VS Code)" (`vscodehc`): Visual Studio Code's Dark High Contrast palette. Black
+  surfaces (floating widgets #0c141f, hover #111111) told apart by the #6fc3df contrast border, white text, #8bcaff (textLink #21a6ff lifted to APCA Lc 70)
+  links, an #f38518 focus ring and #f3f518 on black selection. Built with `scheme::fixed()`, so the colours are kept
+  exactly; the preset passes 7:1 on every shade and never sets `data-a11y-lowcontrast`.
+- Scheme model: optional `border`, `focus`, `selection` and `selectiontext` colours, `scheme::fixed()` for presets
+  designed as a whole, and `scheme::tokens()`. A scheme that declares any of them gets `data-a11y-tokens` on the
+  html element (space-separated: `border focus selection`) and the matching `--a11y-*` custom properties.
+- styles.css: a 1px border in `--a11y-border` on surfaces, fields, table cells and controls under the border token;
+  a focus outline in `--a11y-focus` under the focus token (2px, or the Focus ring tile's 3px and 5px with the halo in
+  the page colour); `::selection` under the selection token. `--bs-border-color` and the panel's edges take
+  `--a11y-border` when present and fall back to `--a11y-text` as before.
+
 ## [3.0.7] - 2026-10-29
 
 ### Fixed

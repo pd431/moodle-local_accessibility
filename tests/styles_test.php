@@ -182,6 +182,22 @@ final class styles_test extends \advanced_testcase {
     }
 
     /**
+     * The surface mop-up covers the activity header, which Boost paints light grey on every module page.
+     */
+    public function test_surface_mop_up(): void {
+        $mopup = self::rules_with('html[data-a11y-colour] body :where(#page, #page-wrapper');
+        $this->assertCount(1, $mopup, 'one rule repaints the theme\'s hardcoded surfaces');
+        $this->assertStringContainsString('background-color: var(--a11y-surface1) !important', $mopup[0][1]);
+        $parts = ['.card', '.activity-item', '.activity-header', '.course-content .section', '.table', '.dropdown-menu'];
+        foreach ($parts as $part) {
+            $this->assertStringContainsString($part . ',', $mopup[0][0] . ',', $part);
+        }
+        $blend = self::rules_with('html[data-a11y-colour] body :where(.badge, .activityiconcontainer)');
+        $this->assertCount(1, $blend, 'badges and activity icons stop multiplying into the surface');
+        $this->assertStringContainsString('mix-blend-mode: normal !important', $blend[0][1]);
+    }
+
+    /**
      * The panel is sized in rem/em, compact on wide screens and a bottom sheet on narrow ones (spec §1, D10).
      */
     public function test_panel_sizing(): void {
@@ -394,6 +410,127 @@ final class styles_test extends \advanced_testcase {
             foreach ($rules as [$selector]) {
                 $this->assertStringNotContainsString('la-ownfont', $selector, $attr);
             }
+        }
+    }
+
+    /**
+     * The scheme tokens (border, focus, selection) each have their rules once, keyed on data-a11y-tokens and never on a
+     * scheme id; edges fall back to the text colour where no border colour is declared.
+     */
+    public function test_scheme_token_rules(): void {
+        $css = self::css();
+        $this->assertStringNotContainsString('vscodehc', $css, 'no rule keyed on a scheme id');
+        $border = self::rules_with('html[data-a11y-tokens~="border"] body :where(');
+        $this->assertCount(1, $border);
+        $this->assertStringContainsString('border: 1px solid var(--a11y-border) !important', $border[0][1]);
+        foreach (['.card', '.form-control', '.table td', '.btn-secondary', '.dropdown-menu', '.modal-content'] as $part) {
+            $this->assertStringContainsString($part, $border[0][0], $part);
+        }
+        $this->assertStringNotContainsString('.nav-tabs .nav-link', $border[0][0], 'tabs have their own rule');
+        $tabs = self::rules_with('html[data-a11y-tokens~="border"] body .nav-tabs');
+        $this->assertCount(3, $tabs, 'one line under the tab bar, a box per tab, a shared edge between neighbours');
+        $this->assertStringContainsString('border-bottom: 1px solid var(--a11y-border) !important', $tabs[0][1]);
+        $this->assertStringContainsString('border: 1px solid var(--a11y-border) !important', $tabs[1][1]);
+        $this->assertStringContainsString('background-color: transparent !important', $tabs[1][1], 'no hover fill');
+        $this->assertStringContainsString('.nav-item + .nav-item .nav-link', $tabs[2][0]);
+        $this->assertStringContainsString('border-left-color: transparent !important', $tabs[2][1], 'shared edge');
+        $current = self::rules_with('[data-a11y-tokens~="active"] body .nav-tabs .nav-link.active');
+        $this->assertCount(1, $current, 'the current tab is boxed in orange alone');
+        $this->assertStringContainsString('border-color: var(--a11y-active) !important', $current[0][1]);
+        $this->assertStringContainsString('box-shadow: inset 0 0 0 1px var(--a11y-active) !important', $current[0][1]);
+        $css = self::css();
+        $activeat = strpos($css, 'data-a11y-tokens~="active"] body :where(');
+        $this->assertGreaterThan($activeat, strpos($css, '.nav-tabs .nav-link.active {'), 'after the active rule');
+        $nofill = self::rules_with('html[data-a11y-tokens~="focus"] body :where(a):where(:focus, .focus)');
+        $this->assertCount(1, $nofill, 'a focused link loses the theme fill and shadow');
+        $this->assertStringContainsString('background-color: transparent !important', $nofill[0][1]);
+        $css = self::css();
+        $activeat = strpos($css, 'data-a11y-tokens~="active"');
+        $this->assertLessThan($activeat, strpos($css, ':where(a):where(:focus, .focus)'), 'before the active rule');
+        $token = self::rules_with('html[data-a11y-tokens~="focus"]');
+        $focus = array_values(array_filter($token, fn($r) => str_contains($r[0], ':focus-visible')));
+        $this->assertCount(4, $focus);
+        $this->assertStringContainsString('outline: 2px dashed var(--a11y-focus) !important', $focus[0][1]);
+        $this->assertStringContainsString('outline-offset: -2px !important', $focus[0][1], 'the ring sits inside');
+        $this->assertStringContainsString(':focus-visible', $focus[0][0]);
+        $hover = ':where(a, button, input, select, textarea, [role="button"], [role="tab"], [role="menuitem"]):hover';
+        $this->assertStringContainsString($hover, $focus[0][0]);
+        $this->assertStringNotContainsString('solid var(--a11y-focus)', self::css(), 'focus is never solid');
+        $this->assertStringContainsString('[data-a11y-focus="ring"]', $focus[1][0]);
+        $this->assertStringContainsString('outline-width: 3px !important', $focus[1][1]);
+        $this->assertStringContainsString('outline-offset: -3px !important', $focus[1][1]);
+        $this->assertStringContainsString('box-shadow: none !important', $focus[1][1], 'no halo inside');
+        $this->assertStringContainsString('[data-a11y-focus="thick"]', $focus[2][0]);
+        $this->assertStringContainsString('outline-width: 5px !important', $focus[2][1]);
+        $this->assertStringContainsString('outline-offset: -5px !important', $focus[2][1]);
+        $this->assertStringContainsString('[data-a11y-tokens~="active"]', $focus[3][0], 'a current item moves the ring in');
+        $this->assertStringContainsString('.courseindex-item.pageitem', $focus[3][0]);
+        $this->assertStringContainsString('outline-offset: -4px !important', $focus[3][1]);
+        $this->assertStringNotContainsString('outline-offset: 2px !important', implode('', array_column($token, 1)));
+        $active = self::rules_with('html[data-a11y-tokens~="active"]');
+        $this->assertCount(1, $active);
+        $this->assertStringContainsString('box-shadow: inset 0 0 0 2px var(--a11y-active) !important', $active[0][1]);
+        $this->assertStringContainsString('background-color: transparent !important', $active[0][1], 'no fill');
+        $this->assertStringContainsString('border-color: transparent !important', $active[0][1], 'no theme underline');
+        $marks = ['.nav-link.active', '.nav-link[aria-current]', '.courseindex-item.pageitem', '.dropdown-item[aria-current]',
+            '.page-item.active .page-link'];
+        foreach ($marks as $part) {
+            $this->assertStringContainsString($part, $active[0][0], $part);
+        }
+        $selection = self::rules_with('html[data-a11y-tokens~="selection"]');
+        $this->assertCount(1, $selection);
+        $this->assertStringContainsString('::selection', $selection[0][0]);
+        $this->assertStringContainsString('var(--a11y-selection) !important', $selection[0][1]);
+        $this->assertStringContainsString('var(--a11y-selection-text) !important', $selection[0][1]);
+        // Edges fall back to the text colour, as before the border token existed.
+        $this->assertStringContainsString('--bs-border-color: var(--a11y-border, var(--a11y-text))', $css);
+        $panel = implode(' ', array_column(array_filter(self::rules(), fn($r) => $r[0] === '.local-accessibility-panel'), 1));
+        $this->assertStringContainsString('--la-edge: var(--a11y-border, var(--a11y-text, ', $panel);
+        $this->assertStringContainsString('border: 1px solid var(--la-edge)', $panel);
+    }
+
+    /**
+     * Links by purpose: the control list is stated once (--la-anchor) and the single anchor rule reads it.
+     *
+     */
+    public function test_links_by_purpose(): void {
+        $controls = array_values(array_filter(self::rules(), fn($r) => str_contains($r[1], '--la-anchor: var(--a11y-text)')));
+        $this->assertCount(1, $controls, 'the control list is stated once');
+        $selector = $controls[0][0];
+        $this->assertStringStartsWith('html[data-a11y-colour] body :where(', $selector);
+        $parts = ['nav', '[role="navigation"]', '[role="menu"]', '[role="menubar"]', '[role="tablist"]', '[role="tree"]',
+            '[role="toolbar"]', 'h1', 'h6', 'thead th', '[role="button"]', '[role="tab"]', '[role="menuitem"]',
+            '.dropdown-item', '.page-link', '.nav-link', '.badge', 'a:has(> :is(h1, h2, h3, h4, h5, h6))',
+            '.activity-item .activityname'];
+        foreach ($parts as $part) {
+            $this->assertStringContainsString($part, $selector, $part);
+        }
+        $this->assertStringContainsString('--la-anchor-line: none', $controls[0][1]);
+        $anchors = array_values(array_filter(self::rules(), fn($r) => str_contains($r[1], 'var(--la-anchor, var(--a11y-link))')));
+        $this->assertCount(1, $anchors, 'one anchor rule');
+        $this->assertStringContainsString('text-decoration: var(--la-anchor-line, underline) !important', $anchors[0][1]);
+        // Buttons and the active page or menu item stay out of it, as before.
+        foreach (['.btn', '.qnbutton', '.nav-link.active', '.page-item.active .page-link', '.dropdown-item.active'] as $part) {
+            $this->assertStringContainsString($part, $anchors[0][0], $part);
+        }
+        $scheme = array_filter(self::rules(), fn($r) => str_starts_with($r[0], 'html[data-a11y-colour] body'));
+        $bodies = implode(' ', array_column($scheme, 1));
+        $this->assertStringNotContainsString('color: var(--a11y-link) !important', $bodies, 'no rule paints every anchor');
+    }
+
+    /**
+     * Activity icons: one filter rule per purpose, Boost's selector shape, pointing at the panel's SVG filter.
+     *
+     */
+    public function test_activity_icon_filters(): void {
+        $rules = self::rules_with('.activityiconcontainer.');
+        $this->assertCount(6, $rules);
+        foreach ($rules as [$selector, $body]) {
+            $shape = '/^html\[data-a11y-colour\] body \.activityiconcontainer\.([a-z]+):not\(\.isbranded\) '
+                . ':is\(\.activityicon, \.icon\):not\(\.nofilter\)$/';
+            $this->assertMatchesRegularExpression($shape, $selector);
+            preg_match('/\.activityiconcontainer\.([a-z]+)/', $selector, $m);
+            $this->assertSame('filter: url("#la-icon-' . $m[1] . '");', trim($body));
         }
     }
 }

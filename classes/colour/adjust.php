@@ -71,25 +71,27 @@ final class adjust {
      * Smallest lightness change that lets a foreground reach a target on every ramp shade.
      *
      * @param string $fg normalised colour
-     * @param array $ramp from ramp()
-     * @param float $target contrast ratio
+     * @param array $ramp from ramp(); 'page' decides the direction
+     * @param float $target contrast ratio, or Lc when $measure is contrast::apca_worst
+     * @param callable|null $measure (fg, backgrounds) => worst contrast; WCAG 2 (contrast::worst) by default
      * @return string|null adjusted colour, or null when no lightness of this hue reaches the target
      */
-    public static function towards(string $fg, array $ramp, float $target): ?string {
-        if (contrast::worst($fg, $ramp) >= $target) {
+    public static function towards(string $fg, array $ramp, float $target, ?callable $measure = null): ?string {
+        $measure ??= contrast::worst(...);
+        if ($measure($fg, $ramp) >= $target) {
             return $fg;
         }
         [$l, $c, $h] = oklch::from_hex($fg);
         $darker = contrast::luminance($fg) < contrast::luminance($ramp['page']);
         $end = $darker ? 0.0 : 1.0;
-        if (contrast::worst(oklch::to_hex([$end, $c, $h]), $ramp) < $target) {
+        if ($measure(oklch::to_hex([$end, $c, $h]), $ramp) < $target) {
             return null;
         }
         $lo = $l;
         $hi = $end;
         for ($i = 0; $i < 30; $i++) {
             $mid = ($lo + $hi) / 2;
-            if (contrast::worst(oklch::to_hex([$mid, $c, $h]), $ramp) >= $target) {
+            if ($measure(oklch::to_hex([$mid, $c, $h]), $ramp) >= $target) {
                 $hi = $mid;
             } else {
                 $lo = $mid;

@@ -34,8 +34,97 @@ final class scheme_test extends \advanced_testcase {
         foreach (scheme::presets() as $id => $s) {
             $this->assertGreaterThanOrEqual(contrast::AAA, $s->worst_text(), "$id text");
             $this->assertGreaterThanOrEqual(contrast::AAA, $s->worst_link(), "$id link");
+            if ($s->border !== null) {
+                continue;       // Tiers are told apart by the border: see test_border_scheme_edges().
+            }
             // On light pages field = page by design, so at least 4 distinct shades.
             $this->assertGreaterThanOrEqual(4, count(array_unique($s->ramp)), "$id ramp has distinct shades");
+        }
+    }
+
+    /**
+     * A scheme with a border colour may share one shade across its tiers; the border then stands out from every shade
+     * by at least 3:1 (WCAG 1.4.11), and so does its focus colour.
+     */
+    public function test_border_scheme_edges(): void {
+        $seen = 0;
+        foreach (scheme::presets() as $id => $s) {
+            if ($s->border === null) {
+                continue;
+            }
+            $seen++;
+            $this->assertGreaterThanOrEqual(3.0, contrast::worst($s->border, $s->ramp), "$id border");
+            $this->assertNotNull($s->focus, "$id focus");
+            $this->assertGreaterThanOrEqual(3.0, contrast::worst($s->focus, $s->ramp), "$id focus");
+        }
+        $this->assertSame(1, $seen, 'one border scheme: vscodehc');
+    }
+
+    /**
+     * The VS Code dark high contrast preset keeps its palette exactly, declares all three tokens and emits them.
+     */
+    public function test_vscodehc_preset(): void {
+        $s = scheme::presets()['vscodehc'];
+        $this->assertTrue($s->exact);
+        $this->assertSame('dark', $s->mode);
+        $this->assertSame('#000000', $s->ramp['page']);
+        $this->assertSame('#000000', $s->ramp['surface1']);
+        $this->assertSame('#000000', $s->ramp['field']);
+        $this->assertSame('#ffffff', $s->text);
+        $this->assertSame('#8bcaff', $s->link);
+        $this->assertGreaterThanOrEqual(70, contrast::apca_worst($s->link, $s->ramp), 'link Lc 70 on every shade');
+        $this->assertSame('#6fc3df', $s->border);
+        $this->assertSame('#f38518', $s->focus);
+        $this->assertSame('#f38518', $s->active);
+        $this->assertGreaterThanOrEqual(3.0, contrast::worst($s->active, $s->ramp), 'active box 3:1 on every shade');
+        $this->assertSame('#f3f518', $s->selection);
+        $this->assertSame('#000000', $s->selectiontext);
+        $this->assertSame(['border', 'focus', 'selection', 'active'], $s->tokens());
+        $css = $s->css_properties();
+        $this->assertStringContainsString('--a11y-border:#6fc3df;', $css);
+        $this->assertStringContainsString('--a11y-focus:#f38518;', $css);
+        $this->assertStringContainsString('--a11y-active:#f38518;', $css);
+        $this->assertStringContainsString('--a11y-selection:#f3f518;--a11y-selection-text:#000000;', $css);
+        $this->assertMatchesRegularExpression('/^(--a11y-[a-z0-9-]+:#[0-9a-f]{6};)+$/', $css);
+        // Every other preset, and a custom scheme, declares no token and emits none.
+        foreach (scheme::presets() + ['c' => scheme::custom('#14202b', '#e8eef3', '#8cc8ff', false)] as $id => $o) {
+            if ($id === 'vscodehc') {
+                continue;
+            }
+            $this->assertSame([], $o->tokens(), $id);
+            $this->assertStringNotContainsString('--a11y-border', $o->css_properties(), $id);
+            $this->assertStringNotContainsString('--a11y-focus', $o->css_properties(), $id);
+            $this->assertStringNotContainsString('--a11y-active', $o->css_properties(), $id);
+            $this->assertNull($o->active, $id);
+            $this->assertStringNotContainsString('--a11y-selection', $o->css_properties(), $id);
+        }
+    }
+
+    /**
+     * fixed() checks every colour, needs the whole ramp, takes selection as a pair, and refuses a palette under 7:1.
+     */
+    public function test_fixed_refusals(): void {
+        $ramp = ['page' => '#000000', 'surface1' => '#000000', 'surface2' => '#0c141f', 'field' => '#000000',
+            'hover' => '#111111'];
+        $ok = scheme::fixed('t', $ramp, '#FFFFFF', '#21a6ff');
+        $this->assertSame('#ffffff', $ok->text, 'normalised');
+        $this->assertNull($ok->border);
+        $this->assertSame([], $ok->tokens());
+        $cases = [
+            'bad hex' => fn() => scheme::fixed('t', $ramp, '#ffffff', '#21a6ff', '#6fc3df;x'),
+            'missing tier' => fn() => scheme::fixed('t', ['page' => '#000000'], '#ffffff', '#21a6ff'),
+            'half selection' => fn() => scheme::fixed('t', $ramp, '#ffffff', '#21a6ff', null, null, '#f3f518'),
+            'link under 7:1' => fn() => scheme::fixed('t', $ramp, '#ffffff', '#0f6cbf'),
+            'text under 7:1 on hover' => fn() => scheme::fixed('t', ['hover' => '#777777'] + $ramp, '#ffffff', '#21a6ff'),
+            'active under 3:1' => fn() => scheme::fixed('t', $ramp, '#ffffff', '#21a6ff', null, null, null, null, '#333333'),
+        ];
+        foreach ($cases as $name => $case) {
+            try {
+                $case();
+                $this->fail("$name accepted");
+            } catch (\invalid_parameter_exception $e) {
+                $this->addToAssertionCount(1);
+            }
         }
     }
 
@@ -44,6 +133,9 @@ final class scheme_test extends \advanced_testcase {
      */
     public function test_preset_tiers_distinct(): void {
         foreach (scheme::presets() as $id => $s) {
+            if ($s->border !== null) {
+                continue;       // Tiers are told apart by the border: see test_border_scheme_edges().
+            }
             $r = $s->ramp;
             $this->assertCount(3, array_unique([$r['page'], $r['surface1'], $r['surface2']]), "$id tiers distinct");
             $this->assertGreaterThanOrEqual(1.15, contrast::ratio($r['page'], $r['surface2']), "$id page vs surface2");
@@ -137,5 +229,40 @@ final class scheme_test extends \advanced_testcase {
     public function test_css_properties_safe(): void {
         $css = scheme::presets()['cream']->css_properties();
         $this->assertMatchesRegularExpression('/^(--a11y-[a-z0-9-]+:#[0-9a-f]{6};)+$/', $css);
+    }
+
+    /**
+     * Every preset's six activity icon colours reach APCA Lc 75 on page, surface1 and surface2, keep Boost's hue,
+     * and are emitted as --a11y-icon-<purpose>.
+     */
+    public function test_icon_colours(): void {
+        foreach (scheme::presets() as $id => $s) {
+            $colours = $s->icon_colours();
+            $this->assertSame(purpose::ids(), array_keys($colours), $id);
+            $surfaces = [$s->ramp['page'], $s->ramp['surface1'], $s->ramp['surface2']];
+            foreach ($colours as $p => $hex) {
+                $this->assertGreaterThanOrEqual(purpose::TARGET, contrast::apca_worst($hex, $surfaces), "$id $p");
+                [, $c, $h] = oklch::from_hex($hex);
+                [, , $boosth] = oklch::from_hex(purpose::BOOST[$p]);
+                $diff = abs($h - $boosth);
+                $this->assertLessThan(3, min($diff, 360 - $diff), "$id $p keeps the hue");
+                $this->assertGreaterThan(0.03, $c, "$id $p keeps some chroma");
+                $this->assertStringContainsString("--a11y-icon-$p:$hex;", $s->css_properties(), $id);
+            }
+            $this->assertCount(6, array_unique($colours), "$id icon colours are distinct");
+        }
+    }
+
+    /**
+     * A purpose colour that already reaches the target is left as Boost made it; one no lightness of its hue can
+     * bring to the target falls back to the text colour.
+     */
+    public function test_icon_colours_untouched_or_fallback(): void {
+        $white = ['page' => '#ffffff', 'surface1' => '#ffffff', 'surface2' => '#ffffff'];
+        $this->assertSame('#8d3d1b', purpose::colours($white, '#000000')['interactivecontent'], 'Lc 85 on white');
+        $grey = ['page' => '#808080', 'surface1' => '#808080', 'surface2' => '#808080'];
+        foreach (purpose::colours($grey, '#101010') as $p => $hex) {
+            $this->assertSame('#101010', $hex, "$p falls back to the text colour on mid grey");
+        }
     }
 }

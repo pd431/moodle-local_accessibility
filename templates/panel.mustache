@@ -28,6 +28,7 @@
     * drawers - one per enabled short-list feature (see local_accessibility/drawer)
     * views - one per rich tile, with a flag naming its partial: issize, isfont, isspacing, isnarrow or iscolour
     * profiles - preset profiles: id, name, values (JSON of feature values)
+    * purposes - activity purposes (id), one SVG filter each: it floods the icon with --a11y-icon-<id>
     * custom - the user's custom scheme, or null
     * lowcontrast - whether the current scheme is exact and under 7:1 (shows the colour tile's warning icon)
 
@@ -68,9 +69,21 @@
         ],
         "profiles": [{"id": "dyslexia", "name": "Dyslexia", "values": "{\"font\":\"dyslexic\"}"}],
         "custom": null,
-        "lowcontrast": false
+        "lowcontrast": false,
+        "purposes": [{"id": "content"}]
     }
 }}
+{{! Activity icons under a scheme: styles.css points each purpose's icon at its filter, which floods the icon's
+    shape with the scheme's lifted purpose colour. Sized 0 and absolute, not hidden: a hidden SVG's filters do not
+    resolve. }}
+<svg id="la-icon-filters" width="0" height="0" aria-hidden="true" focusable="false" style="position: absolute">
+{{#purposes}}
+    <filter id="la-icon-{{id}}" color-interpolation-filters="sRGB">
+        <feFlood style="flood-color: var(--a11y-icon-{{id}})"/>
+        <feComposite in2="SourceAlpha" operator="in"/>
+    </filter>
+{{/purposes}}
+</svg>
 {{#floating}}
 <button type="button" class="local-accessibility-launcher btn btn-primary"
         aria-expanded="false" aria-controls="local-accessibility-panel"

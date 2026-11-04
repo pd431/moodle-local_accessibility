@@ -14,6 +14,9 @@ It is one plugin with all features built in.
 - Text size, line height, letter spacing, word spacing and line width have no fixed list of values. Each has
   − and + buttons (hold one to keep stepping), a field where you can type a number and press Enter, and a
   _Site default_ button. Changes show at once and are saved a moment after the last one.
+- Under a colour scheme, links are coloured by purpose: navigation, menus, tabs, buttons and titles take the text
+  colour, and links in text keep the link colour and an underline. Activity icons keep their purpose colour but
+  are lifted or lowered in lightness until they reach APCA Lc 75 against the scheme's surfaces.
 - The panel follows your own text size, font, spacing and colours. Alignment, line width, link and image
   options and the reading guide are not applied to the panel itself.
 - Profiles: one-click bundles of settings (Dyslexia, Focus, Low vision, Seizure-safe).
@@ -27,7 +30,7 @@ It is one plugin with all features built in.
 | Spacing: letter spacing | Site default, or any value from −5 to 5 em in steps of 0.01 em |
 | Spacing: word spacing | Site default, or any value from −10 to 10 em in steps of 0.02 em |
 | Alignment | Site default, Left, Centre, Right, Justified |
-| Colours | Site default, High contrast, Yellow on black, Black on white, Cream, Dark, the site's own schemes, and Custom (your own background, text and link colours, adjusted to a 7:1 contrast ratio unless you keep your exact colours) |
+| Colours | Site default, High contrast, Yellow on black, Dark high contrast (VS Code), Black on white, Cream, Dark, the site's own schemes, and Custom (your own background, text and link colours, adjusted to a 7:1 contrast ratio unless you keep your exact colours) |
 | Line width | Full width, or any width from 1 to 300 characters in steps of 5 |
 | Links | Off, Underlined, Underline and outline, Highlighted |
 | Images | Shown, Dimmed, Hidden (alt text shown); this includes photos shown as background images, such as Tiles course format tiles and Dashboard course cards |
