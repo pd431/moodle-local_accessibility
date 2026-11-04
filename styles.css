@@ -400,22 +400,28 @@ html[data-a11y-focus="thick"] :focus-visible {
 }
 
 /* 11a. Focus token (data-a11y-tokens): the scheme's own focus colour, dashed so it is never mistaken for the active
-   token's solid box, on keyboard focus and on the pointer over a link or control. A 2px ring where the Focus ring
-   tile is off; "ring" and "thick" keep their thickness, with the halo in the page colour so the ring reads on any
-   surface. Never in forced colours, where the system draws focus. */
+   token's solid box, on keyboard focus and on the pointer over a link or control. The ring is drawn inside the item's
+   edge, on its own surface, so it needs no halo: 2px where the Focus ring tile is off; "ring" and "thick" keep their
+   thickness. A current item carries the active token's solid box inside its edge, so the ring moves in by 4px to sit
+   inside that box rather than over it. Never in forced colours, where the system draws focus. */
 @media (forced-colors: none) {
     html[data-a11y-tokens~="focus"] :focus-visible,
     html[data-a11y-tokens~="focus"] body :where(a, button, input, select, textarea, [role="button"], [role="tab"], [role="menuitem"]):hover {
         outline: 2px dashed var(--a11y-focus) !important; /* stylelint-disable-line declaration-no-important */
-        outline-offset: 2px !important; /* stylelint-disable-line declaration-no-important */
+        outline-offset: -2px !important; /* stylelint-disable-line declaration-no-important */
     }
     html[data-a11y-tokens~="focus"][data-a11y-focus="ring"] :focus-visible {
         outline-width: 3px !important; /* stylelint-disable-line declaration-no-important */
-        box-shadow: 0 0 0 5px var(--a11y-page) !important; /* stylelint-disable-line declaration-no-important */
+        outline-offset: -3px !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
     }
     html[data-a11y-tokens~="focus"][data-a11y-focus="thick"] :focus-visible {
         outline-width: 5px !important; /* stylelint-disable-line declaration-no-important */
-        box-shadow: 0 0 0 9px var(--a11y-page) !important; /* stylelint-disable-line declaration-no-important */
+        outline-offset: -5px !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-tokens~="focus"][data-a11y-tokens~="active"] body :where(.nav-link.active, .nav-link[aria-current], .courseindex-item.pageitem, .courseindex-item.active, .dropdown-item[aria-current], .page-item.active .page-link):where(:focus-visible, :hover) {
+        outline-offset: -4px !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Selection token: selected text in the scheme's own pair. */
     html[data-a11y-tokens~="selection"] ::selection {

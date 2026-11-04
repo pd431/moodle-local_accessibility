@@ -27,6 +27,9 @@
 - Dark high contrast (VS Code): each course tab is boxed in cyan, neighbours sharing one edge and the tab bottoms
   sitting on the bar line, so no line is ever doubled; the current tab is boxed in orange alone, with no cyan around
   it.
+- Dark high contrast (VS Code): the dashed focus and hover ring is drawn inside the item's edge instead of around it,
+  on the item's own surface. On a current item it sits inside the solid orange box. The Focus ring tile's Ring and
+  Extra thick go inside too and drop their page-colour halo, which only framed a ring drawn outside.
 - Colour schemes can now declare a border, a focus, a selection and an active colour. The page lists the ones a scheme declares
   in a data-a11y-tokens attribute, and the stylesheet keys on those tokens. Schemes without them paint exactly as
   before.

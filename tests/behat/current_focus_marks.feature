@@ -27,14 +27,16 @@ Feature: Current, focus and hover each have one mark under the VS Code scheme
     And the computed "background-color" of ".courseindex-item.pageitem" should be "rgba(0, 0, 0, 0)"
     And the computed "color" of ".courseindex-item.pageitem .courseindex-link" should be "rgb(255, 255, 255)"
 
-  Scenario: Keyboard focus is a dashed ring outside the item, and the current item keeps its solid box under it
+  Scenario: Keyboard focus is a dashed ring inside the item, and a current item keeps its solid box around it
     Given I log in as "student1"
     Then the computed "outline-style" of ".primary-navigation .nav-link[aria-current]:focus-visible" should be "dashed"
     And the computed "outline-color" of ".primary-navigation .nav-link[aria-current]:focus-visible" should be "rgb(243, 133, 24)"
+    And the computed "outline-offset" of ".primary-navigation .nav-link[aria-current]:focus-visible" should be "-4px"
     And the computed "box-shadow" of ".primary-navigation .nav-link[aria-current]:focus-visible" should be "rgb(243, 133, 24) 0px 0px 0px 2px inset"
     When the main region contains core controls
     Then the "#la-test-link" element should show a keyboard focus indicator
     And the computed "outline-style" of "#la-test-link:focus-visible" should be "dashed"
+    And the computed "outline-offset" of "#la-test-link:focus-visible" should be "-2px"
 
   Scenario: Pointing at a link or control shows the same dashed ring
     Given I log in as "student1"
@@ -63,3 +65,5 @@ Feature: Current, focus and hover each have one mark under the VS Code scheme
     When the main region contains core controls
     Then the computed "outline-style" of "#la-test-link:focus-visible" should be "dashed"
     And the computed "outline-width" of "#la-test-link:focus-visible" should be "5px"
+    And the computed "outline-offset" of "#la-test-link:focus-visible" should be "-5px"
+    And the computed "box-shadow" of "#la-test-link:focus-visible" should be "none"

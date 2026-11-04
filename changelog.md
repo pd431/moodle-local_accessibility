@@ -17,6 +17,9 @@
   background, and `.nav-item + .nav-item .nav-link` a transparent left edge; after the active rule,
   `html[data-a11y-tokens~="border"][data-a11y-tokens~="active"] body .nav-tabs .nav-link.active` sets
   `border-color: var(--a11y-active)` and `box-shadow: inset 0 0 0 1px var(--a11y-active)`.
+- `styles.css` section 11a: the focus token ring has `outline-offset: -2px`; the `ring` and `thick` variants set
+  `outline-offset` to `-3px` and `-5px` and `box-shadow: none`; a fourth rule, keyed on the focus and active tokens
+  together, gives the active rule's items `outline-offset: -4px` on `:focus-visible` and `:hover`.
 
 ### Added
 - Scheme model: optional `active` colour (`scheme::fixed()` refuses one under 3:1 on any shade), token `active`,
