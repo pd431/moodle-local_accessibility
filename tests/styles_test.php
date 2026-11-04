@@ -192,6 +192,9 @@ final class styles_test extends \advanced_testcase {
         foreach ($parts as $part) {
             $this->assertStringContainsString($part . ',', $mopup[0][0] . ',', $part);
         }
+        $blend = self::rules_with('html[data-a11y-colour] body :where(.badge, .activityiconcontainer)');
+        $this->assertCount(1, $blend, 'badges and activity icons stop multiplying into the surface');
+        $this->assertStringContainsString('mix-blend-mode: normal !important', $blend[0][1]);
     }
 
     /**

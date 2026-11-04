@@ -225,6 +225,11 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         background-color: var(--a11y-surface1) !important; /* stylelint-disable-line declaration-no-important */
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
     }
+    /* Boost multiplies completion badges, and the badge and icon of a hidden or hovered activity card, into the grey
+       behind them. Over a scheme's dark surface, multiply turns white text and icons black, so they blend normally. */
+    html[data-a11y-colour] body :where(.badge, .activityiconcontainer) {
+        mix-blend-mode: normal !important; /* stylelint-disable-line declaration-no-important */
+    }
     html[data-a11y-colour] body :where(.drawer, .navbar, .secondary-navigation):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
         background-color: var(--a11y-surface2) !important; /* stylelint-disable-line declaration-no-important */
     }

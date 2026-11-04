@@ -32,7 +32,9 @@
   Extra thick go inside too and drop their page-colour halo, which only framed a ring drawn outside.
 - Under a colour scheme, the activity header (the strip under the tabs on a module page that holds the completion
   conditions, dates and description) takes the surface colour. Before, it kept Boost's light grey under every scheme,
-  so on a dark scheme it stood out and its white text was unreadable.
+  so on a dark scheme it stood out and its white text was unreadable. The completion badges in it, and the badge and
+  icon of a hidden or hovered activity card, no longer multiply into the surface behind them, which on a dark surface
+  turned their white text and icons black.
 - Colour schemes can now declare a border, a focus, a selection and an active colour. The page lists the ones a scheme declares
   in a data-a11y-tokens attribute, and the stylesheet keys on those tokens. Schemes without them paint exactly as
   before.
