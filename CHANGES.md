@@ -1,3 +1,8 @@
+# 3.1.1
+
+- A Tag release workflow tags main with the plugin's release after a green CI run, or on demand from the Actions
+  tab, and starts the publish workflows. Tags are never moved: a merge that keeps the release makes no tag.
+
 # 3.1.0
 
 - New colour scheme, Dark high contrast (VS Code): the palette of Visual Studio Code's Dark High Contrast theme. Every
