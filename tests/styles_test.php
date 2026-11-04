@@ -404,15 +404,32 @@ final class styles_test extends \advanced_testcase {
     public function test_scheme_token_rules(): void {
         $css = self::css();
         $this->assertStringNotContainsString('vscodehc', $css, 'no rule keyed on a scheme id');
-        $border = self::rules_with('html[data-a11y-tokens~="border"]');
+        $border = self::rules_with('html[data-a11y-tokens~="border"] body :where(');
         $this->assertCount(1, $border);
         $this->assertStringContainsString('border: 1px solid var(--a11y-border) !important', $border[0][1]);
         foreach (['.card', '.form-control', '.table td', '.btn-secondary', '.dropdown-menu', '.modal-content'] as $part) {
             $this->assertStringContainsString($part, $border[0][0], $part);
         }
-        $focus = self::rules_with('html[data-a11y-tokens~="focus"]');
+        $this->assertStringNotContainsString('.nav-tabs .nav-link', $border[0][0], 'tabs carry no border each');
+        $tabs = self::rules_with('html[data-a11y-tokens~="border"] body .nav-tabs');
+        $this->assertCount(2, $tabs, 'one line under the tab bar, none around a tab');
+        $this->assertStringContainsString('border-bottom: 1px solid var(--a11y-border) !important', $tabs[0][1]);
+        $this->assertStringContainsString('border-color: transparent !important', $tabs[1][1]);
+        $this->assertStringContainsString('background-color: transparent !important', $tabs[1][1], 'no hover fill');
+        $nofill = self::rules_with('html[data-a11y-tokens~="focus"] body :where(a):where(:focus, .focus)');
+        $this->assertCount(1, $nofill, 'a focused link loses the theme fill and shadow');
+        $this->assertStringContainsString('background-color: transparent !important', $nofill[0][1]);
+        $css = self::css();
+        $activeat = strpos($css, 'data-a11y-tokens~="active"');
+        $this->assertLessThan($activeat, strpos($css, ':where(a):where(:focus, .focus)'), 'before the active rule');
+        $token = self::rules_with('html[data-a11y-tokens~="focus"]');
+        $focus = array_values(array_filter($token, fn($r) => str_contains($r[0], ':focus-visible')));
         $this->assertCount(3, $focus);
-        $this->assertStringContainsString('outline: 2px solid var(--a11y-focus) !important', $focus[0][1]);
+        $this->assertStringContainsString('outline: 2px dashed var(--a11y-focus) !important', $focus[0][1]);
+        $this->assertStringContainsString(':focus-visible', $focus[0][0]);
+        $hover = ':where(a, button, input, select, textarea, [role="button"], [role="tab"], [role="menuitem"]):hover';
+        $this->assertStringContainsString($hover, $focus[0][0]);
+        $this->assertStringNotContainsString('solid var(--a11y-focus)', self::css(), 'focus is never solid');
         $this->assertStringContainsString('[data-a11y-focus="ring"]', $focus[1][0]);
         $this->assertStringContainsString('outline-width: 3px !important', $focus[1][1]);
         $this->assertStringContainsString('[data-a11y-focus="thick"]', $focus[2][0]);
@@ -420,6 +437,8 @@ final class styles_test extends \advanced_testcase {
         $active = self::rules_with('html[data-a11y-tokens~="active"]');
         $this->assertCount(1, $active);
         $this->assertStringContainsString('box-shadow: inset 0 0 0 2px var(--a11y-active) !important', $active[0][1]);
+        $this->assertStringContainsString('background-color: transparent !important', $active[0][1], 'no fill');
+        $this->assertStringContainsString('border-color: transparent !important', $active[0][1], 'no theme underline');
         $marks = ['.nav-link.active', '.nav-link[aria-current]', '.courseindex-item.pageitem', '.dropdown-item[aria-current]',
             '.page-item.active .page-link'];
         foreach ($marks as $part) {

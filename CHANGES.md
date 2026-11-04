@@ -20,6 +20,11 @@
   page in the top nav, the current course tab, the current activity or section in the course index, the current
   item in a dropdown and the current page in pagination. The box is drawn inside the item, so the keyboard focus ring
   still shows around it.
+- Dark high contrast (VS Code): one mark per state. The current item has its solid orange box and nothing else (no
+  fill, no theme underline); keyboard focus and the pointer over a link or control show a dashed orange ring outside
+  the item, so a current item under the pointer reads as solid inside, dashed outside; the course tabs have one cyan
+  line under the bar instead of a border around each tab. The Focus ring tile's Ring and Extra thick keep their
+  thickness, dashed.
 - Colour schemes can now declare a border, a focus, a selection and an active colour. The page lists the ones a scheme declares
   in a data-a11y-tokens attribute, and the stylesheet keys on those tokens. Schemes without them paint exactly as
   before.

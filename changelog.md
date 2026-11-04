@@ -9,6 +9,12 @@
   `.badge`, and `a:has(> h1..h6)`; the single anchor rule paints `var(--la-anchor, var(--a11y-link))` and
   `var(--la-anchor-line, underline)`. Buttons and the active page or menu item stay excluded as before.
 
+### Changed
+- `styles.css`: the active token rule adds `background-color`, `border-color: transparent` and `color: var(--a11y-text)`;
+  the focus token rule is `2px dashed` and also matches `:where(a, button, input, select, textarea, [role=button],
+  [role=tab], [role=menuitem]):hover`; `.nav-tabs .nav-link` leaves the border token list and two rules give
+  `.nav-tabs` a 1px `--a11y-border` bottom line and its links transparent border and background.
+
 ### Added
 - Scheme model: optional `active` colour (`scheme::fixed()` refuses one under 3:1 on any shade), token `active`,
   `--a11y-active`; vscodehc sets `#f38518`. `styles.css` section 7: `html[data-a11y-tokens~="active"]` draws an inset
