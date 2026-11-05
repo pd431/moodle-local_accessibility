@@ -1,3 +1,15 @@
+# 3.1.3
+
+- Merges upstream 3.0.8 (Adam Jenkins): the panel stays open while you try settings, Site default comes first in
+  every stepper, Line width opens under its tile, profiles replace your settings, Links "Off" is "Standard", the
+  large cursor shows over every control but text entry, and under a colour scheme the navigation bar, menus,
+  notification and messaging panels, conversations and placeholders all take the scheme's colours, including on
+  Boost Union. See 3.0.8 below.
+- Dark high contrast (VS Code) follows the same hover rule as every other scheme: a hovered menu item, course tab or
+  navigation pill takes the scheme's hover surface, and the dashed orange ring now marks keyboard focus only. The
+  current item keeps its solid orange box, drawn on that surface rather than on bare black, and keeps the menu's
+  underline in the text colour.
+
 # 3.1.2
 
 - Under a colour scheme, plain buttons (the course index and block drawer toggles, the user menu toggle, the
