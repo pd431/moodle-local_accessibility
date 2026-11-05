@@ -246,14 +246,22 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         background-color: var(--a11y-page) !important; /* stylelint-disable-line declaration-no-important */
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
     }
-    /* Theme-coloured controls (Task 22 browser pass): secondary, outline and icon buttons take the scheme. */
-    html[data-a11y-colour] body :where(.btn-secondary, .btn-light, .btn-outline-secondary, .btn-outline-primary, .btn-icon, .btn-footer-popover, .icons-collapse-expand, .mds-nav-pill--selected, .mds-nav-pill.active):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
+    /* Theme-coloured controls (Task 22 browser pass): secondary, outline and icon buttons take the scheme, and so
+       does a plain .btn with no variant class (drawer and user menu toggles, the activity Completion dropdown),
+       which Boost paints in its own dark text and, for the dropdown, white. Primary, success, danger, warning,
+       info, dark, link and the other outline variants keep the theme's colours. */
+    html[data-a11y-colour] body :where(.btn-secondary, .btn-light, .btn-outline-secondary, .btn-outline-primary, .btn-icon, .btn-footer-popover, .icons-collapse-expand, .mds-nav-pill--selected, .mds-nav-pill.active, .btn:not(.btn-primary, .btn-success, .btn-danger, .btn-warning, .btn-info, .btn-dark, .btn-link, [class*="btn-outline-"])):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
         background-color: var(--a11y-surface2) !important; /* stylelint-disable-line declaration-no-important */
         border-color: var(--a11y-border, var(--a11y-text)) !important; /* stylelint-disable-line declaration-no-important */
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
     }
-    html[data-a11y-colour] body :where(.btn-secondary, .btn-light, .btn-outline-secondary, .btn-outline-primary, .btn-icon, .btn-footer-popover, .icons-collapse-expand, .mds-nav-pill--selected, .mds-nav-pill.active):where(:hover, :focus, .active, [aria-expanded="true"]):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
+    html[data-a11y-colour] body :where(.btn-secondary, .btn-light, .btn-outline-secondary, .btn-outline-primary, .btn-icon, .btn-footer-popover, .icons-collapse-expand, .mds-nav-pill--selected, .mds-nav-pill.active, .btn:not(.btn-primary, .btn-success, .btn-danger, .btn-warning, .btn-info, .btn-dark, .btn-link, [class*="btn-outline-"])):where(:hover, :focus, .active, [aria-expanded="true"]):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
         background-color: var(--a11y-hover) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* The notification toggle is a div with role=button, not an anchor, so the link rule skips it and Boost's
+       light-navbar colour (black at 60%) stays; it takes the text colour like the messages link beside it. */
+    html[data-a11y-colour] body .popover-region-toggle {
+        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Border token (data-a11y-tokens): a scheme whose surfaces share one shade, such as VS Code dark high contrast,
        tells them apart by a 1px edge in its border colour on every surface, field, table cell and control. Schemes

@@ -1,6 +1,12 @@
 # Changelog
 
-## [Unreleased]
+## [3.1.2] - 2026-11-05
+
+### Changed
+- `styles.css` section 7: the theme-coloured controls list (both rules) adds `.btn:not(.btn-primary, .btn-success,
+  .btn-danger, .btn-warning, .btn-info, .btn-dark, .btn-link, [class*="btn-outline-"])`; a new rule gives
+  `html[data-a11y-colour] body .popover-region-toggle` `color: var(--a11y-text)`.
+- Behat: vscode_scheme.feature scenario "Plain buttons and the notification toggle take the scheme".
 
 ### Removed
 - `.github/workflows/camp-release.yml`, `.github/workflows/moodle-release.yml` and `.camp/` (listing manifest and

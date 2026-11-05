@@ -497,6 +497,24 @@ final class styles_test extends \advanced_testcase {
     }
 
     /**
+     * Theme-coloured controls: a plain .btn (no variant class) joins the list in both rules, the variants that keep the
+     * theme's colours are excluded, and the notification toggle (a div, not an anchor) takes the text colour.
+     */
+    public function test_theme_coloured_controls(): void {
+        $plain = '.btn:not(.btn-primary, .btn-success, .btn-danger, .btn-warning, .btn-info, .btn-dark, .btn-link, '
+            . '[class*="btn-outline-"])';
+        $rules = self::rules_with($plain);
+        $this->assertCount(2, $rules, 'the colour rule and the hover rule');
+        $this->assertStringStartsWith('html[data-a11y-colour] body :where(.btn-secondary', $rules[0][0]);
+        $this->assertStringContainsString('background-color: var(--a11y-surface2) !important', $rules[0][1]);
+        $this->assertStringContainsString('color: var(--a11y-text) !important', $rules[0][1]);
+        $this->assertStringContainsString(':where(:hover, :focus, .active, [aria-expanded="true"])', $rules[1][0]);
+        $bell = self::rules_with('html[data-a11y-colour] body .popover-region-toggle');
+        $this->assertCount(1, $bell);
+        $this->assertSame('color: var(--a11y-text) !important;', trim(preg_replace('~/\*.*?\*/~s', '', $bell[0][1])));
+    }
+
+    /**
      * Links by purpose: the control list is stated once (--la-anchor) and the single anchor rule reads it.
      *
      */
