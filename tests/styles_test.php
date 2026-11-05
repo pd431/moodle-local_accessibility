@@ -423,8 +423,9 @@ final class styles_test extends \advanced_testcase {
         $border = self::rules_with('html[data-a11y-tokens~="border"] body :where(');
         $this->assertCount(1, $border);
         $this->assertStringContainsString('border: 1px solid var(--a11y-border) !important', $border[0][1]);
-        foreach (['.card', '.form-control', '.table td', '.btn-secondary', '.dropdown-menu', '.modal-content', '.activity-item',
-            '.badge'] as $part) {
+        $parts = ['.card', '.form-control', '.table td', '.btn-secondary', '.dropdown-menu', '.modal-content', '.activity-item',
+            '.badge'];
+        foreach ($parts as $part) {
             $this->assertStringContainsString($part, $border[0][0], $part);
         }
         $this->assertStringNotContainsString('.nav-tabs .nav-link', $border[0][0], 'tabs have their own rule');
