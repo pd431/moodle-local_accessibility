@@ -1,3 +1,15 @@
+# 3.1.2
+
+- Under a colour scheme, plain buttons (the course index and block drawer toggles, the user menu toggle, the
+  Completion dropdown on an activity) take the scheme's text colour, surface and border like secondary buttons.
+  Before, they kept Boost's dark text, and the Completion dropdown its white background, so on a dark scheme their
+  icons were black on black. The notification bell in the top bar takes the text colour too; it is not a link, so the
+  link rule never reached it and it stayed black at 60% while the messages icon beside it was white.
+- Dark high contrast (VS Code), and any scheme with a border colour: no separator line between activities, since
+  each activity already has its box; the line only doubled the top edge. Badges, such as the completion conditions
+  in an activity's header on Moodle 4.5 ("View") and the badges on activity cards, get the same 1px edge, so a pill
+  no longer reads as bare text on the surface. (Moodle 5.2 and later list the completion conditions as text.)
+
 # 3.1.1
 
 - Dark high contrast (VS Code) on Moodle 5.3: the top navigation and the course menu are now design-system pills,

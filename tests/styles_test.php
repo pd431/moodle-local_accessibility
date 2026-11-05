@@ -423,10 +423,15 @@ final class styles_test extends \advanced_testcase {
         $border = self::rules_with('html[data-a11y-tokens~="border"] body :where(');
         $this->assertCount(1, $border);
         $this->assertStringContainsString('border: 1px solid var(--a11y-border) !important', $border[0][1]);
-        foreach (['.card', '.form-control', '.table td', '.btn-secondary', '.dropdown-menu', '.modal-content'] as $part) {
+        $parts = ['.card', '.form-control', '.table td', '.btn-secondary', '.dropdown-menu', '.modal-content', '.activity-item',
+            '.badge'];
+        foreach ($parts as $part) {
             $this->assertStringContainsString($part, $border[0][0], $part);
         }
         $this->assertStringNotContainsString('.nav-tabs .nav-link', $border[0][0], 'tabs have their own rule');
+        $separator = self::rules_with('html[data-a11y-tokens~="border"] body .section .activity');
+        $this->assertCount(1, $separator, 'no separator line between boxed activities');
+        $this->assertStringContainsString('border-top: 0 !important', $separator[0][1]);
         $tabs = self::rules_with('html[data-a11y-tokens~="border"] body .nav-tabs');
         $this->assertCount(3, $tabs, 'one line under the tab bar, a box per tab, a shared edge between neighbours');
         $this->assertStringContainsString('border-bottom: 1px solid var(--a11y-border) !important', $tabs[0][1]);
@@ -494,6 +499,24 @@ final class styles_test extends \advanced_testcase {
         $panel = implode(' ', array_column(array_filter(self::rules(), fn($r) => $r[0] === '.local-accessibility-panel'), 1));
         $this->assertStringContainsString('--la-edge: var(--a11y-border, var(--a11y-text, ', $panel);
         $this->assertStringContainsString('border: 1px solid var(--la-edge)', $panel);
+    }
+
+    /**
+     * Theme-coloured controls: a plain .btn (no variant class) joins the list in both rules, the variants that keep the
+     * theme's colours are excluded, and the notification toggle (a div, not an anchor) takes the text colour.
+     */
+    public function test_theme_coloured_controls(): void {
+        $plain = '.btn:not(.btn-primary, .btn-success, .btn-danger, .btn-warning, .btn-info, .btn-dark, .btn-link, '
+            . '[class*="btn-outline-"])';
+        $rules = self::rules_with($plain);
+        $this->assertCount(2, $rules, 'the colour rule and the hover rule');
+        $this->assertStringStartsWith('html[data-a11y-colour] body :where(.btn-secondary', $rules[0][0]);
+        $this->assertStringContainsString('background-color: var(--a11y-surface2) !important', $rules[0][1]);
+        $this->assertStringContainsString('color: var(--a11y-text) !important', $rules[0][1]);
+        $this->assertStringContainsString(':where(:hover, :focus, .active, [aria-expanded="true"])', $rules[1][0]);
+        $bell = self::rules_with('html[data-a11y-colour] body .popover-region-toggle');
+        $this->assertCount(1, $bell);
+        $this->assertSame('color: var(--a11y-text) !important;', trim(preg_replace('~/\*.*?\*/~s', '', $bell[0][1])));
     }
 
     /**

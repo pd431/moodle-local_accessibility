@@ -38,6 +38,64 @@ Feature: VS Code dark high contrast colour scheme
     And the "#la-card" element should stand out from its background
     And the "#la-test-text" element should stand out from its background
 
+  Scenario: Plain buttons and the notification toggle take the scheme
+    Given the following "courses" exist:
+      | fullname | shortname |
+      | Course 1 | C1        |
+    And the following "course enrolments" exist:
+      | user     | course | role    |
+      | student1 | C1     | student |
+    And the following "user preferences" exist:
+      | user     | preference                 | value    |
+      | student1 | local_accessibility_colour | vscodehc |
+    And I am on the "C1" course page logged in as "student1"
+    And the HTML "<button id='la-plain' class='btn btn-sm'>Plain</button>" is added to the main region
+    Then the computed "color" of "#la-plain" should be "rgb(255, 255, 255)"
+    And the computed "background-color" of "#la-plain" should be "rgb(12, 20, 31)"
+    And the computed "border-top-color" of "#la-plain" should be "rgb(111, 195, 223)"
+    And the computed "color" of ".popover-region-toggle" should be "rgb(255, 255, 255)"
+    And the computed "color" of "#theme_boost-drawers-courseindex .drawertoggle" should be "rgb(255, 255, 255)"
+
+  Scenario: Boxed activities have no separator line and a badge has an edge
+    Given the following "courses" exist:
+      | fullname | shortname | enablecompletion |
+      | Course 1 | C1        | 1                |
+    And the following "course enrolments" exist:
+      | user     | course | role    |
+      | student1 | C1     | student |
+    And the following "activities" exist:
+      | activity | course | name   | section | completion | completionview |
+      | page     | C1     | Page 1 | 1       | 2          | 1              |
+      | page     | C1     | Page 2 | 1       | 2          | 1              |
+    And the following "user preferences" exist:
+      | user     | preference                 | value    |
+      | student1 | local_accessibility_colour | vscodehc |
+    And I am on the "C1" course page logged in as "student1"
+    Then the computed "border-top-width" of ".section .activity:nth-child(2)" should be "0px"
+    And the computed "border-top-width" of ".section .activity:nth-child(2) .activity-item" should be "1px"
+    And the computed "border-top-color" of ".section .activity:nth-child(2) .activity-item" should be "rgb(111, 195, 223)"
+    And the HTML "<span id='la-badge' class='badge rounded-pill bg-light text-dark'>View</span>" is added to the main region
+    Then the computed "border-top-width" of "#la-badge" should be "1px"
+    And the computed "border-top-color" of "#la-badge" should be "rgb(111, 195, 223)"
+
+  Scenario: On Moodle 4.5 the completion conditions in an activity's header are badges and get the edge
+    Given the site is running Moodle version 5.0 or lower
+    And the following "courses" exist:
+      | fullname | shortname | enablecompletion |
+      | Course 1 | C1        | 1                |
+    And the following "course enrolments" exist:
+      | user     | course | role    |
+      | student1 | C1     | student |
+    And the following "activities" exist:
+      | activity | course | name   | section | completion | completionview |
+      | page     | C1     | Page 1 | 1       | 2          | 1              |
+    And the following "user preferences" exist:
+      | user     | preference                 | value    |
+      | student1 | local_accessibility_colour | vscodehc |
+    And I am on the "Page 1" "page activity" page logged in as "student1"
+    Then the computed "border-top-width" of ".activity-header .badge" should be "1px"
+    And the computed "border-top-color" of ".activity-header .badge" should be "rgb(111, 195, 223)"
+
   Scenario: Links are VS Code blue and pass 7:1
     Given the following "user preferences" exist:
       | user     | preference                 | value    |
