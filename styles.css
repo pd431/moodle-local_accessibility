@@ -258,11 +258,6 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     html[data-a11y-colour] body :where(.btn-secondary, .btn-light, .btn-outline-secondary, .btn-outline-primary, .btn-icon, .btn-footer-popover, .icons-collapse-expand, .mds-nav-pill--selected, .mds-nav-pill.active, .btn:not(.btn-primary, .btn-success, .btn-danger, .btn-warning, .btn-info, .btn-dark, .btn-link, [class*="btn-outline-"])):where(:hover, :focus, .active, [aria-expanded="true"]):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
         background-color: var(--a11y-hover) !important; /* stylelint-disable-line declaration-no-important */
     }
-    /* The notification toggle is a div with role=button, not an anchor, so the link rule skips it and Boost's
-       light-navbar colour (black at 60%) stays; it takes the text colour like the messages link beside it. */
-    html[data-a11y-colour] body .popover-region-toggle {
-        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
-    }
     /* Border token (data-a11y-tokens): a scheme whose surfaces share one shade, such as VS Code dark high contrast,
        tells them apart by a 1px edge in its border colour on every surface, field, table cell and control. Schemes
        without the token keep the theme's edges. */
@@ -276,37 +271,32 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     }
     /* Tabs under the border token: one line under the bar and a box around each tab. A tab after another drops its
        left edge, so neighbours share one line; Bootstrap pulls each tab 1px onto the bar line, so the bottoms merge.
-       No fill, on hover included: the dashed ring marks the pointer. The current tab's box is drawn below, after the
-       active rule. */
+       A hovered or current tab takes the scheme's hover surface, as every menu item does (the navigation menus rule
+       below). The current tab's box is drawn below, after the active rule. */
     html[data-a11y-tokens~="border"] body .nav-tabs {
         border-bottom: 1px solid var(--a11y-border) !important; /* stylelint-disable-line declaration-no-important */
     }
     html[data-a11y-tokens~="border"] body .nav-tabs .nav-link {
         border: 1px solid var(--a11y-border) !important; /* stylelint-disable-line declaration-no-important */
-        background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
     }
     html[data-a11y-tokens~="border"] body .nav-tabs .nav-item + .nav-item .nav-link {
         border-left-color: transparent !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Focus token: Boost marks a focused plain link with a pale primary fill and a two-line shadow, which the scheme's
        forced link colour turns into white on pale blue. The token's dashed ring marks focus instead, so the fill and
-       the shadow go. Before the active rule, so a current item keeps its box while focused. */
-    html[data-a11y-tokens~="focus"] body :where(a):where(:focus, .focus) {
+       the shadow go. Menu items and pills are not plain links: focused, they take the scheme's hover surface (the
+       navigation menus rule below). Before the active rule, so a current item keeps its box while focused. */
+    html[data-a11y-tokens~="focus"] body :where(a:not(.nav-link, .mds-nav-pill)):where(:focus, .focus) {
         background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
         box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
     }
-    /* Moodle 5.3's navigation pills take a fill on hover and when pressed; the dashed ring marks the pointer. */
-    html[data-a11y-tokens~="focus"] body .mds-nav-pill:where(:hover, :active) {
-        background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
-    }
-    /* Active token: the current item, boxed in the scheme's active colour (VS Code's contrastActiveBorder) and nothing
-       else: no fill and no theme underline, text in the text colour. Drawn inside with a shadow, so nothing moves and
+    /* Active token: the current item, boxed in the scheme's active colour (VS Code's contrastActiveBorder), text in
+       the text colour. The box is the token's one addition: a menu item or tab keeps the scheme's hover surface and its
+       underline in the text colour (the navigation menus rule below). Drawn inside with a shadow, so nothing moves and
        the keyboard focus outline, which sits outside, shows on top. Every "current" mark Moodle makes gets it, so
        they agree: the top and secondary nav, the course index, a dropdown's current item and pagination. */
     html[data-a11y-tokens~="active"] body :where(.nav-link.active, .nav-link[aria-current], .mds-nav-pill--selected, .mds-nav-pill.active, .courseindex-item.pageitem, .courseindex-item.active, .dropdown-item[aria-current], .page-item.active .page-link) {
         box-shadow: inset 0 0 0 2px var(--a11y-active) !important; /* stylelint-disable-line declaration-no-important */
-        background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
-        border-color: transparent !important; /* stylelint-disable-line declaration-no-important */
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Moodle 5.3 draws the current navigation pill with a fill and a dot; the box is the one mark. */
@@ -514,13 +504,13 @@ html[data-a11y-focus="thick"] :focus-visible {
 }
 
 /* 11a. Focus token (data-a11y-tokens): the scheme's own focus colour, dashed so it is never mistaken for the active
-   token's solid box, on keyboard focus and on the pointer over a link or control. The ring is drawn inside the item's
-   edge, on its own surface, so it needs no halo: 2px where the Focus ring tile is off; "ring" and "thick" keep their
-   thickness. A current item carries the active token's solid box inside its edge, so the ring moves in by 4px to sit
-   inside that box rather than over it. Never in forced colours, where the system draws focus. */
+   token's solid box, on keyboard focus. The pointer gets no ring: a hovered item takes the scheme's hover surface, as
+   under every scheme. The ring is drawn inside the item's edge, on its own surface, so it needs no halo: 2px where the
+   Focus ring tile is off; "ring" and "thick" keep their thickness. A current item carries the active token's solid box
+   inside its edge, so the ring moves in by 4px to sit inside that box rather than over it. Never in forced colours,
+   where the system draws focus. */
 @media (forced-colors: none) {
-    html[data-a11y-tokens~="focus"] :focus-visible,
-    html[data-a11y-tokens~="focus"] body :where(a, button, input, select, textarea, [role="button"], [role="tab"], [role="menuitem"]):hover {
+    html[data-a11y-tokens~="focus"] :focus-visible {
         outline: 2px dashed var(--a11y-focus) !important; /* stylelint-disable-line declaration-no-important */
         outline-offset: -2px !important; /* stylelint-disable-line declaration-no-important */
     }
@@ -534,7 +524,7 @@ html[data-a11y-focus="thick"] :focus-visible {
         outline-offset: -5px !important; /* stylelint-disable-line declaration-no-important */
         box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
     }
-    html[data-a11y-tokens~="focus"][data-a11y-tokens~="active"] body :where(.nav-link.active, .nav-link[aria-current], .mds-nav-pill--selected, .mds-nav-pill.active, .courseindex-item.pageitem, .courseindex-item.active, .dropdown-item[aria-current], .page-item.active .page-link):where(:focus-visible, :hover) {
+    html[data-a11y-tokens~="focus"][data-a11y-tokens~="active"] body :where(.nav-link.active, .nav-link[aria-current], .mds-nav-pill--selected, .mds-nav-pill.active, .courseindex-item.pageitem, .courseindex-item.active, .dropdown-item[aria-current], .page-item.active .page-link):focus-visible {
         outline-offset: -4px !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Selection token: selected text in the scheme's own pair. */

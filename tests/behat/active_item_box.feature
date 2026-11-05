@@ -27,7 +27,6 @@ Feature: The current navigation item is boxed in the scheme's active colour
     And the computed "box-shadow" of ".primary-navigation [aria-current]" should be "rgb(243, 133, 24) 0px 0px 0px 2px inset"
     When I am on the "C1" course page
     Then the computed "box-shadow" of ".secondary-navigation :is(.nav-link.active, .mds-nav-pill--selected)" should contain "rgb(243, 133, 24)"
-    And the computed "background-color" of ".secondary-navigation :is(.nav-link.active, .mds-nav-pill--selected)" should be "rgba(0, 0, 0, 0)"
     When I am on the "Page 1" "page activity" page
     Then the computed "box-shadow" of ".courseindex-item.pageitem" should be "rgb(243, 133, 24) 0px 0px 0px 2px inset"
 

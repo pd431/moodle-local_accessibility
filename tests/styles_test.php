@@ -494,7 +494,7 @@ final class styles_test extends \advanced_testcase {
         $this->assertCount(3, $tabs, 'one line under the tab bar, a box per tab, a shared edge between neighbours');
         $this->assertStringContainsString('border-bottom: 1px solid var(--a11y-border) !important', $tabs[0][1]);
         $this->assertStringContainsString('border: 1px solid var(--a11y-border) !important', $tabs[1][1]);
-        $this->assertStringContainsString('background-color: transparent !important', $tabs[1][1], 'no hover fill');
+        $this->assertStringNotContainsString('background-color', $tabs[1][1], 'a hovered tab keeps the hover surface');
         $this->assertStringContainsString('.nav-item + .nav-item .nav-link', $tabs[2][0]);
         $this->assertStringContainsString('border-left-color: transparent !important', $tabs[2][1], 'shared edge');
         $current = self::rules_with('[data-a11y-tokens~="active"] body .nav-tabs .nav-link.active');
@@ -504,20 +504,20 @@ final class styles_test extends \advanced_testcase {
         $css = self::css();
         $activeat = strpos($css, 'data-a11y-tokens~="active"] body :where(');
         $this->assertGreaterThan($activeat, strpos($css, '.nav-tabs .nav-link.active {'), 'after the active rule');
-        $nofill = self::rules_with('html[data-a11y-tokens~="focus"] body :where(a):where(:focus, .focus)');
-        $this->assertCount(1, $nofill, 'a focused link loses the theme fill and shadow');
+        $plainlink = ':where(a:not(.nav-link, .mds-nav-pill)):where(:focus, .focus)';
+        $nofill = self::rules_with('html[data-a11y-tokens~="focus"] body ' . $plainlink);
+        $this->assertCount(1, $nofill, 'a focused plain link loses the theme fill and shadow; menu items keep their surface');
         $this->assertStringContainsString('background-color: transparent !important', $nofill[0][1]);
         $css = self::css();
         $activeat = strpos($css, 'data-a11y-tokens~="active"');
-        $this->assertLessThan($activeat, strpos($css, ':where(a):where(:focus, .focus)'), 'before the active rule');
+        $this->assertLessThan($activeat, strpos($css, $plainlink), 'before the active rule');
         $token = self::rules_with('html[data-a11y-tokens~="focus"]');
         $focus = array_values(array_filter($token, fn($r) => str_contains($r[0], ':focus-visible')));
         $this->assertCount(4, $focus);
         $this->assertStringContainsString('outline: 2px dashed var(--a11y-focus) !important', $focus[0][1]);
         $this->assertStringContainsString('outline-offset: -2px !important', $focus[0][1], 'the ring sits inside');
         $this->assertStringContainsString(':focus-visible', $focus[0][0]);
-        $hover = ':where(a, button, input, select, textarea, [role="button"], [role="tab"], [role="menuitem"]):hover';
-        $this->assertStringContainsString($hover, $focus[0][0]);
+        $this->assertStringNotContainsString(':hover', implode('', array_column($token, 0)), 'the pointer gets no ring');
         $this->assertStringNotContainsString('solid var(--a11y-focus)', self::css(), 'focus is never solid');
         $this->assertStringContainsString('[data-a11y-focus="ring"]', $focus[1][0]);
         $this->assertStringContainsString('outline-width: 3px !important', $focus[1][1]);
@@ -536,12 +536,9 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringContainsString('.mds-nav-pill__indicator', $active[1][0]);
         $this->assertStringContainsString('.mds-nav-pill.active::before', $active[1][0]);
         $this->assertStringContainsString('display: none !important', $active[1][1]);
-        $pillfill = self::rules_with('html[data-a11y-tokens~="focus"] body .mds-nav-pill:where(:hover, :active)');
-        $this->assertCount(1, $pillfill, 'a hovered or pressed pill loses its fill');
-        $this->assertStringContainsString('background-color: transparent !important', $pillfill[0][1]);
         $this->assertStringContainsString('box-shadow: inset 0 0 0 2px var(--a11y-active) !important', $active[0][1]);
-        $this->assertStringContainsString('background-color: transparent !important', $active[0][1], 'no fill');
-        $this->assertStringContainsString('border-color: transparent !important', $active[0][1], 'no theme underline');
+        $this->assertStringNotContainsString('background-color', $active[0][1], 'the theme fill stays (3.0.8 menus rule)');
+        $this->assertStringNotContainsString('border-color', $active[0][1], 'the theme underline stays');
         $marks = ['.nav-link.active', '.nav-link[aria-current]', '.mds-nav-pill--selected', '.mds-nav-pill.active',
             '.courseindex-item.pageitem', '.dropdown-item[aria-current]', '.page-item.active .page-link'];
         foreach ($marks as $part) {
@@ -561,7 +558,8 @@ final class styles_test extends \advanced_testcase {
 
     /**
      * Theme-coloured controls: a plain .btn (no variant class) joins the list in both rules, the variants that keep the
-     * theme's colours are excluded, and the notification toggle (a div, not an anchor) takes the text colour.
+     * theme's colours are excluded. The notification toggle is covered by the navbar controls rule (issue #4), not a
+     * rule of its own.
      */
     public function test_theme_coloured_controls(): void {
         $plain = '.btn:not(.btn-primary, .btn-success, .btn-danger, .btn-warning, .btn-info, .btn-dark, .btn-link, '
@@ -572,9 +570,7 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringContainsString('background-color: var(--a11y-surface2) !important', $rules[0][1]);
         $this->assertStringContainsString('color: var(--a11y-text) !important', $rules[0][1]);
         $this->assertStringContainsString(':where(:hover, :focus, .active, [aria-expanded="true"])', $rules[1][0]);
-        $bell = self::rules_with('html[data-a11y-colour] body .popover-region-toggle');
-        $this->assertCount(1, $bell);
-        $this->assertSame('color: var(--a11y-text) !important;', trim(preg_replace('~/\*.*?\*/~s', '', $bell[0][1])));
+        $this->assertCount(0, self::rules_with('html[data-a11y-colour] body .popover-region-toggle'), 'one rule, upstream\'s');
     }
 
     /**
