@@ -266,8 +266,13 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     /* Border token (data-a11y-tokens): a scheme whose surfaces share one shade, such as VS Code dark high contrast,
        tells them apart by a 1px edge in its border colour on every surface, field, table cell and control. Schemes
        without the token keep the theme's edges. */
-    html[data-a11y-tokens~="border"] body :where(.card, .card-header, .card-footer, .list-group-item, .dropdown-menu, .modal-content, .popover, .form-control, .form-select, .custom-select, select, textarea, .table td, .table th, .btn-secondary, .btn-light, .btn-outline-secondary, .btn-outline-primary, .btn-icon, .activity-item, .section-item):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
+    html[data-a11y-tokens~="border"] body :where(.card, .card-header, .card-footer, .list-group-item, .dropdown-menu, .modal-content, .popover, .form-control, .form-select, .custom-select, select, textarea, .table td, .table th, .btn-secondary, .btn-light, .btn-outline-secondary, .btn-outline-primary, .btn-icon, .activity-item, .section-item, .badge):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
         border: 1px solid var(--a11y-border) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* Boost separates activities with a 1px line on top of each one after the first; with each activity boxed
+       above, that line only doubles the edge. */
+    html[data-a11y-tokens~="border"] body .section .activity {
+        border-top: 0 !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Tabs under the border token: one line under the bar and a box around each tab. A tab after another drops its
        left edge, so neighbours share one line; Bootstrap pulls each tab 1px onto the bar line, so the bottoms merge.

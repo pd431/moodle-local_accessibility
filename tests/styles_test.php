@@ -423,10 +423,14 @@ final class styles_test extends \advanced_testcase {
         $border = self::rules_with('html[data-a11y-tokens~="border"] body :where(');
         $this->assertCount(1, $border);
         $this->assertStringContainsString('border: 1px solid var(--a11y-border) !important', $border[0][1]);
-        foreach (['.card', '.form-control', '.table td', '.btn-secondary', '.dropdown-menu', '.modal-content'] as $part) {
+        foreach (['.card', '.form-control', '.table td', '.btn-secondary', '.dropdown-menu', '.modal-content', '.activity-item',
+            '.badge'] as $part) {
             $this->assertStringContainsString($part, $border[0][0], $part);
         }
         $this->assertStringNotContainsString('.nav-tabs .nav-link', $border[0][0], 'tabs have their own rule');
+        $separator = self::rules_with('html[data-a11y-tokens~="border"] body .section .activity');
+        $this->assertCount(1, $separator, 'no separator line between boxed activities');
+        $this->assertStringContainsString('border-top: 0 !important', $separator[0][1]);
         $tabs = self::rules_with('html[data-a11y-tokens~="border"] body .nav-tabs');
         $this->assertCount(3, $tabs, 'one line under the tab bar, a box per tab, a shared edge between neighbours');
         $this->assertStringContainsString('border-bottom: 1px solid var(--a11y-border) !important', $tabs[0][1]);

@@ -5,6 +5,10 @@
   Before, they kept Boost's dark text, and the Completion dropdown its white background, so on a dark scheme their
   icons were black on black. The notification bell in the top bar takes the text colour too; it is not a link, so the
   link rule never reached it and it stayed black at 60% while the messages icon beside it was white.
+- Dark high contrast (VS Code), and any scheme with a border colour: no separator line between activities, since
+  each activity already has its box; the line only doubled the top edge. Badges, such as the completion conditions
+  in an activity's header ("View") and on activity cards, get the same 1px edge, so a pill no longer reads as bare
+  text on the surface.
 
 # 3.1.1
 

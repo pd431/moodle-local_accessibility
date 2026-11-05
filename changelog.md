@@ -7,6 +7,9 @@
   .btn-danger, .btn-warning, .btn-info, .btn-dark, .btn-link, [class*="btn-outline-"])`; a new rule gives
   `html[data-a11y-colour] body .popover-region-toggle` `color: var(--a11y-text)`.
 - Behat: vscode_scheme.feature scenario "Plain buttons and the notification toggle take the scheme".
+- `styles.css` section 7: `.badge` joins the border-token surface list; `html[data-a11y-tokens~="border"] body
+  .section .activity` sets `border-top: 0` (Boost's 1px `.activity` separator).
+- Behat: vscode_scheme.feature scenario "Boxed activities have no separator line and a badge has an edge".
 
 ### Removed
 - `.github/workflows/camp-release.yml`, `.github/workflows/moodle-release.yml` and `.camp/` (listing manifest and
