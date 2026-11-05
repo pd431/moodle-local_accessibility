@@ -364,6 +364,10 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringContainsString('color: inherit !important', reset($icons)[1]);
         $toggles = array_filter($rules, fn($r) => str_contains($r[0], '.navbar :is(.popover-region-toggle:not(a), .btn,'));
         $this->assertStringContainsString('color: var(--a11y-text) !important', reset($toggles)[1]);
+        // Navbar links follow links by purpose: the id's weight must not paint a menu item in the link colour.
+        $links = array_filter($rules, fn($r) => str_contains($r[0], '.navbar a:not(.btn, .dropdown-item)'));
+        $this->assertCount(1, $links);
+        $this->assertStringContainsString('color: var(--la-anchor, var(--a11y-link)) !important', reset($links)[1]);
         // Themes mark their navbar colours !important (Boost Union), so the navbar rules carry an id's weight.
         foreach (array_merge($icons, $toggles) as [$selector]) {
             $this->assertStringContainsString('body:not(#la-weight)', $selector);
