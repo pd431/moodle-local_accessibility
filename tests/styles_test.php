@@ -595,7 +595,9 @@ final class styles_test extends \advanced_testcase {
         }
         $this->assertStringContainsString('--la-anchor-line: none', $controls[0][1]);
         $anchors = array_values(array_filter(self::rules(), fn($r) => str_contains($r[1], 'var(--la-anchor, var(--a11y-link))')));
-        $this->assertCount(1, $anchors, 'one anchor rule');
+        // The anchor rule, and the 3.0.8 navbar links rule, which reads the same value so its id's weight agrees with it.
+        $this->assertCount(2, $anchors, 'the anchor rule and the navbar links rule');
+        $this->assertStringContainsString('.navbar a:not(.btn, .dropdown-item)', $anchors[1][0]);
         $this->assertStringContainsString('text-decoration: var(--la-anchor-line, underline) !important', $anchors[0][1]);
         // Buttons and the active page or menu item stay out of it, as before.
         foreach (['.btn', '.qnbutton', '.nav-link.active', '.page-item.active .page-link', '.dropdown-item.active'] as $part) {
