@@ -74,7 +74,25 @@ Feature: VS Code dark high contrast colour scheme
     Then the computed "border-top-width" of ".section .activity:nth-child(2)" should be "0px"
     And the computed "border-top-width" of ".section .activity:nth-child(2) .activity-item" should be "1px"
     And the computed "border-top-color" of ".section .activity:nth-child(2) .activity-item" should be "rgb(111, 195, 223)"
-    When I am on the "Page 1" "page activity" page
+    And the HTML "<span id='la-badge' class='badge rounded-pill bg-light text-dark'>View</span>" is added to the main region
+    Then the computed "border-top-width" of "#la-badge" should be "1px"
+    And the computed "border-top-color" of "#la-badge" should be "rgb(111, 195, 223)"
+
+  Scenario: On Moodle 4.5 the completion conditions in an activity's header are badges and get the edge
+    Given the site is running Moodle version 5.0 or lower
+    And the following "courses" exist:
+      | fullname | shortname | enablecompletion |
+      | Course 1 | C1        | 1                |
+    And the following "course enrolments" exist:
+      | user     | course | role    |
+      | student1 | C1     | student |
+    And the following "activities" exist:
+      | activity | course | name   | section | completion | completionview |
+      | page     | C1     | Page 1 | 1       | 2          | 1              |
+    And the following "user preferences" exist:
+      | user     | preference                 | value    |
+      | student1 | local_accessibility_colour | vscodehc |
+    And I am on the "Page 1" "page activity" page logged in as "student1"
     Then the computed "border-top-width" of ".activity-header .badge" should be "1px"
     And the computed "border-top-color" of ".activity-header .badge" should be "rgb(111, 195, 223)"
 
