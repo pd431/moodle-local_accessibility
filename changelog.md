@@ -1,5 +1,26 @@
 # Changelog
 
+## [3.1.3] - 2026-11-05
+
+### Changed
+- Merge of adamjenkins/moodle-local_accessibility main at 01ac8fe (3.0.8). Conflicts in version.php, CHANGES.md,
+  changelog.md, README.md and styles.css (an ordering clash at section 11a/11b) resolved by keeping both sides.
+- `styles.css` section 7: the focus token's plain-link rule is `:where(a:not(.nav-link, .mds-nav-pill)):where(:focus,
+  .focus)`, so menu items keep the 3.0.8 hover surface when focused; the active token rule drops `background-color:
+  transparent` and `border-color: transparent`; `.nav-tabs .nav-link` under the border token drops `background-color:
+  transparent`.
+- `styles.css` section 11a: the focus token ring is `:focus-visible` only (the `:hover` list goes); the -4px offset rule
+  is `:focus-visible` only.
+- Behat: current_focus_marks.feature expects the hover surface (rgb(17, 17, 17)) on hovered and current tabs, the
+  control surface (rgb(12, 20, 31)) on the current 5.3 pill, and `outline-style: none` on hover; the "Pointing at a
+  link or control shows the same dashed ring" scenario becomes "Pointing at a course tab shows the scheme's hover
+  surface and no ring"; active_item_box.feature drops its transparent-background check.
+
+### Removed
+- `styles.css` section 7: `html[data-a11y-colour] body .popover-region-toggle` (3.1.2); the 3.0.8 navbar controls
+  rule covers the toggle with an id's weight. `html[data-a11y-tokens~="focus"] body .mds-nav-pill:where(:hover,
+  :active)` (3.1.1).
+
 ## [3.1.2] - 2026-11-05
 
 ### Changed
@@ -80,6 +101,27 @@
   a focus outline in `--a11y-focus` under the focus token (2px, or the Focus ring tile's 3px and 5px with the halo in
   the page colour); `::selection` under the selection token. `--bs-border-color` and the panel's edges take
   `--a11y-border` when present and fall back to `--a11y-text` as before.
+
+## [3.0.8] - 2026-11-03
+
+### Changed
+- The panel stays open after choosing a colour scheme or a profile, Reset All, or the device note's Undo (#4): these
+  still reload the page, and the panel reopens on the same view with focus on the same control (sessionStorage).
+- "Site default" is the first button of every −/+ stepper, as the default is first in every list (#4).
+- Line width opens in a drawer under its tile, holding its stepper, instead of a detail view (#4).
+- Profiles replace the user's settings: every feature the user can change takes the profile's value, or the site
+  default when the profile leaves it out; a saved custom scheme is kept (#4). The confirmation is reworded.
+- The Links option "Off" is labelled "Standard" (#4).
+- The large cursor applies over every control except text entry (text-type inputs, textarea, contenteditable) (#4).
+
+### Fixed
+- Under a colour scheme, hovered, focused and current menu items and course tabs (Boost `.moremenu`, Moodle 5.3
+  `.mds-nav-pill`) kept the theme's near-white background behind the scheme's light link colour (#4).
+- With highlighted links, icons and a current item's underline inside a link kept a theme's white (#4).
+- Under a colour scheme, navbar controls and icons, the notification and message popovers, the messaging drawer and
+  page, conversation bubbles, unread notifications, text-field placeholders and active pills kept hard-coded light
+  colours. Rules that a theme overrides with weightier `!important` rules (Boost Union's coloured navbars, Moodle
+  5.3's dark mode) carry an id's weight.
 
 ## [3.0.7] - 2026-10-29
 

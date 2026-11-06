@@ -348,6 +348,68 @@ final class styles_test extends \advanced_testcase {
     }
 
     /**
+     * Issue #4: under a scheme, the theme's hard-coded light grey on hovered, focused and current menu items gives way
+     * to the scheme's hover surface, and navbar controls and their icons take the scheme's colours; a highlighted link's
+     * icons and current-item underline follow its text; the large cursor applies over every control but text entry.
+     */
+    public function test_issue4_rules(): void {
+        $rules = self::rules_with('data-a11y-colour');
+        $menu = array_filter($rules, fn($r) => str_contains($r[0], ':where(.moremenu .nav-link, .mds-nav-pill):where(:hover'));
+        $this->assertCount(1, $menu);
+        [$selector, $body] = reset($menu);
+        $this->assertStringContainsString(':where(:hover, :focus, .active)', $selector);
+        $this->assertStringContainsString('background-color: var(--a11y-hover) !important', $body);
+        $icons = array_filter($rules, fn($r) => str_contains($r[0], '.navbar :is(a, .popover-region-toggle, .btn) .icon'));
+        $this->assertCount(1, $icons);
+        $this->assertStringContainsString('color: inherit !important', reset($icons)[1]);
+        $toggles = array_filter($rules, fn($r) => str_contains($r[0], '.navbar :is(.popover-region-toggle:not(a), .btn,'));
+        $this->assertStringContainsString('color: var(--a11y-text) !important', reset($toggles)[1]);
+        // Navbar links follow links by purpose: the id's weight must not paint a menu item in the link colour.
+        $links = array_filter($rules, fn($r) => str_contains($r[0], '.navbar a:not(.btn, .dropdown-item)'));
+        $this->assertCount(1, $links);
+        $this->assertStringContainsString('color: var(--la-anchor, var(--a11y-link)) !important', reset($links)[1]);
+        // Themes mark their navbar colours !important (Boost Union), so the navbar rules carry an id's weight.
+        foreach (array_merge($icons, $toggles) as [$selector]) {
+            $this->assertStringContainsString('body:not(#la-weight)', $selector);
+        }
+
+        // Messaging and notifications: the drawer, bubbles (with their tails), unread notifications and active pills.
+        $bodies = [];
+        foreach ($rules as [$selector, $body]) {
+            $bodies[$selector] = $body;
+        }
+        $expect = ['.message-app)' => 'var(--a11y-surface1)', '.message-app .message.received)' => 'var(--a11y-surface2)',
+            '.message-app .message.received .tail)' => 'border-bottom-color: var(--a11y-surface2)',
+            '.message-app .message.send .tail)' => 'border-bottom-color: var(--a11y-hover)',
+            '.content-item-container.unread)' => 'var(--a11y-surface2)',
+            '.nav-pills .nav-link.active)' => 'color: var(--a11y-page)'];
+        foreach ($expect as $target => $declaration) {
+            $match = array_filter(array_keys($bodies), fn($selector) => str_contains($selector, ':where(' . $target));
+            $this->assertCount(1, $match, $target);
+            $this->assertStringContainsString($declaration, $bodies[reset($match)], $target);
+        }
+
+        $highlight = self::rules_with('data-a11y-links="highlight"');
+        $icon = array_filter($highlight, fn($r) => str_contains($r[0], 'a:not(.btn, .qnbutton) .icon'));
+        $this->assertCount(1, $icon);
+        $this->assertStringContainsString('color: inherit !important', reset($icon)[1]);
+        $underline = array_filter($highlight, fn($r) => str_contains($r[0], 'a.nav-link:is(.active'));
+        $this->assertStringContainsString('border-bottom-color: currentcolor !important', reset($underline)[1]);
+
+        foreach (['large', 'xlarge'] as $size) {
+            $rules = self::rules_with('data-a11y-cursor="' . $size . '"');
+            $cursor = array_values(array_filter($rules, fn($r) => str_contains($r[1], 'cursor:')));
+            $this->assertCount(1, $cursor, $size);
+            $selector = $cursor[0][0];
+            // Text entry keeps its cursor; select, checkbox and radio are no longer excluded.
+            $this->assertStringContainsString('textarea', $selector);
+            $this->assertStringContainsString('[type="checkbox"]', $selector);
+            $this->assertStringNotContainsString('select', $selector);
+            $this->assertStringNotContainsString('*:not(input,', $selector);
+        }
+    }
+
+    /**
      * The extra-large cursor exists at 96px, and images.js adds alt text for the "hide" value.
      */
     public function test_cursor_and_images_script(): void {
@@ -436,7 +498,7 @@ final class styles_test extends \advanced_testcase {
         $this->assertCount(3, $tabs, 'one line under the tab bar, a box per tab, a shared edge between neighbours');
         $this->assertStringContainsString('border-bottom: 1px solid var(--a11y-border) !important', $tabs[0][1]);
         $this->assertStringContainsString('border: 1px solid var(--a11y-border) !important', $tabs[1][1]);
-        $this->assertStringContainsString('background-color: transparent !important', $tabs[1][1], 'no hover fill');
+        $this->assertStringNotContainsString('background-color', $tabs[1][1], 'a hovered tab keeps the hover surface');
         $this->assertStringContainsString('.nav-item + .nav-item .nav-link', $tabs[2][0]);
         $this->assertStringContainsString('border-left-color: transparent !important', $tabs[2][1], 'shared edge');
         $current = self::rules_with('[data-a11y-tokens~="active"] body .nav-tabs .nav-link.active');
@@ -446,20 +508,20 @@ final class styles_test extends \advanced_testcase {
         $css = self::css();
         $activeat = strpos($css, 'data-a11y-tokens~="active"] body :where(');
         $this->assertGreaterThan($activeat, strpos($css, '.nav-tabs .nav-link.active {'), 'after the active rule');
-        $nofill = self::rules_with('html[data-a11y-tokens~="focus"] body :where(a):where(:focus, .focus)');
-        $this->assertCount(1, $nofill, 'a focused link loses the theme fill and shadow');
+        $plainlink = ':where(a:not(.nav-link, .mds-nav-pill)):where(:focus, .focus)';
+        $nofill = self::rules_with('html[data-a11y-tokens~="focus"] body ' . $plainlink);
+        $this->assertCount(1, $nofill, 'a focused plain link loses the theme fill and shadow; menu items keep their surface');
         $this->assertStringContainsString('background-color: transparent !important', $nofill[0][1]);
         $css = self::css();
         $activeat = strpos($css, 'data-a11y-tokens~="active"');
-        $this->assertLessThan($activeat, strpos($css, ':where(a):where(:focus, .focus)'), 'before the active rule');
+        $this->assertLessThan($activeat, strpos($css, $plainlink), 'before the active rule');
         $token = self::rules_with('html[data-a11y-tokens~="focus"]');
         $focus = array_values(array_filter($token, fn($r) => str_contains($r[0], ':focus-visible')));
         $this->assertCount(4, $focus);
         $this->assertStringContainsString('outline: 2px dashed var(--a11y-focus) !important', $focus[0][1]);
         $this->assertStringContainsString('outline-offset: -2px !important', $focus[0][1], 'the ring sits inside');
         $this->assertStringContainsString(':focus-visible', $focus[0][0]);
-        $hover = ':where(a, button, input, select, textarea, [role="button"], [role="tab"], [role="menuitem"]):hover';
-        $this->assertStringContainsString($hover, $focus[0][0]);
+        $this->assertStringNotContainsString(':hover', implode('', array_column($token, 0)), 'the pointer gets no ring');
         $this->assertStringNotContainsString('solid var(--a11y-focus)', self::css(), 'focus is never solid');
         $this->assertStringContainsString('[data-a11y-focus="ring"]', $focus[1][0]);
         $this->assertStringContainsString('outline-width: 3px !important', $focus[1][1]);
@@ -478,12 +540,9 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringContainsString('.mds-nav-pill__indicator', $active[1][0]);
         $this->assertStringContainsString('.mds-nav-pill.active::before', $active[1][0]);
         $this->assertStringContainsString('display: none !important', $active[1][1]);
-        $pillfill = self::rules_with('html[data-a11y-tokens~="focus"] body .mds-nav-pill:where(:hover, :active)');
-        $this->assertCount(1, $pillfill, 'a hovered or pressed pill loses its fill');
-        $this->assertStringContainsString('background-color: transparent !important', $pillfill[0][1]);
         $this->assertStringContainsString('box-shadow: inset 0 0 0 2px var(--a11y-active) !important', $active[0][1]);
-        $this->assertStringContainsString('background-color: transparent !important', $active[0][1], 'no fill');
-        $this->assertStringContainsString('border-color: transparent !important', $active[0][1], 'no theme underline');
+        $this->assertStringNotContainsString('background-color', $active[0][1], 'the theme fill stays (3.0.8 menus rule)');
+        $this->assertStringNotContainsString('border-color', $active[0][1], 'the theme underline stays');
         $marks = ['.nav-link.active', '.nav-link[aria-current]', '.mds-nav-pill--selected', '.mds-nav-pill.active',
             '.courseindex-item.pageitem', '.dropdown-item[aria-current]', '.page-item.active .page-link'];
         foreach ($marks as $part) {
@@ -503,7 +562,8 @@ final class styles_test extends \advanced_testcase {
 
     /**
      * Theme-coloured controls: a plain .btn (no variant class) joins the list in both rules, the variants that keep the
-     * theme's colours are excluded, and the notification toggle (a div, not an anchor) takes the text colour.
+     * theme's colours are excluded. The notification toggle is covered by the navbar controls rule (issue #4), not a
+     * rule of its own.
      */
     public function test_theme_coloured_controls(): void {
         $plain = '.btn:not(.btn-primary, .btn-success, .btn-danger, .btn-warning, .btn-info, .btn-dark, .btn-link, '
@@ -514,9 +574,7 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringContainsString('background-color: var(--a11y-surface2) !important', $rules[0][1]);
         $this->assertStringContainsString('color: var(--a11y-text) !important', $rules[0][1]);
         $this->assertStringContainsString(':where(:hover, :focus, .active, [aria-expanded="true"])', $rules[1][0]);
-        $bell = self::rules_with('html[data-a11y-colour] body .popover-region-toggle');
-        $this->assertCount(1, $bell);
-        $this->assertSame('color: var(--a11y-text) !important;', trim(preg_replace('~/\*.*?\*/~s', '', $bell[0][1])));
+        $this->assertCount(0, self::rules_with('html[data-a11y-colour] body .popover-region-toggle'), 'one rule, upstream\'s');
     }
 
     /**
@@ -537,7 +595,11 @@ final class styles_test extends \advanced_testcase {
         }
         $this->assertStringContainsString('--la-anchor-line: none', $controls[0][1]);
         $anchors = array_values(array_filter(self::rules(), fn($r) => str_contains($r[1], 'var(--la-anchor, var(--a11y-link))')));
-        $this->assertCount(1, $anchors, 'one anchor rule');
+        // The anchor rule, and the 3.0.8 navbar and popover links rules, which read the same value so their id's weight
+        // agrees with it.
+        $this->assertCount(3, $anchors, 'the anchor rule and the navbar and popover links rules');
+        $this->assertStringContainsString('.navbar a:not(.btn, .dropdown-item)', $anchors[1][0]);
+        $this->assertStringContainsString('.popover-region-container :is(a, .btn-link)', $anchors[2][0]);
         $this->assertStringContainsString('text-decoration: var(--la-anchor-line, underline) !important', $anchors[0][1]);
         // Buttons and the active page or menu item stay out of it, as before.
         foreach (['.btn', '.qnbutton', '.nav-link.active', '.page-item.active .page-link', '.dropdown-item.active'] as $part) {

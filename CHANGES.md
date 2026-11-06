@@ -1,3 +1,15 @@
+# 3.1.3
+
+- Merges upstream 3.0.8 (Adam Jenkins): the panel stays open while you try settings, Site default comes first in
+  every stepper, Line width opens under its tile, profiles replace your settings, Links "Off" is "Standard", the
+  large cursor shows over every control but text entry, and under a colour scheme the navigation bar, menus,
+  notification and messaging panels, conversations and placeholders all take the scheme's colours, including on
+  Boost Union. See 3.0.8 below.
+- Dark high contrast (VS Code) follows the same hover rule as every other scheme: a hovered menu item, course tab or
+  navigation pill takes the scheme's hover surface, and the dashed orange ring now marks keyboard focus only. The
+  current item keeps its solid orange box, drawn on that surface rather than on bare black, and keeps the menu's
+  underline in the text colour.
+
 # 3.1.2
 
 - Under a colour scheme, plain buttons (the course index and block drawer toggles, the user menu toggle, the
@@ -62,9 +74,21 @@
   in a data-a11y-tokens attribute, and the stylesheet keys on those tokens. Schemes without them paint exactly as
   before.
 
-# 3.0.7
+# 3.0.8
 
-- Images, Dimmed and Hidden, now also apply to photos shown as background images, such as the photo tiles of the
-  Tiles course format and the course cards on the Dashboard. Before, those photos stayed at full strength (GitHub
-  issue #3). Hidden removes the photo and keeps the tile and its title. Dimmed fades the photo but not the text on it,
-  and the photo comes back to full strength while you point at or focus the tile.
+Improvements from a usability review by a university's instructional designers and accessibility specialist (GitHub
+issue #4), with fixes for the Boost Union theme.
+
+- The panel stays open while you try settings. Choosing a colour scheme or a profile, or Reset All, brings the panel
+  back where you were.
+- The site default option comes first everywhere, including the number settings.
+- Line width opens under its tile, like the other short settings, instead of on a separate page.
+- A profile now replaces your settings: anything it does not set goes back to the site default. The confirmation says
+  so.
+- Under a colour scheme, hovered and current menu items and course tabs, the navigation bar and its icons, the
+  notification and messaging panels, conversations and unread notifications all take the scheme's colours. Before,
+  some of them kept the theme's light colours, which left the scheme's light text on a light background.
+- Links has a "Standard" option instead of "Off".
+- With highlighted links, icons and current-page underlines inside a link follow the link's dark text.
+- The large cursor also shows over checkboxes, radio buttons, menus and buttons. Only text fields keep the text cursor.
+- Works with Boost Union, including its coloured navigation bars.
