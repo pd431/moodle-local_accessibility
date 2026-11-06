@@ -31,6 +31,7 @@ $string['allsettings'] = 'All settings';
 $string['apply'] = 'Apply';
 $string['background'] = 'Background';
 $string['cachedef_enabled'] = 'Enabled accessibility features';
+$string['cachedef_iconbaseline'] = 'Activity icon colours of each theme';
 $string['characters'] = '{$a} characters';
 $string['closepanel'] = 'Close accessibility settings';
 $string['contrastadjusted'] = 'Adjusted to reach 7:1: {$a}';

@@ -1,8 +1,8 @@
 @local @local_accessibility @javascript @la_activityicons
-Feature: Activity icon colours reach APCA Lc 75 under a colour scheme
+Feature: Activity icon colours reach APCA Lc 75 and 4.5:1 under a colour scheme
   In order to tell activity types apart on a dark or light scheme
   As a user with a colour scheme active
-  I need every activity icon colour lifted or lowered until it reaches APCA Lc 75 against what it sits on
+  I need every activity icon colour lifted or lowered until it reaches APCA Lc 75 and WCAG 2 4.5:1 against what it sits on
 
   Background:
     Given the following "users" exist:
@@ -20,7 +20,7 @@ Feature: Activity icon colours reach APCA Lc 75 under a colour scheme
       | forum    | C1     | Forum 1      |
       | page     | C1     | Page 1       |
 
-  Scenario Outline: Every icon reaches Lc 75 under <colour>
+  Scenario Outline: Every icon reaches Lc 75 and 4.5:1 under <colour>
     Given the following "user preferences" exist:
       | user     | preference                 | value    |
       | student1 | local_accessibility_colour | <colour> |
@@ -31,6 +31,9 @@ Feature: Activity icon colours reach APCA Lc 75 under a colour scheme
     And the activity icon for "Assignment 1" should have an APCA contrast of at least 75
     And the activity icon for "Forum 1" should have an APCA contrast of at least 75
     And the activity icon for "Page 1" should have an APCA contrast of at least 75
+    And the activity icon for "Assignment 1" should have a contrast ratio of at least 4.5
+    And the activity icon for "Forum 1" should have a contrast ratio of at least 4.5
+    And the activity icon for "Page 1" should have a contrast ratio of at least 4.5
 
     Examples:
       | colour       |
@@ -61,3 +64,4 @@ Feature: Activity icon colours reach APCA Lc 75 under a colour scheme
     And I am on the "C1" course page logged in as "student1"
     Then ".activityiconcontainer.content .activityicon" "css_element" should be visible
     And the activity icon for "Page 1" should have an APCA contrast of at least 75
+    And the activity icon for "Page 1" should have a contrast ratio of at least 4.5

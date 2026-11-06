@@ -469,6 +469,32 @@ class behat_local_accessibility extends behat_base {
     }
 
     /**
+     * Check the WCAG 2 contrast ratio of an activity's icon, as painted by the plugin's SVG filter, against what is
+     * behind it. The icon colours are held to APCA and WCAG 2 both; this step is the WCAG 2 half.
+     *
+     * @Then /^the activity icon for "(?P<name>[^"]*)" should have a contrast ratio of at least (?P<min>[0-9.]+)$/
+     * @param string $name activity name
+     * @param string $min ratio
+     */
+    public function the_activity_icon_should_have_contrast_ratio(string $name, string $min): void {
+        $this->check_script($this->activity_icon_script($name) . '
+            const m = String(getComputedStyle(icon).filter).match(/#(la-icon-[a-z]+)/);
+            if (!m) {
+                return "The icon of " + ' . json_encode($name) . ' + " does not use a plugin filter: " +
+                    getComputedStyle(icon).filter;
+            }
+            const flood = document.querySelector("#" + m[1] + " feFlood");
+            const fg = flood && parse(getComputedStyle(flood).floodColor);
+            if (!fg) {
+                return "No flood colour for " + m[1];
+            }
+            const back = behind(icon);
+            const r = ratio(over(fg, back), back);
+            return r >= ' . (float) $min . ' ? "" : "Contrast " + r.toFixed(2) + ":1 (icon " +
+                getComputedStyle(flood).floodColor + " on rgb(" + back.map(Math.round).join(", ") + "))";');
+    }
+
+    /**
      * Check which filter, if any of the plugin's, paints an activity's icon.
      *
      * @Then /^the activity icon for "(?P<name>[^"]*)" should (?P<not>not )?use the filter "(?P<id>[^"]*)"$/

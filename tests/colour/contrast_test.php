@@ -119,6 +119,24 @@ final class contrast_test extends \advanced_testcase {
     }
 
     /**
+     * The dual measure is the smaller of the two normalised readings over the backgrounds: 1 or more passes both.
+     */
+    public function test_dual_worst(): void {
+        // Boost's violet on black: WCAG 2 passes 4.5:1 (6.4:1), APCA does not (Lc 43), so APCA binds.
+        $apca = contrast::apca_worst('#da58ef', ['#000000']) / 75;
+        $this->assertEqualsWithDelta($apca, contrast::dual_worst('#da58ef', ['#000000']), 0.0001);
+        $this->assertLessThan(1.0, contrast::dual_worst('#da58ef', ['#000000']));
+        // Black on white passes both by a wide margin.
+        $this->assertGreaterThan(1.0, contrast::dual_worst('#000000', ['#ffffff']));
+        // The pass levels can be moved; at a 21:1 WCAG level nothing passes, and WCAG binds.
+        $this->assertLessThan(1.0, contrast::dual_worst('#000000', ['#ffffff'], 75.0, 21.1));
+        $this->assertEqualsWithDelta(21.0 / 21.1, contrast::dual_worst('#000000', ['#ffffff'], 75.0, 21.1), 0.001);
+        // Over several backgrounds the worst one counts.
+        $both = contrast::dual_worst('#0f6cbf', ['#ffffff', '#000000']);
+        $this->assertEqualsWithDelta(contrast::dual_worst('#0f6cbf', ['#000000']), $both, 0.0001);
+    }
+
+    /**
      * OKLCH round-trips within one step per channel.
      */
     public function test_oklch_roundtrip(): void {

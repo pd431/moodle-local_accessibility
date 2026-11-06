@@ -20,6 +20,7 @@ use local_accessibility\colour\contrast;
 use local_accessibility\colour\scheme;
 use local_accessibility\feature\registry;
 use local_accessibility\local\legacy;
+use local_accessibility\local\theme_icons;
 use moodle_exception;
 use invalid_parameter_exception;
 
@@ -291,7 +292,7 @@ final class preferences {
                     // it in the browser: name the scheme's own mode so that script cannot flip data-bs-theme.
                     $attrs['data-colourmode'] = $s->mode;
                 }
-                array_unshift($properties, rtrim($s->css_properties(), ';'));
+                array_unshift($properties, rtrim($s->css_properties(theme_icons::baseline()), ';'));
                 if ($s->tokens()) {
                     $attrs['data-a11y-tokens'] = implode(' ', $s->tokens());
                 }
