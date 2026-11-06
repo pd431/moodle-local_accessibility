@@ -1,3 +1,13 @@
+# 3.1.4
+
+- Under a colour scheme, activity icons start from the purpose colours your theme actually paints, read from its
+  compiled stylesheet, rather than from a built-in table of Boost's. Boost Union's configured activity colours and a
+  child theme's own now carry through (lightened or darkened as before); Boost's table stands in only while the
+  theme's stylesheet has not been built yet.
+- Each icon colour is now held to WCAG 2 as well as APCA: at least 4.5:1 and Lc 75 against the page and both
+  surfaces. APCA is the stricter of the two on every preset, so the preset colours are unchanged; the WCAG 2 floor
+  binds for a theme colour whose hue APCA would otherwise pass at a lower ratio.
+
 # 3.1.3
 
 - Merges upstream 3.0.8 (Adam Jenkins): the panel stays open while you try settings, Site default comes first in

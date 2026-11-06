@@ -1,5 +1,33 @@
 # Changelog
 
+## [3.1.4] - 2026-11-06
+
+### Added
+- `classes/colour/cssfilter.php`: `cssfilter::apply(chain, hex)` evaluates a CSS filter chain (invert, sepia, saturate,
+  hue-rotate, brightness, contrast, grayscale) on a flat colour with the Filter Effects colour matrices; null for blur,
+  drop-shadow, opacity, url() or a non-filter value.
+- `classes/local/theme_icons.php`: `theme_icons::baseline(?theme_config)` reads `--activity<purpose>` from the theme's
+  post-processed CSS in core's `postprocessedcss` cache (a colour on 5.2+, a filter chain on 4.5), first declaration
+  per purpose wins, Boost's table fills gaps; cached in `local_accessibility/iconbaseline` under `<theme>_<themerev>`
+  and memoised per request (`reset_cache()`). No compile on a page request: with no cached CSS Boost's table is
+  returned and nothing cached; in theme designer mode `get_css_content()` compiles. `parse(css)` is the pure reader.
+- `db/caches.php`: `iconbaseline` (application, simple keys and data, static acceleration); lang
+  `cachedef_iconbaseline`.
+- `contrast::dual_worst(fg, backgrounds, lc = 75, ratio = 4.5)`: min over backgrounds of min(|Lc| / lc, ratio / 4.5);
+  `purpose::WCAG = 4.5`.
+- Behat step `the activity icon for "X" should have a contrast ratio of at least N`; activity_icons.feature asserts
+  4.5:1 beside Lc 75.
+- PHPUnit: `tests/colour/cssfilter_test.php`, `tests/local/theme_icons_test.php` (the designer-mode test compiles
+  Boost's SCSS and asserts it declares all six purposes within 8 per channel of Boost's table),
+  `contrast_test::test_dual_worst`, `scheme_test::test_icon_colours_from_baseline`.
+
+### Changed
+- `purpose::colours(ramp, text, ?baseline)`: searches with `dual_worst` normalised to a target of 1; `baseline`
+  (purpose => colour) replaces Boost's table per purpose. `scheme::icon_colours(?baseline)` and
+  `scheme::css_properties(?baseline)` pass it through; `preferences::html_attributes()` passes
+  `theme_icons::baseline()`.
+- version.php: 3.1.4, 2026110600.
+
 ## [3.1.3] - 2026-11-05
 
 ### Changed
