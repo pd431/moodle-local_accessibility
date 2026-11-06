@@ -31,4 +31,11 @@ $definitions = [
         'simpledata' => true,
         'staticacceleration' => true,
     ],
+    // The activity purpose colours the active theme paints, read from its compiled CSS, per theme and theme revision.
+    'iconbaseline' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'simpledata' => true,
+        'staticacceleration' => true,
+    ],
 ];
