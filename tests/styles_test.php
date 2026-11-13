@@ -670,4 +670,13 @@ final class styles_test extends \advanced_testcase {
             $this->assertCount(1, self::rules_with('html[data-a11y-colour] body :where(' . $type), $type);
         }
     }
+
+    /**
+     * Utility surfaces that core's dark mode repaints with more weight take the scheme through the id's weight.
+     */
+    public function test_weighted_utilities(): void {
+        $rules = self::rules_with('html[data-a11y-colour] body:not(#la-weight) :where(.bg-white, .bg-light, .bg-body)');
+        $this->assertCount(1, $rules);
+        $this->assertStringContainsString('background-color: var(--a11y-surface1) !important', $rules[0][1]);
+    }
 }
