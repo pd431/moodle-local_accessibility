@@ -13,6 +13,8 @@ rest, hovered, focused and with menus open.
 - Text the theme colours itself takes the scheme's text colour: `.text-dark`, plain text, headers and buttons in menus,
   activity dates, grade category toggles, "Not marked", question names on the quiz editing page, and the grey
   component names on Plugins overview.
+- A search term marked in results (site administration search, course search) takes the text colour on the hover
+  surface, underlined. Before, it kept Boost's teal, which is APCA Lc 30 on a black page.
 - Link-styled buttons (Show more, Expand all, move and info icons) take the link colour. Before, they kept the theme's
   brand colour, and turned black when hovered.
 - A site's own forced link colours (an `!important` rule in a theme's custom SCSS) no longer beat the scheme.

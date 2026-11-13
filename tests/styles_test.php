@@ -767,4 +767,15 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringContainsString(':not(.activityiconcontainer *', $rules[0][0]);
         $this->assertStringContainsString('filter: invert(1) hue-rotate(180deg) !important', $rules[0][1]);
     }
+
+    /**
+     * A highlighted search term takes the text colour on the hover surface, underlined.
+     */
+    public function test_search_highlight(): void {
+        $rules = self::rules_with('html[data-a11y-colour] body :where(.highlight)');
+        $this->assertCount(1, $rules);
+        $this->assertStringContainsString('color: var(--a11y-text) !important', $rules[0][1]);
+        $this->assertStringContainsString('background-color: var(--a11y-hover) !important', $rules[0][1]);
+        $this->assertStringContainsString('text-decoration: underline !important', $rules[0][1]);
+    }
 }

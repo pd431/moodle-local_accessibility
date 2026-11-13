@@ -382,6 +382,14 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     html[data-a11y-colour] body :where(.text-muted, .text-secondary, .text-body-secondary, .dimmed_text, .categoryname, .progress-text, .collapsemenu-text, .mds-switch-label, .nav-link.active, .text-dark:not(.badge), .dropdown-item-text, .dropdown-header, button.dropdown-item, .activity-dates, .completion-dialog, .form-autocomplete-downarrow, .submissionnotgraded, .submissiongraded, #plugins-control-panel .componentname, #plugins-control-panel .versionnumber, #plugins-control-panel .requiredby, a.toggle-category, a.toggle-category i, .gradeitemheader, .btn-outline-dark, #page-mod-quiz-edit .questionname, #page-mod-quiz-edit .questiontext, .path-mod-book .btn-previous .icon, .path-mod-book .btn-next .icon, .task-class, .moremenu .dropdown-item[aria-current="true"]):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
     }
+    /* A search term marked in results (.highlight: site administration search, course search, forum search) is
+       Boost's info teal, which is APCA Lc 30 on a black page whatever its WCAG ratio says. Under a scheme the term
+       takes the text colour on the hover surface, underlined, so it is marked by more than colour. */
+    html[data-a11y-colour] body :where(.highlight) {
+        background-color: var(--a11y-hover) !important; /* stylelint-disable-line declaration-no-important */
+        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+        text-decoration: underline !important; /* stylelint-disable-line declaration-no-important */
+    }
     /* Navigation menus (issue #4): Boost paints a hovered, focused or current item of its menus (.moremenu: the top
        navbar and the course tabs) with a hard-coded light grey, which under a dark scheme left the scheme's link colour
        on near-white. Moodle 5.3's course tabs (.mds-nav-pill) take the same scheme hover surface. */

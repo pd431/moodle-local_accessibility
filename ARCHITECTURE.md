@@ -17,6 +17,7 @@ One owner per rule. A change goes in the owner; a new rule gets an owner and a g
 | Text-entry fields and input-group add-ons | `styles.css` s7, the fields rule | `styles_test::test_fields` |
 | Theme-coloured buttons | `styles.css` s7, the controls rules | `styles_test::test_theme_coloured_controls` |
 | Hard-coded theme text colours | `styles.css` s7, the text-colour rule | `styles_test::test_hardcoded_text_colours` |
+| Highlighted search terms | `styles.css` s7, the highlight rule | `styles_test::test_search_highlight` |
 | Border, focus, active and selection tokens | `styles.css` s7 and s11a | `styles_test::test_scheme_token_rules` |
 | Focus for schemes without a focus token | `styles.css` s11a | `styles_test::test_focus_without_token` |
 | Activity icons and other monochrome image icons | `styles.css` s7, the icon filter rules | `styles_test::test_activity_icon_filters`, `test_image_icons` |
