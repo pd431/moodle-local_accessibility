@@ -790,6 +790,7 @@ final class styles_test extends \advanced_testcase {
             'chosen' => ['.page-item.active > .page-link', '.list-group-item.active', '.btn.active', '[aria-pressed="true"]',
                 '[aria-selected="true"]', '.nav-link.active', '.mds-nav-pill--selected', '.courseindex-item.pageitem',
                 '.dropdown-item.active', '.tox-tbtn--enabled', '.today .day-number-circle', 'tr.selectedrow > *'],
+            'changed' => ['.quickgrademodified', 'td.ajaxoverridden'],
         ];
     }
 
@@ -866,5 +867,16 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringContainsString('display: none !important', $dot[0][1]);
         $this->assertStringNotContainsString('--a11y-active)', file_get_contents(__DIR__ . '/../styles.css'),
             'the mark colour replaces the active token everywhere');
+    }
+
+    /**
+     * State marks: changed.
+     */
+    public function test_state_marks_changed(): void {
+        [, $rules] = self::state_marks();
+        $r = array_values(array_filter($rules, fn($x) => str_contains($x[0], '.quickgrademodified')));
+        $this->assertNotEmpty($r);
+        $this->assertStringContainsString('outline: 2px dashed var(--a11y-mark) !important', $r[0][1]);
+        $this->assertStringContainsString('outline-offset: -3px !important', $r[0][1]);
     }
 }
