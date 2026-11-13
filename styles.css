@@ -198,6 +198,12 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         color: var(--la-anchor, var(--a11y-link)) !important; /* stylelint-disable-line declaration-no-important */
         text-decoration: var(--la-anchor-line, underline) !important; /* stylelint-disable-line declaration-no-important */
     }
+    /* Link-styled buttons (.btn-link: Show more, Expand all, move and info icons) are controls painted as links. The
+       anchor rule leaves .btn out, and Boost paints them in the brand colour (black when hovered), so they read the
+       same purpose colour here, with no forced underline: the underline is the mark of a link in text. */
+    html[data-a11y-colour] body :where(.btn-link):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
+        color: var(--la-anchor, var(--a11y-link)) !important; /* stylelint-disable-line declaration-no-important */
+    }
     /* Activity icons: Boost paints each monologo icon with a filter chain that yields a purpose colour (Lc 13 to 43
        on black by APCA). Under a scheme the icon takes the panel's SVG filter for its purpose instead, which floods
        its shape with --a11y-icon-<purpose>: the same hue lifted or lowered to Lc 75 (see colour\purpose). Same

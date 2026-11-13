@@ -48,6 +48,16 @@ final class styles_test extends \advanced_testcase {
     }
 
     /**
+     * A rule's selector without the comment that precedes it.
+     *
+     * @param string $selector
+     * @return string
+     */
+    private static function selector_only(string $selector): string {
+        return trim(preg_replace('~/\*.*?\*/~s', '', $selector));
+    }
+
+    /**
      * The rules whose selector contains a string.
      *
      * @param string $needle
@@ -597,9 +607,11 @@ final class styles_test extends \advanced_testcase {
         $anchors = array_values(array_filter(self::rules(), fn($r) => str_contains($r[1], 'var(--la-anchor, var(--a11y-link))')));
         // The anchor rule, and the 3.0.8 navbar and popover links rules, which read the same value so their id's weight
         // agrees with it.
-        $this->assertCount(3, $anchors, 'the anchor rule and the navbar and popover links rules');
-        $this->assertStringContainsString('.navbar a:not(.btn, .dropdown-item)', $anchors[1][0]);
-        $this->assertStringContainsString('.popover-region-container :is(a, .btn-link)', $anchors[2][0]);
+        $this->assertCount(4, $anchors, 'the anchor rule, the link-styled buttons rule and the navbar and popover links rules');
+        $this->assertStringStartsWith('html[data-a11y-colour] body :where(.btn-link)', self::selector_only($anchors[1][0]));
+        $this->assertStringNotContainsString('text-decoration', $anchors[1][1], 'a link-styled button is not underlined');
+        $this->assertStringContainsString('.navbar a:not(.btn, .dropdown-item)', $anchors[2][0]);
+        $this->assertStringContainsString('.popover-region-container :is(a, .btn-link)', $anchors[3][0]);
         $this->assertStringContainsString('text-decoration: var(--la-anchor-line, underline) !important', $anchors[0][1]);
         // Buttons and the active page or menu item stay out of it, as before.
         foreach (['.btn', '.qnbutton', '.nav-link.active', '.page-item.active .page-link', '.dropdown-item.active'] as $part) {
