@@ -625,4 +625,19 @@ final class styles_test extends \advanced_testcase {
             $this->assertSame('filter: url("#la-icon-' . $m[1] . '");', trim($body));
         }
     }
+
+    /**
+     * Legacy tables (.generaltable without .table) take the scheme, with one hover surface for their rows.
+     */
+    public function test_legacy_tables(): void {
+        $mopup = self::rules_with('html[data-a11y-colour] body :where(#page, #page-wrapper');
+        $this->assertCount(1, $mopup, 'still one rule repaints the hardcoded surfaces');
+        foreach (['.generaltable', '.generaltable tbody tr', '.generaltable td', '.generaltable th', '.generaltable .sticky-column'] as $part) {
+            $this->assertStringContainsString($part . ',', $mopup[0][0] . ',', $part);
+        }
+        $hover = self::rules_with('tbody tr:hover > :is(td, th)');
+        $this->assertCount(1, $hover, 'one hover-surface rule');
+        $this->assertStringContainsString('background-color: var(--a11y-hover) !important', $hover[0][1]);
+        $this->assertStringContainsString('.maincalendar .calendarmonth .clickable:hover', $hover[0][0]);
+    }
 }
