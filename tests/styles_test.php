@@ -792,6 +792,7 @@ final class styles_test extends \advanced_testcase {
                 '.dropdown-item.active', '.tox-tbtn--enabled', '.today .day-number-circle', 'tr.selectedrow > *'],
             'changed' => ['.quickgrademodified', 'td.ajaxoverridden'],
             'disabled' => ['.btn.disabled', '.dropdown-item.disabled', '.nav-link.disabled', '.list-group-item.disabled', '.page-item.disabled > .page-link', '.tox-tbtn--disabled'],
+            'status' => ['.gradepass', '.gradefail', '.submissionstatussubmitted', '.submissiongraded', '.submissionstatusdraft', '.latesubmission', 'tr.table-success > :first-child', 'tr.table-warning > :first-child', 'tr.table-danger > :first-child'],
         ];
     }
 
@@ -889,5 +890,20 @@ final class styles_test extends \advanced_testcase {
         $r = array_values(array_filter($rules, fn($x) => str_contains($x[0], '.dropdown-item.disabled')));
         $this->assertNotEmpty($r);
         $this->assertStringContainsString('opacity: 0.6 !important', $r[0][1]);
+    }
+
+    /**
+     * State marks: status.
+     */
+    public function test_state_marks_status(): void {
+        [, $rules] = self::state_marks();
+        $all = implode("\n", array_column($rules, 1));
+        $this->assertStringContainsString('background-image: linear-gradient(var(--a11y-mark), var(--a11y-mark)) !important', $all, 'success solid');
+        $this->assertStringContainsString('repeating-linear-gradient(to bottom, var(--a11y-mark) 0 4px', $all, 'warning dotted');
+        $this->assertStringContainsString('transparent 1.5px 2.5px, var(--a11y-mark) 2.5px 4px', $all, 'danger double');
+        $this->assertStringContainsString('border-inline-start-style: dotted !important', $all);
+        $this->assertStringContainsString('text-decoration-style: double !important', $all);
+        $this->assertStringNotContainsString('content:', $all, 'no generated text');
+
     }
 }
