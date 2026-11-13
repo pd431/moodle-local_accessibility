@@ -741,4 +741,16 @@ final class styles_test extends \advanced_testcase {
         $this->assertCount(1, $nofill);
         $this->assertStringContainsString('background-color: transparent !important', $nofill[0][1]);
     }
+
+    /**
+     * The text editor's menu bar, toolbar and status bar take the scheme; its icons take the text colour.
+     */
+    public function test_editor_toolbar(): void {
+        $bars = self::rules_with('html[data-a11y-colour] body :where(.tox .tox-editor-header');
+        $this->assertCount(1, $bars);
+        $this->assertStringContainsString('background-color: var(--a11y-surface2) !important', $bars[0][1]);
+        $icons = self::rules_with('html[data-a11y-colour] body .tox :where(.tox-tbtn svg');
+        $this->assertCount(1, $icons);
+        $this->assertStringContainsString('fill: var(--a11y-text) !important', $icons[0][1]);
+    }
 }

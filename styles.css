@@ -449,6 +449,16 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
         opacity: 0.8;
     }
+    /* The text editor (TinyMCE) on Moodle 4.5 paints its menu bar, toolbar and status bar white. They take the second
+       surface and the text colour; its icons are SVG and take the text colour as their fill. The editing area is an
+       iframe and keeps the author's own colours. */
+    html[data-a11y-colour] body :where(.tox .tox-editor-header, .tox .tox-menubar, .tox .tox-toolbar, .tox .tox-toolbar__primary, .tox .tox-toolbar__overflow, .tox .tox-toolbar-overlord, .tox .tox-statusbar, .tox .tox-tbtn, .tox .tox-mbtn, .tox .tox-statusbar a, .tox .tox-statusbar__path-item, .tox .tox-statusbar__wordcount) {
+        background-color: var(--a11y-surface2) !important; /* stylelint-disable-line declaration-no-important */
+        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-colour] body .tox :where(.tox-tbtn svg, .tox-statusbar svg) {
+        fill: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+    }
     /* Exclusions (spec §6.4): media, icons, maths and quiz state are never matched, via the :not() guard below. */
     /* Pasted content colours lose to the scheme (spec §6.2, CSS only): inline colours and backgrounds (the shorthand
        too) and legacy <font color> and bgcolor, in the main region and in authored text anywhere (HTML blocks). */
