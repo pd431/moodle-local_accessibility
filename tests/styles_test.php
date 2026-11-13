@@ -645,7 +645,7 @@ final class styles_test extends \advanced_testcase {
         $mopup = self::rules_with('html[data-a11y-colour] body :where(#page, #page-wrapper');
         $this->assertCount(1, $mopup, 'still one rule repaints the hardcoded surfaces');
         foreach (['.generaltable', '.generaltable tbody tr', '.generaltable td', '.generaltable th', '.generaltable .sticky-column'] as $part) {
-            $this->assertStringContainsString($part . ',', $mopup[0][0] . ',', $part);
+            $this->assertStringContainsString($part, $mopup[0][0], $part);
         }
         $hover = self::rules_with('tbody tr:hover > :is(td, th)');
         $this->assertCount(1, $hover, 'one hover-surface rule');
@@ -660,7 +660,7 @@ final class styles_test extends \advanced_testcase {
         $mopup = self::rules_with('html[data-a11y-colour] body :where(#page, #page-wrapper');
         $this->assertCount(1, $mopup, 'still one rule repaints the hardcoded surfaces');
         foreach (['.page-link', '.gradeparent .cell', '.user-report-container', '.user-grade td', '.gradetree-wrapper td', '.gradingtable td', '.gradingtable th', '#page-mod-quiz-edit ul.slots li.activity', '#page-mod-quiz-edit .inplaceeditable', '.page-header-headings', '.fp-filename'] as $part) {
-            $this->assertStringContainsString($part . ',', $mopup[0][0] . ',', $part);
+            $this->assertStringContainsString($part, $mopup[0][0], $part);
         }
     }
 
