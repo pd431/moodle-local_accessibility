@@ -791,6 +791,7 @@ final class styles_test extends \advanced_testcase {
                 '[aria-selected="true"]', '.nav-link.active', '.mds-nav-pill--selected', '.courseindex-item.pageitem',
                 '.dropdown-item.active', '.tox-tbtn--enabled', '.today .day-number-circle', 'tr.selectedrow > *'],
             'changed' => ['.quickgrademodified', 'td.ajaxoverridden'],
+            'disabled' => ['.btn.disabled', '.dropdown-item.disabled', '.nav-link.disabled', '.list-group-item.disabled', '.page-item.disabled > .page-link', '.tox-tbtn--disabled'],
         ];
     }
 
@@ -878,5 +879,15 @@ final class styles_test extends \advanced_testcase {
         $this->assertNotEmpty($r);
         $this->assertStringContainsString('outline: 2px dashed var(--a11y-mark) !important', $r[0][1]);
         $this->assertStringContainsString('outline-offset: -3px !important', $r[0][1]);
+    }
+
+    /**
+     * State marks: disabled.
+     */
+    public function test_state_marks_disabled(): void {
+        [, $rules] = self::state_marks();
+        $r = array_values(array_filter($rules, fn($x) => str_contains($x[0], '.dropdown-item.disabled')));
+        $this->assertNotEmpty($r);
+        $this->assertStringContainsString('opacity: 0.6 !important', $r[0][1]);
     }
 }

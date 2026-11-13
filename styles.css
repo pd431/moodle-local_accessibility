@@ -517,6 +517,16 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         outline: 2px dashed var(--a11y-mark) !important; /* stylelint-disable-line declaration-no-important */
         outline-offset: -3px !important; /* stylelint-disable-line declaration-no-important */
     }
+    /* Disabled: a control that cannot be used, and a field that cannot be edited. Section 7 gives it the same text
+       colour as the enabled control beside it, so it is faded to 0.6, as Bootstrap fades a disabled button (WCAG asks
+       no contrast of an inactive control). A field also gets a dashed edge in the text colour. */
+    html[data-a11y-colour] body:not(#la-weight) :where(:is(button, input, select, textarea, .btn):disabled, .btn.disabled, .dropdown-item.disabled, .nav-link.disabled, .list-group-item.disabled, .page-item.disabled > .page-link, :is(a, button, .btn, [role="button"], [role="menuitem"], [role="tab"])[aria-disabled="true"], .tox-tbtn--disabled, :is(.form-control, .form-select, .custom-select)[readonly]):where(:not(.local-accessibility-panel, .local-accessibility-panel *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-readbar, .la-readbar *, .la-guide, .la-guide *)) {
+        opacity: 0.6 !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-colour] body:not(#la-weight) :where(:is(.form-control, .form-select, .custom-select):is(:disabled, [readonly])):where(:not(.local-accessibility-panel, .local-accessibility-panel *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-readbar, .la-readbar *, .la-guide, .la-guide *)) {
+        border-style: dashed !important; /* stylelint-disable-line declaration-no-important */
+        border-color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+    }
 }
 /* 7a end */
 /* 8. Links: no layout shift; never the panel or the readbar. "outline" is underline plus outline. "highlight" keeps a
