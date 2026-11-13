@@ -301,6 +301,25 @@ final class scheme {
     }
 
     /**
+     * The colour that marks a state (current, chosen, changed, a focus ring) under this scheme: the scheme's own
+     * active colour if it declares one, else its link colour if that reaches 3:1 on every shade, else its text colour
+     * if that does, else black or white. Styles read it as --a11y-mark.
+     *
+     * @return string normalised colour
+     */
+    public function mark(): string {
+        if ($this->active !== null) {
+            return $this->active;
+        }
+        foreach ([$this->link, $this->text] as $hex) {
+            if (contrast::worst($hex, $this->ramp) >= 3.0) {
+                return $hex;
+            }
+        }
+        return self::best_bw($this->ramp);
+    }
+
+    /**
      * Activity purpose colours under this scheme (see purpose).
      *
      * @return array<string, string> purpose => normalised colour
@@ -318,7 +337,7 @@ final class scheme {
     public function css_properties(): string {
         $props = $this->ramp + ['text' => $this->text, 'link' => $this->link, 'border' => $this->border,
             'focus' => $this->focus, 'selection' => $this->selection, 'selection-text' => $this->selectiontext,
-            'active' => $this->active];
+            'active' => $this->active, 'mark' => $this->mark()];
         foreach ($this->icon_colours() as $id => $hex) {
             $props['icon-' . $id] = $hex;
         }

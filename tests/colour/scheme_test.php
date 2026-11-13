@@ -265,4 +265,24 @@ final class scheme_test extends \advanced_testcase {
             $this->assertSame('#101010', $hex, "$p falls back to the text colour on mid grey");
         }
     }
+
+    /**
+     * Every scheme has a mark colour that reaches 3:1 on every shade (WCAG 1.4.11): the built-in presets, VS Code's
+     * own orange, and a spread of custom schemes, auto-adjusted and exact.
+     */
+    public function test_mark_meets_floor(): void {
+        $schemes = scheme::presets();
+        $schemes['custom-dark'] = scheme::custom('#101820', '#f0f0f0', '#80c0ff', false);
+        $schemes['custom-light'] = scheme::custom('#fffbe6', '#202020', '#0050a0', false);
+        $schemes['custom-mid'] = scheme::custom('#777777', '#ffffff', '#ffff00', false);
+        $schemes['custom-exact-low-link'] = scheme::custom('#ffffff', '#000000', '#cccccc', true);
+        $schemes['custom-exact-low-both'] = scheme::custom('#ffffff', '#999999', '#aaaaaa', true);
+        foreach ($schemes as $id => $s) {
+            $this->assertGreaterThanOrEqual(3.0, contrast::worst($s->mark(), $s->ramp), "$id mark " . $s->mark());
+            $this->assertStringContainsString('--a11y-mark:' . $s->mark() . ';', $s->css_properties(), $id);
+        }
+        $this->assertSame(scheme::presets()['vscodehc']->active, scheme::presets()['vscodehc']->mark(), 'vscodehc keeps its orange');
+        $this->assertSame(scheme::presets()['highcontrast']->link, scheme::presets()['highcontrast']->mark(), 'the link colour first');
+        $this->assertSame('#000000', $schemes['custom-exact-low-link']->mark(), 'the text colour when the link is too faint');
+    }
 }
