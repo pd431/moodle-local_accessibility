@@ -679,4 +679,19 @@ final class styles_test extends \advanced_testcase {
         $this->assertCount(1, $rules);
         $this->assertStringContainsString('background-color: var(--a11y-surface1) !important', $rules[0][1]);
     }
+
+    /**
+     * Text the theme colours itself takes the scheme's text colour.
+     */
+    public function test_hardcoded_text_colours(): void {
+        $rules = self::rules_with('html[data-a11y-colour] body :where(.text-muted');
+        $this->assertCount(1, $rules, 'one rule for hard-coded text colours');
+        $this->assertStringContainsString('color: var(--a11y-text) !important', $rules[0][1]);
+        $parts = ['.text-dark:not(.badge)', '.dropdown-item-text', '.dropdown-header', 'button.dropdown-item', '.activity-dates',
+            '.submissionnotgraded', '#plugins-control-panel .componentname', 'a.toggle-category i', '.btn-outline-dark',
+            '#page-mod-quiz-edit .questionname', '.path-mod-book .btn-next .icon'];
+        foreach ($parts as $part) {
+            $this->assertStringContainsString($part, $rules[0][0], $part);
+        }
+    }
 }
