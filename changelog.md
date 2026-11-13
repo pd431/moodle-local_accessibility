@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.1.5] - 2026-11-14
+
+- States keep their mark under every colour scheme: current and chosen items are boxed, changed grades have a dashed
+  edge, disabled controls are faded, statuses have a solid, dotted or double leading edge, hidden items are italic, and
+  keyboard focus is drawn in the scheme's mark colour. See CHANGES.md.
+
 ## [3.1.4] - 2026-11-13
 
 - Standard Moodle components keep their contrast under a colour scheme: tables, pagination, the gradebook, the

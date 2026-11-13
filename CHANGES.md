@@ -1,3 +1,28 @@
+# 3.1.5
+
+States keep their mark under every colour scheme. A scheme gives a state and its neighbour the same colours, so the
+current page, a ticked row, a disabled button or a failing grade looked like the items around it. Found by checking
+97 states on Moodle 4.5, 5.2 and 5.3 under every scheme, against upstream 3.0.9 and under core Boost and Boost Union.
+
+- Every scheme has a mark colour: its link colour, or its text colour where the link is under 3:1 on a surface. VS Code
+  dark high contrast keeps its orange.
+- Chosen and current items (the current page, tab, pill, breadcrumb, menu and list item, a pressed toggle or editor
+  button, a ticked or active row, today in the calendar) are boxed in the mark colour on the hover surface. Before,
+  only VS Code dark high contrast boxed them.
+- A changed quick grade and an overridden grade have a dashed edge in the mark colour.
+- Disabled menu items, buttons, tabs, page links, editor buttons and fields are faded to 0.6; fields that cannot be
+  edited also get a dashed edge.
+- Status (a passing or failing grade, a submission's status, a coloured table row, an alert's type, an error) has an
+  edge at its leading side in the mark colour: solid for success, dotted for warning, double for danger. Status text in
+  a line is underlined in that style. No text is added.
+- A progress bar's fill is in the mark colour, on a track with an edge.
+- Hidden items, hidden courses and suspended users are set in italic, at full contrast.
+- Keyboard focus under a scheme without its own focus colour is drawn in the mark colour, and moves inside a current
+  item's box under every scheme.
+- Alert edges no longer use fixed hex colours.
+- Tests: the Behat step "should look different from" now uses a 3:1 rule (it passed on any difference before) and
+  counts Bootstrap 5's table fills as background; a new feature, state_marks, covers each state.
+
 # 3.1.4
 
 Contrast of standard Moodle components under a colour scheme, found by measuring 70 pages on Moodle 4.5 and 5.3 at

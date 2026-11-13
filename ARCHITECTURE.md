@@ -7,6 +7,8 @@ One owner per rule. A change goes in the owner; a new rule gets an owner and a g
 | Concern | Owner | Guard test |
 |---|---|---|
 | Scheme colours, tokens and their contrast floors | `classes/colour/scheme.php` | `tests/colour/scheme_test.php` |
+| Mark colour for states (`--a11y-mark`, 3:1 on every shade) | `classes/colour/scheme.php`, `mark()` | `tests/colour/scheme_test.php::test_mark_meets_floor` |
+| State marks: chosen/current, changed, disabled, status, progress, hidden, keyboard focus (the only place a state class is named) | `styles.css` s7a | `styles_test::test_state_marks_*`, `test_state_marks_follow_section_7`, `test_state_classes_named_once`, `test_nothing_after_state_marks_undoes_them`; `tests/behat/state_marks.feature` |
 | Contrast maths (WCAG ratio, APCA) | `classes/colour/contrast.php` | `tests/colour/contrast_test.php` |
 | Scheme variables onto Bootstrap variables | `styles.css` s7, `html[data-a11y-colour]` | `styles_test::test_new_variables_and_values` |
 | Links by purpose (control anchors, link anchors, link-styled buttons) | `styles.css` s7, the `--la-anchor` rules | `styles_test::test_links_by_purpose` |
@@ -18,8 +20,8 @@ One owner per rule. A change goes in the owner; a new rule gets an owner and a g
 | Theme-coloured buttons | `styles.css` s7, the controls rules | `styles_test::test_theme_coloured_controls` |
 | Hard-coded theme text colours | `styles.css` s7, the text-colour rule | `styles_test::test_hardcoded_text_colours` |
 | Highlighted search terms | `styles.css` s7, the highlight rule | `styles_test::test_search_highlight` |
-| Border, focus, active and selection tokens | `styles.css` s7 and s11a | `styles_test::test_scheme_token_rules` |
-| Focus for schemes without a focus token | `styles.css` s11a | `styles_test::test_focus_without_token` |
+| Border, focus and selection tokens (the active token is the mark colour, s7a) | `styles.css` s7 and s11a | `styles_test::test_scheme_token_rules` |
+| Focus for schemes without a focus token | `styles.css` s7a | `styles_test::test_focus_without_token` |
 | Activity icons and other monochrome image icons | `styles.css` s7, the icon filter rules | `styles_test::test_activity_icon_filters`, `test_image_icons` |
 | The text editor's toolbar | `styles.css` s7, the editor rule | `styles_test::test_editor_toolbar` |
 | Navbar, popovers, messaging (issue #4) | `styles.css` s7 | `styles_test::test_issue4_rules` |

@@ -98,6 +98,9 @@ Nothing is stored on the server for them. Logged-in users' settings are stored a
 - Images covers background images only when they are set in the page itself (as Tiles and the Dashboard course
   cards do). A background image set in a theme's or plugin's stylesheet is not hidden or dimmed.
 - The Moodle mobile app does not load the plugin.
+- Under a colour scheme a state is marked by an edge, a fade or italic, not by its colour: a success, warning or
+  danger status shows that it has a status by its edge's style, and Moodle's own words say which. Coloured badges keep
+  their words and the theme's colours.
 - The colour contrast guarantee covers only the surfaces the plugin recolours. Content with its own
   colours, such as images or embedded media, is not guaranteed.
 - Under a colour scheme the text editor's editing area keeps the author's own colours; its toolbar takes the scheme.
