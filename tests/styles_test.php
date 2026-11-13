@@ -718,4 +718,14 @@ final class styles_test extends \advanced_testcase {
         $this->assertCount(1, $highlight, 'highlighted links keep the link colour on their surface');
         $this->assertStringContainsString('color: var(--a11y-link) !important', $highlight[0][1]);
     }
+
+    /**
+     * Fields, selects and input-group add-ons take the field colour and an edge in the scheme's border or text colour.
+     */
+    public function test_fields(): void {
+        $rules = self::rules_with('.custom-select, .input-group-text, select, textarea, input:not(');
+        $this->assertCount(1, $rules);
+        $this->assertStringContainsString('background-color: var(--a11y-field) !important', $rules[0][1]);
+        $this->assertStringContainsString('border-color: var(--a11y-border, var(--a11y-text)) !important', $rules[0][1]);
+    }
 }
