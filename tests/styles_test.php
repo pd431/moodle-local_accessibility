@@ -753,4 +753,15 @@ final class styles_test extends \advanced_testcase {
         $this->assertCount(1, $icons);
         $this->assertStringContainsString('fill: var(--a11y-text) !important', $icons[0][1]);
     }
+
+    /**
+     * Monochrome image icons outside an activity icon container are inverted under a dark scheme.
+     */
+    public function test_image_icons(): void {
+        $rules = self::rules_with('img.icon:not(.nofilter, .userpicture), img.pluginicon, img.itemicon');
+        $this->assertCount(1, $rules);
+        $this->assertStringStartsWith('html[data-a11y-colour][data-bs-theme="dark"] body', self::selector_only($rules[0][0]));
+        $this->assertStringContainsString(':not(.activityiconcontainer *', $rules[0][0]);
+        $this->assertStringContainsString('filter: invert(1) hue-rotate(180deg) !important', $rules[0][1]);
+    }
 }

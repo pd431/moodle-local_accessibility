@@ -228,6 +228,13 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     html[data-a11y-colour] body .activityiconcontainer.interactivecontent:not(.isbranded) :is(.activityicon, .icon):not(.nofilter) {
         filter: url("#la-icon-interactivecontent");
     }
+    /* Other image icons (the icon beside each plugin on Plugins overview, gradebook item and aggregation icons, the
+       group mode icon) are dark monochrome artwork with no purpose colour. Under a dark scheme, which carries
+       data-bs-theme="dark", they are inverted with the hue kept, so a dark icon reads light and a coloured one keeps
+       its colour family. Activity icons keep their purpose filters above; user pictures and .nofilter icons are left. */
+    html[data-a11y-colour][data-bs-theme="dark"] body :where(img.icon:not(.nofilter, .userpicture), img.pluginicon, img.itemicon):where(:not(.activityiconcontainer *, .local-accessibility-panel *, .la-guide *)) {
+        filter: invert(1) hue-rotate(180deg) !important; /* stylelint-disable-line declaration-no-important */
+    }
     /* Mop-up: hardcoded surfaces (spec §6.4). Grows during Task 22's manual pass. Boost's .generaltable (a table
        without Bootstrap's .table class) carries its own text colour, striped rows and sticky columns on Moodle 4.5,
        so the table, its rows and its cells are named here. */
