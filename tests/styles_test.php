@@ -793,6 +793,7 @@ final class styles_test extends \advanced_testcase {
             'changed' => ['.quickgrademodified', 'td.ajaxoverridden'],
             'disabled' => ['.btn.disabled', '.dropdown-item.disabled', '.nav-link.disabled', '.list-group-item.disabled', '.page-item.disabled > .page-link', '.tox-tbtn--disabled'],
             'status' => ['.gradepass', '.gradefail', '.submissionstatussubmitted', '.submissiongraded', '.submissionstatusdraft', '.latesubmission', 'tr.table-success > :first-child', 'tr.table-warning > :first-child', 'tr.table-danger > :first-child'],
+            'progress' => ['.progress-bar', '.progress'],
         ];
     }
 
@@ -905,5 +906,15 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringContainsString('text-decoration-style: double !important', $all);
         $this->assertStringNotContainsString('content:', $all, 'no generated text');
 
+    }
+
+    /**
+     * State marks: progress.
+     */
+    public function test_state_marks_progress(): void {
+        [, $rules] = self::state_marks();
+        $r = array_values(array_filter($rules, fn($x) => str_contains($x[0], '.progress-bar')));
+        $this->assertNotEmpty($r);
+        $this->assertStringContainsString('background-color: var(--a11y-mark) !important', $r[0][1]);
     }
 }
