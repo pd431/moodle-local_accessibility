@@ -1,3 +1,36 @@
+# 3.1.4
+
+Contrast of standard Moodle components under a colour scheme, found by measuring 70 pages on Moodle 4.5 and 5.3 at
+rest, hovered, focused and with menus open.
+
+- Tables that use Moodle's own table style without Bootstrap's (most admin tables, the participants list, the user
+  list) take the scheme on Moodle 4.5: before, their text stayed dark on a dark page and every other row stayed white.
+  Hovered rows take the scheme's hover surface.
+- Pagination, the gradebook (grader report, user report, grade setup), the assignment grading table and the quiz
+  editing page take the scheme. Before, their cells stayed white or pale grey under the scheme's light text.
+- Alerts and other small pale panels (the plugin update panel, status cells, user initials, grey badges) take the
+  scheme's second surface. An alert keeps an edge in its type's colour, since its fill no longer shows its type.
+- Text the theme colours itself takes the scheme's text colour: `.text-dark`, plain text, headers and buttons in menus,
+  activity dates, grade category toggles, "Not marked", question names on the quiz editing page, and the grey
+  component names on Plugins overview.
+- Link-styled buttons (Show more, Expand all, move and info icons) take the link colour. Before, they kept the theme's
+  brand colour, and turned black when hovered.
+- A site's own forced link colours (an `!important` rule in a theme's custom SCSS) no longer beat the scheme.
+- Keyboard focus shows under every scheme. A scheme without its own focus colour draws a solid ring in its text colour
+  inside the control, and a focused link loses the theme's pale fill there too. Before, High contrast relied on the
+  theme's ring, which is mixed from the brand colour and can vanish on a dark page. The Focus ring tile's Ring and
+  Extra thick are unchanged.
+- Fields and selects have an edge in the scheme's border or text colour, and an input group's add-on takes the field
+  colour.
+- White and light utility panels follow the scheme on Moodle 5.3, where core's dark mode repainted them dark grey.
+- The text editor's menu bar, toolbar and status bar take the scheme on Moodle 4.5. The editing area keeps the
+  author's own colours.
+- Dark image icons (the icon beside each plugin on Plugins overview, gradebook item icons, the group mode icon) are
+  lightened under a dark scheme.
+- Dark high contrast (VS Code): links are lighter, #a3d5ff, APCA Lc 77 on every surface of the scheme (was #8bcaff, Lc
+  70). Lc 75 is what link text at Moodle's paragraph size needs.
+- An ARCHITECTURE.md table says which rule owns which concern and which test guards it.
+
 # 3.1.3
 
 - Merges upstream 3.0.8 (Adam Jenkins): the panel stays open while you try settings, Site default comes first in
