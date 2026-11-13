@@ -260,15 +260,6 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         border-color: var(--a11y-border, var(--a11y-text)) !important; /* stylelint-disable-line declaration-no-important */
         border-inline-start: 4px solid var(--a11y-link) !important; /* stylelint-disable-line declaration-no-important */
     }
-    html[data-a11y-colour] body :where(.alert-warning, .environmenttable .warn) {
-        border-inline-start-color: #f0ad4e !important; /* stylelint-disable-line declaration-no-important */
-    }
-    html[data-a11y-colour] body :where(.alert-danger) {
-        border-inline-start-color: #ff6b6b !important; /* stylelint-disable-line declaration-no-important */
-    }
-    html[data-a11y-colour] body :where(.alert-success) {
-        border-inline-start-color: #5cb85c !important; /* stylelint-disable-line declaration-no-important */
-    }
     /* Moodle 5.3's dark mode repaints .bg-white, .bg-light and .bg-body with an !important rule of more weight than
        the mop-up rule, which left dark grey panels on a black page. body:not(#la-weight) adds one id's weight, as for
        the navbar rules. */

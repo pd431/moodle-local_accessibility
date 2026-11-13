@@ -653,7 +653,7 @@ final class styles_test extends \advanced_testcase {
     }
 
     /**
-     * Alerts and other small pale panels take the second surface; an alert keeps an edge in its type's colour.
+     * Alerts and other small pale panels take the second surface; an alert keeps a leading edge.
      */
     public function test_small_panels(): void {
         $panels = self::rules_with('html[data-a11y-colour] body :where(.alert, .pluginupdateinfo');
@@ -666,8 +666,10 @@ final class styles_test extends \advanced_testcase {
         $edge = self::rules_with('html[data-a11y-colour] body :where(.alert)');
         $this->assertCount(1, $edge);
         $this->assertStringContainsString('border-inline-start: 4px solid var(--a11y-link) !important', $edge[0][1]);
+        // The edge's type (solid, dotted, double) and colour come from the state marks (section 7a), not a hex colour.
         foreach (['.alert-warning', '.alert-danger', '.alert-success'] as $type) {
-            $this->assertCount(1, self::rules_with('html[data-a11y-colour] body :where(' . $type), $type);
+            $this->assertCount(0, self::rules_with('html[data-a11y-colour] body :where(' . $type), $type);
+            $this->assertCount(1, self::rules_with('html[data-a11y-colour] body:not(#la-weight) :where(' . $type), $type);
         }
     }
 
