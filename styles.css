@@ -276,6 +276,12 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         background-color: var(--a11y-surface1) !important; /* stylelint-disable-line declaration-no-important */
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
     }
+    /* A grey button (the footer's help button) turns pale again when hovered or focused, through a theme rule with
+       !important and more weight than the small-panels rule; it keeps the second surface. */
+    html[data-a11y-colour] body:not(#la-weight) :where(a.bg-secondary:hover, a.bg-secondary:focus, button.bg-secondary:hover, button.bg-secondary:focus) {
+        background-color: var(--a11y-surface2) !important; /* stylelint-disable-line declaration-no-important */
+        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+    }
     /* Boost multiplies completion badges, and the badge and icon of a hidden or hovered activity card, into the grey
        behind them. Over a scheme's dark surface, multiply turns white text and icons black, so they blend normally. */
     html[data-a11y-colour] body :where(.badge, .activityiconcontainer) {
@@ -373,7 +379,7 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     /* Hardcoded theme text colours (Task 22): muted text and the active navigation item; Bootstrap 4 text that carries
        its own colour (.text-dark, plain text and headers in menus, menu buttons); and page-specific greys and blacks on
        the course page, the gradebook, the assignment grading table, the quiz editing page and Plugins overview. */
-    html[data-a11y-colour] body :where(.text-muted, .text-secondary, .text-body-secondary, .dimmed_text, .categoryname, .progress-text, .collapsemenu-text, .mds-switch-label, .nav-link.active, .text-dark:not(.badge), .dropdown-item-text, .dropdown-header, button.dropdown-item, .activity-dates, .completion-dialog, .form-autocomplete-downarrow, .submissionnotgraded, .submissiongraded, #plugins-control-panel .componentname, #plugins-control-panel .versionnumber, #plugins-control-panel .requiredby, a.toggle-category, a.toggle-category i, .gradeitemheader, .btn-outline-dark, #page-mod-quiz-edit .questionname, #page-mod-quiz-edit .questiontext, .path-mod-book .btn-previous .icon, .path-mod-book .btn-next .icon):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
+    html[data-a11y-colour] body :where(.text-muted, .text-secondary, .text-body-secondary, .dimmed_text, .categoryname, .progress-text, .collapsemenu-text, .mds-switch-label, .nav-link.active, .text-dark:not(.badge), .dropdown-item-text, .dropdown-header, button.dropdown-item, .activity-dates, .completion-dialog, .form-autocomplete-downarrow, .submissionnotgraded, .submissiongraded, #plugins-control-panel .componentname, #plugins-control-panel .versionnumber, #plugins-control-panel .requiredby, a.toggle-category, a.toggle-category i, .gradeitemheader, .btn-outline-dark, #page-mod-quiz-edit .questionname, #page-mod-quiz-edit .questiontext, .path-mod-book .btn-previous .icon, .path-mod-book .btn-next .icon, .task-class, .moremenu .dropdown-item[aria-current="true"]):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Navigation menus (issue #4): Boost paints a hovered, focused or current item of its menus (.moremenu: the top

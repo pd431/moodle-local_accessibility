@@ -690,6 +690,9 @@ final class styles_test extends \advanced_testcase {
         $rules = self::rules_with('html[data-a11y-colour] body:not(#la-weight) :where(.bg-white, .bg-light, .bg-body)');
         $this->assertCount(1, $rules);
         $this->assertStringContainsString('background-color: var(--a11y-surface1) !important', $rules[0][1]);
+        $grey = self::rules_with('html[data-a11y-colour] body:not(#la-weight) :where(a.bg-secondary:hover');
+        $this->assertCount(1, $grey, 'a hovered or focused grey button keeps the second surface');
+        $this->assertStringContainsString('background-color: var(--a11y-surface2) !important', $grey[0][1]);
     }
 
     /**
