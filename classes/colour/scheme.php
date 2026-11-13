@@ -203,7 +203,8 @@ final class scheme {
             // Visual Studio Code's Dark High Contrast theme (vscode: themes/hc_black.json and the hcDark defaults of
             // platform/theme/common/colors): black everywhere, told apart by contrastBorder; textLink, focusBorder,
             // the editor selection colours, and contrastActiveBorder (the same orange) around the current item. The
-            // link is textLink (#21a6ff, APCA Lc 51 on black) lifted in lightness to Lc 70, the same hue.
+            // link is textLink (#21a6ff, APCA Lc 51 on black) lifted in lightness to Lc 77, the same hue:
+            // Lc 75 is what link text at Moodle's paragraph size needs.
             // Floating widgets take editorWidget.background; hover is a 7% white, the
             // most that keeps the link at 7:1 (VS Code's own list hover is 10%).
             'vscodehc' => self::fixed(
@@ -211,7 +212,7 @@ final class scheme {
                 ['page' => '#000000', 'surface1' => '#000000', 'surface2' => '#0c141f', 'field' => '#000000',
                     'hover' => '#111111'],
                 '#ffffff',
-                '#8bcaff',
+                '#a3d5ff',
                 '#6fc3df',
                 '#f38518',
                 '#f3f518',
