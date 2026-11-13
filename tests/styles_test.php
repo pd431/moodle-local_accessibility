@@ -511,20 +511,20 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringNotContainsString('background-color', $tabs[1][1], 'a hovered tab keeps the hover surface');
         $this->assertStringContainsString('.nav-item + .nav-item .nav-link', $tabs[2][0]);
         $this->assertStringContainsString('border-left-color: transparent !important', $tabs[2][1], 'shared edge');
-        $current = self::rules_with('[data-a11y-tokens~="active"] body .nav-tabs .nav-link.active');
-        $this->assertCount(1, $current, 'the current tab is boxed in orange alone');
-        $this->assertStringContainsString('border-color: var(--a11y-active) !important', $current[0][1]);
-        $this->assertStringContainsString('box-shadow: inset 0 0 0 1px var(--a11y-active) !important', $current[0][1]);
+        $current = self::rules_with('html[data-a11y-tokens~="border"] body:not(#la-weight) .nav-tabs .nav-link.active');
+        $this->assertCount(1, $current, 'the current tab is boxed in the mark colour alone');
+        $this->assertStringContainsString('border-color: var(--a11y-mark) !important', $current[0][1]);
+        $this->assertStringContainsString('box-shadow: inset 0 0 0 1px var(--a11y-mark) !important', $current[0][1]);
         $css = self::css();
-        $activeat = strpos($css, 'data-a11y-tokens~="active"] body :where(');
-        $this->assertGreaterThan($activeat, strpos($css, '.nav-tabs .nav-link.active {'), 'after the active rule');
+        $activeat = strpos($css, 'body:not(#la-weight) :where(.page-item.active > .page-link');
+        $this->assertGreaterThan($activeat, strpos($css, '.nav-tabs .nav-link.active {'), 'after the chosen rule');
         $plainlink = ':where(a:not(.nav-link, .mds-nav-pill)):where(:focus, .focus)';
         $nofill = self::rules_with('html[data-a11y-tokens~="focus"] body ' . $plainlink);
         $this->assertCount(1, $nofill, 'a focused plain link loses the theme fill and shadow; menu items keep their surface');
         $this->assertStringContainsString('background-color: transparent !important', $nofill[0][1]);
         $css = self::css();
-        $activeat = strpos($css, 'data-a11y-tokens~="active"');
-        $this->assertLessThan($activeat, strpos($css, $plainlink), 'before the active rule');
+        $activeat = strpos($css, 'body:not(#la-weight) :where(.page-item.active > .page-link');
+        $this->assertLessThan($activeat, strpos($css, $plainlink), 'before the chosen rule');
         $token = self::rules_with('html[data-a11y-tokens~="focus"]');
         $focus = array_values(array_filter($token, fn($r) => str_contains($r[0], ':focus-visible')));
         $this->assertCount(4, $focus);
@@ -545,19 +545,6 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringContainsString('.mds-nav-pill--selected', $focus[3][0]);
         $this->assertStringContainsString('outline-offset: -4px !important', $focus[3][1]);
         $this->assertStringNotContainsString('outline-offset: 2px !important', implode('', array_column($token, 1)));
-        $active = self::rules_with('html[data-a11y-tokens~="active"]');
-        $this->assertCount(2, $active, 'the box, and the pill dot hidden');
-        $this->assertStringContainsString('.mds-nav-pill__indicator', $active[1][0]);
-        $this->assertStringContainsString('.mds-nav-pill.active::before', $active[1][0]);
-        $this->assertStringContainsString('display: none !important', $active[1][1]);
-        $this->assertStringContainsString('box-shadow: inset 0 0 0 2px var(--a11y-active) !important', $active[0][1]);
-        $this->assertStringNotContainsString('background-color', $active[0][1], 'the theme fill stays (3.0.8 menus rule)');
-        $this->assertStringNotContainsString('border-color', $active[0][1], 'the theme underline stays');
-        $marks = ['.nav-link.active', '.nav-link[aria-current]', '.mds-nav-pill--selected', '.mds-nav-pill.active',
-            '.courseindex-item.pageitem', '.dropdown-item[aria-current]', '.page-item.active .page-link'];
-        foreach ($marks as $part) {
-            $this->assertStringContainsString($part, $active[0][0], $part);
-        }
         $selection = self::rules_with('html[data-a11y-tokens~="selection"]');
         $this->assertCount(1, $selection);
         $this->assertStringContainsString('::selection', $selection[0][0]);
@@ -777,5 +764,107 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringContainsString('color: var(--a11y-text) !important', $rules[0][1]);
         $this->assertStringContainsString('background-color: var(--a11y-hover) !important', $rules[0][1]);
         $this->assertStringContainsString('text-decoration: underline !important', $rules[0][1]);
+    }
+
+    /**
+     * Section 7a "State marks" comes after section 7, and the stylesheet names each state class in 7a once.
+     *
+     * @return array{0: string, 1: array<int, array{0: string, 1: string}>} the raw 7a text and its rules
+     */
+    private static function state_marks(): array {
+        $raw = file_get_contents(__DIR__ . '/../styles.css');
+        $start = strpos($raw, '/* 7a. State marks.');
+        $end = strpos($raw, '/* 8. Links');
+        $section = substr($raw, $start, $end - $start);
+        preg_match_all('/([^{}]+)\{([^{}]*)\}/', preg_replace('~/\*.*?\*/~s', '', $section), $m, PREG_SET_ORDER);
+        return [$section, array_map(fn($r) => [trim($r[1]), $r[2]], $m)];
+    }
+
+    /**
+     * The state classes 7a owns, by kind.
+     *
+     * @return array<string, string[]>
+     */
+    private static function state_classes(): array {
+        return [
+            'chosen' => ['.page-item.active > .page-link', '.list-group-item.active', '.btn.active', '[aria-pressed="true"]',
+                '[aria-selected="true"]', '.nav-link.active', '.mds-nav-pill--selected', '.courseindex-item.pageitem',
+                '.dropdown-item.active', '.tox-tbtn--enabled', '.today .day-number-circle', 'tr.selectedrow > *'],
+        ];
+    }
+
+    /**
+     * 7a comes after every section 7 rule and before section 8; it never applies in forced colours.
+     */
+    public function test_state_marks_follow_section_7(): void {
+        $raw = file_get_contents(__DIR__ . '/../styles.css');
+        $s7 = strpos($raw, '/* 7. Colour schemes');
+        $s7a = strpos($raw, '/* 7a. State marks.');
+        $s8 = strpos($raw, '/* 8. Links');
+        $this->assertNotFalse($s7a);
+        $this->assertGreaterThan($s7, $s7a);
+        $this->assertLessThan($s8, $s7a);
+        [$section] = self::state_marks();
+        $this->assertStringContainsString('@media (forced-colors: none)', $section);
+        $this->assertSame(1, substr_count($raw, '/* 7a. State marks.'));
+    }
+
+    /**
+     * Each state class is named once in 7a (in the selector of its kind's rule), and 7a's rules all sit under a
+     * colour scheme, so with no scheme chosen nothing changes.
+     */
+    public function test_state_classes_named_once(): void {
+        [, $rules] = self::state_marks();
+        $selectors = implode("\n", array_column($rules, 0));
+        foreach (self::state_classes() as $kind => $classes) {
+            foreach ($classes as $class) {
+                $this->assertSame(1, substr_count($selectors, $class . ',') + substr_count($selectors, $class . ')'),
+                    "$kind: $class named once");
+            }
+        }
+        foreach ($rules as [$selector]) {
+            $this->assertMatchesRegularExpression('/^html\[data-a11y-(colour|tokens)/', $selector, 'under a scheme');
+        }
+    }
+
+    /**
+     * No rule after 7a sets an edge, an outline, opacity or font style on a state class, so nothing undoes a mark.
+     */
+    public function test_nothing_after_state_marks_undoes_them(): void {
+        $raw = file_get_contents(__DIR__ . '/../styles.css');
+        $after = preg_replace('~/\*.*?\*/~s', '', substr($raw, strpos($raw, '/* 8. Links')));
+        preg_match_all('/([^{}]+)\{([^{}]*)\}/', $after, $m, PREG_SET_ORDER);
+        $classes = array_merge(...array_values(self::state_classes()));
+        foreach ($m as $r) {
+            foreach ($classes as $class) {
+                if (!str_contains($r[1], $class)) {
+                    continue;
+                }
+                $this->assertDoesNotMatchRegularExpression('/(^|[;\s])(box-shadow|outline|outline-color|outline-style|outline-width|opacity|font-style)\s*:/',
+                    $r[2], trim($r[1]) . " sets a mark property on $class");
+            }
+        }
+    }
+
+    /**
+     * Chosen and current items: a 2px box inside the edge in the mark colour, the hover surface where the scheme has
+     * no active colour of its own; a chosen row boxed as one; the 5.3 pill dot hidden.
+     */
+    public function test_state_marks_chosen(): void {
+        [, $rules] = self::state_marks();
+        $chosen = array_values(array_filter($rules, fn($r) => str_contains($r[0], '.page-item.active > .page-link')));
+        $this->assertCount(2, $chosen);
+        $this->assertStringContainsString('box-shadow: inset 0 0 0 2px var(--a11y-mark) !important', $chosen[0][1]);
+        $this->assertStringNotContainsString('background-color', $chosen[0][1], 'VS Code keeps the theme fill');
+        $this->assertStringContainsString(':not([data-a11y-tokens~="active"])', $chosen[1][0]);
+        $this->assertStringContainsString('background-color: var(--a11y-hover) !important', $chosen[1][1]);
+        $this->assertStringNotContainsString('font-weight', implode('', array_column($rules, 1)), 'no bold: it shifts layout');
+        $rows = array_values(array_filter($rules, fn($r) => str_contains($r[0], 'tr.selectedrow')));
+        $this->assertCount(3, $rows, 'every cell, the first and the last');
+        $this->assertStringContainsString('inset 0 2px 0 var(--a11y-mark)', $rows[0][1]);
+        $dot = array_values(array_filter($rules, fn($r) => str_contains($r[0], '.mds-nav-pill__indicator')));
+        $this->assertStringContainsString('display: none !important', $dot[0][1]);
+        $this->assertStringNotContainsString('--a11y-active)', file_get_contents(__DIR__ . '/../styles.css'),
+            'the mark colour replaces the active token everywhere');
     }
 }
