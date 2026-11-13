@@ -651,4 +651,23 @@ final class styles_test extends \advanced_testcase {
             $this->assertStringContainsString($part . ',', $mopup[0][0] . ',', $part);
         }
     }
+
+    /**
+     * Alerts and other small pale panels take the second surface; an alert keeps an edge in its type's colour.
+     */
+    public function test_small_panels(): void {
+        $panels = self::rules_with('html[data-a11y-colour] body :where(.alert, .pluginupdateinfo');
+        $this->assertCount(1, $panels, 'one rule for small panels');
+        $this->assertStringContainsString('background-color: var(--a11y-surface2) !important', $panels[0][1]);
+        $this->assertStringContainsString('color: var(--a11y-text) !important', $panels[0][1]);
+        foreach (['.submissionstatus', '.userinitials', '.bg-secondary', '.bg-primary-light', '.path-mod-book .btn-next'] as $part) {
+            $this->assertStringContainsString($part, $panels[0][0], $part);
+        }
+        $edge = self::rules_with('html[data-a11y-colour] body :where(.alert)');
+        $this->assertCount(1, $edge);
+        $this->assertStringContainsString('border-inline-start: 4px solid var(--a11y-link) !important', $edge[0][1]);
+        foreach (['.alert-warning', '.alert-danger', '.alert-success'] as $type) {
+            $this->assertCount(1, self::rules_with('html[data-a11y-colour] body :where(' . $type), $type);
+        }
+    }
 }
