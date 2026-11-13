@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.4] - 2026-11-13
+
+- Standard Moodle components keep their contrast under a colour scheme: tables, pagination, the gradebook, the
+  assignment grading table, the quiz editing page, alerts, menus, link-styled buttons, fields and the text editor's
+  toolbar. Keyboard focus shows under every scheme. Dark image icons are lightened under dark schemes. A site's own
+  forced link colours no longer beat the scheme. See CHANGES.md.
+
 ## [3.1.3] - 2026-11-05
 
 ### Changed
