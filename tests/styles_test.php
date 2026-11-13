@@ -728,4 +728,17 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringContainsString('background-color: var(--a11y-field) !important', $rules[0][1]);
         $this->assertStringContainsString('border-color: var(--a11y-border, var(--a11y-text)) !important', $rules[0][1]);
     }
+
+    /**
+     * A scheme without a focus token draws keyboard focus in its text colour and drops the theme's focused-link fill.
+     */
+    public function test_focus_without_token(): void {
+        $ring = self::rules_with('html[data-a11y-colour]:not([data-a11y-tokens~="focus"], [data-a11y-focus="ring"], [data-a11y-focus="thick"]) :focus-visible');
+        $this->assertCount(1, $ring);
+        $this->assertStringContainsString('outline: 2px solid var(--a11y-text) !important', $ring[0][1]);
+        $this->assertStringContainsString('outline-offset: -2px !important', $ring[0][1]);
+        $nofill = self::rules_with('html[data-a11y-colour]:not([data-a11y-tokens~="focus"]) body :where(a:not(.nav-link, .mds-nav-pill))');
+        $this->assertCount(1, $nofill);
+        $this->assertStringContainsString('background-color: transparent !important', $nofill[0][1]);
+    }
 }

@@ -337,6 +337,13 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
         box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
     }
+    /* A scheme without a focus token gets the same treatment in its text colour (the focus rule is in section 11a),
+       so a focused plain link loses the theme's fill and shadow there too: the scheme's forced link colour on Boost's
+       pale fill was yellow on cyan under High contrast. */
+    html[data-a11y-colour]:not([data-a11y-tokens~="focus"]) body :where(a:not(.nav-link, .mds-nav-pill)):where(:focus, .focus) {
+        background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
+    }
     /* Active token: the current item, boxed in the scheme's active colour (VS Code's contrastActiveBorder), text in
        the text colour. The box is the token's one addition: a menu item or tab keeps the scheme's hover surface and its
        underline in the text colour (the navigation menus rule below). Drawn inside with a shadow, so nothing moves and
@@ -576,6 +583,14 @@ html[data-a11y-focus="thick"] :focus-visible {
     }
     html[data-a11y-tokens~="focus"][data-a11y-tokens~="active"] body :where(.nav-link.active, .nav-link[aria-current], .mds-nav-pill--selected, .mds-nav-pill.active, .courseindex-item.pageitem, .courseindex-item.active, .dropdown-item[aria-current], .page-item.active .page-link):focus-visible {
         outline-offset: -4px !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* A scheme without a focus token: the theme's own ring is mixed from the brand colour, which can vanish on the
+       scheme's surfaces, so keyboard focus is drawn in the scheme's text colour (at least 7:1 on every surface), solid,
+       inside the item's edge. The Focus ring tile's "ring" and "thick" keep their two-colour ring. */
+    html[data-a11y-colour]:not([data-a11y-tokens~="focus"], [data-a11y-focus="ring"], [data-a11y-focus="thick"]) :focus-visible {
+        outline: 2px solid var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+        outline-offset: -2px !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Selection token: selected text in the scheme's own pair. */
     html[data-a11y-tokens~="selection"] ::selection {
