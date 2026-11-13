@@ -527,7 +527,7 @@ final class styles_test extends \advanced_testcase {
         $this->assertLessThan($activeat, strpos($css, $plainlink), 'before the chosen rule');
         $token = self::rules_with('html[data-a11y-tokens~="focus"]');
         $focus = array_values(array_filter($token, fn($r) => str_contains($r[0], ':focus-visible')));
-        $this->assertCount(4, $focus);
+        $this->assertCount(3, $focus);
         $this->assertStringContainsString('outline: 2px dashed var(--a11y-focus) !important', $focus[0][1]);
         $this->assertStringContainsString('outline-offset: -2px !important', $focus[0][1], 'the ring sits inside');
         $this->assertStringContainsString(':focus-visible', $focus[0][0]);
@@ -540,10 +540,11 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringContainsString('[data-a11y-focus="thick"]', $focus[2][0]);
         $this->assertStringContainsString('outline-width: 5px !important', $focus[2][1]);
         $this->assertStringContainsString('outline-offset: -5px !important', $focus[2][1]);
-        $this->assertStringContainsString('[data-a11y-tokens~="active"]', $focus[3][0], 'a current item moves the ring in');
-        $this->assertStringContainsString('.courseindex-item.pageitem', $focus[3][0]);
-        $this->assertStringContainsString('.mds-nav-pill--selected', $focus[3][0]);
-        $this->assertStringContainsString('outline-offset: -4px !important', $focus[3][1]);
+        $current = self::rules_with('html[data-a11y-colour] body:not(#la-weight) :where(.nav-link.active, .nav-link[aria-current]');
+        $this->assertCount(1, $current, 'a current item moves the ring in, under every scheme');
+        $this->assertStringContainsString('.courseindex-item.pageitem', $current[0][0]);
+        $this->assertStringContainsString('.mds-nav-pill--selected', $current[0][0]);
+        $this->assertStringContainsString('outline-offset: -4px !important', $current[0][1]);
         $this->assertStringNotContainsString('outline-offset: 2px !important', implode('', array_column($token, 1)));
         $selection = self::rules_with('html[data-a11y-tokens~="selection"]');
         $this->assertCount(1, $selection);
@@ -720,12 +721,15 @@ final class styles_test extends \advanced_testcase {
     }
 
     /**
-     * A scheme without a focus token draws keyboard focus in its text colour and drops the theme's focused-link fill.
+     * A scheme without a focus token draws keyboard focus in its mark colour (section 7a) and drops the theme's
+     * focused-link fill.
      */
     public function test_focus_without_token(): void {
         $ring = self::rules_with('html[data-a11y-colour]:not([data-a11y-tokens~="focus"], [data-a11y-focus="ring"], [data-a11y-focus="thick"]) :focus-visible');
         $this->assertCount(1, $ring);
-        $this->assertStringContainsString('outline: 2px solid var(--a11y-text) !important', $ring[0][1]);
+        $this->assertStringContainsString('outline: 2px solid var(--a11y-mark) !important', $ring[0][1]);
+        [, $rules] = self::state_marks();
+        $this->assertContains($ring[0], $rules, 'in section 7a');
         $this->assertStringContainsString('outline-offset: -2px !important', $ring[0][1]);
         $nofill = self::rules_with('html[data-a11y-colour]:not([data-a11y-tokens~="focus"]) body :where(a:not(.nav-link, .mds-nav-pill))');
         $this->assertCount(1, $nofill);

@@ -350,13 +350,6 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
         box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
     }
-    /* A scheme without a focus token gets the same treatment in its text colour (the focus rule is in section 11a),
-       so a focused plain link loses the theme's fill and shadow there too: the scheme's forced link colour on Boost's
-       pale fill was yellow on cyan under High contrast. */
-    html[data-a11y-colour]:not([data-a11y-tokens~="focus"]) body :where(a:not(.nav-link, .mds-nav-pill)):where(:focus, .focus) {
-        background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
-        box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
-    }
     /* Hardcoded theme text colours (Task 22): muted text and the active navigation item; Bootstrap 4 text that carries
        its own colour (.text-dark, plain text and headers in menus, menu buttons); and page-specific greys and blacks on
        the course page, the gradebook, the assignment grading table, the quiz editing page and Plugins overview. */
@@ -628,6 +621,20 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         font-style: italic !important; /* stylelint-disable-line declaration-no-important */
         opacity: 1 !important; /* stylelint-disable-line declaration-no-important */
     }
+    /* Keyboard focus under a scheme without its own focus colour, where the Focus ring tile is off: the theme's ring is
+       mixed from the brand colour, which can vanish on the scheme's surfaces, so focus is a 2px solid outline in the
+       mark colour inside the item's edge. A focused plain link also loses the theme's pale fill and shadow (the
+       scheme's link colour on Boost's pale fill was yellow on cyan under High contrast); a chosen item keeps its box,
+       because the chosen rule above carries more weight. VS Code's dashed focus token (section 11a) is unchanged. */
+    html[data-a11y-colour]:not([data-a11y-tokens~="focus"], [data-a11y-focus="ring"], [data-a11y-focus="thick"]) :focus-visible {
+        outline: 2px solid var(--a11y-mark) !important; /* stylelint-disable-line declaration-no-important */
+        outline-offset: -2px !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-colour]:not([data-a11y-tokens~="focus"]) body :where(a:not(.nav-link, .mds-nav-pill)):where(:focus, .focus) {
+        background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
+    }
 }
 /* 7a end */
 /* 8. Links: no layout shift; never the panel or the readbar. "outline" is underline plus outline. "highlight" keeps a
@@ -752,16 +759,8 @@ html[data-a11y-focus="thick"] :focus-visible {
         outline-offset: -5px !important; /* stylelint-disable-line declaration-no-important */
         box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
     }
-    html[data-a11y-tokens~="focus"][data-a11y-tokens~="active"] body :where(.nav-link.active, .nav-link[aria-current], .mds-nav-pill--selected, .mds-nav-pill.active, .courseindex-item.pageitem, .courseindex-item.active, .dropdown-item[aria-current], .page-item.active .page-link):focus-visible {
+    html[data-a11y-colour] body:not(#la-weight) :where(.nav-link.active, .nav-link[aria-current], .mds-nav-pill--selected, .mds-nav-pill.active, .courseindex-item.pageitem, .courseindex-item.active, .dropdown-item[aria-current], .page-item.active > .page-link):focus-visible {
         outline-offset: -4px !important; /* stylelint-disable-line declaration-no-important */
-    }
-    /* A scheme without a focus token: the theme's own ring is mixed from the brand colour, which can vanish on the
-       scheme's surfaces, so keyboard focus is drawn in the scheme's text colour (at least 7:1 on every surface), solid,
-       inside the item's edge. The Focus ring tile's "ring" and "thick" keep their two-colour ring. */
-    html[data-a11y-colour]:not([data-a11y-tokens~="focus"], [data-a11y-focus="ring"], [data-a11y-focus="thick"]) :focus-visible {
-        outline: 2px solid var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
-        outline-offset: -2px !important; /* stylelint-disable-line declaration-no-important */
-        box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Selection token: selected text in the scheme's own pair. */
     html[data-a11y-tokens~="selection"] ::selection {
