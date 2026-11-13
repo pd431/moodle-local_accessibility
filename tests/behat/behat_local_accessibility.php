@@ -233,15 +233,36 @@ class behat_local_accessibility extends behat_base {
                 const p = m[1].split(/[\s,\/]+/).filter((v) => v !== "").map(Number);
                 return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1];
             };
+            // Bootstrap 5 paints striped, hovered, active and coloured table cells with an inset box-shadow of 9999px
+            // over the cell, not with a background colour: a shadow at least half the element's size is a fill.
+            const fills = (e) => {
+                const out = [];
+                const r = e.getBoundingClientRect();
+                const half = Math.min(r.width, r.height) / 2;
+                const parts = String(getComputedStyle(e).boxShadow).split(/,(?![^(]*\))/);
+                for (const part of parts) {
+                    if (!/inset/.test(part) || half <= 0) {
+                        continue;
+                    }
+                    const c = parse(part);
+                    const sizes = part.replace(/rgba?\([^)]*\)/, "").match(/-?[0-9.]+px/g) || [];
+                    const spread = sizes.length > 3 ? Math.abs(parseFloat(sizes[3])) : 0;
+                    if (c && c[3] > 0 && spread >= half) {
+                        out.push(c);
+                    }
+                }
+                return out.reverse();
+            };
             const behind = (el) => {
                 const layers = [];
                 for (let e = el; e; e = e.parentElement) {
+                    layers.push(...fills(e));
                     const c = parse(getComputedStyle(e).backgroundColor);
                     if (c && c[3] > 0) {
                         layers.push(c);
-                        if (c[3] >= 1) {
-                            break;
-                        }
+                    }
+                    if (layers.length && layers[layers.length - 1][3] >= 1) {
+                        break;
                     }
                 }
                 let out = [255, 255, 255];
@@ -392,22 +413,136 @@ class behat_local_accessibility extends behat_base {
     }
 
     /**
-     * Check that two elements differ visibly: colours, borders, outline, shadow or background image.
+     * Check that two elements look different, by the rule the contrast harness uses (distinct_score.js, D1): at least
+     * one of these holds.
+     *  - Their backgrounds differ by 3:1 or more.
+     *  - Their text colours differ by 3:1 or more, when both carry text. An element with no text that holds an icon
+     *    counts the icon's ink (an SVG's fill, a font icon's colour) as its text colour.
+     *  - One has an edge the other lacks, 3:1 from its own background: a border side or an inset shadow against the
+     *    element's background; an outline or an outer shadow ring against the background around it.
+     *  - A mark that is not colour differs: underline, weight (600+ against less), italic, opacity 0.7 or less against
+     *    more, a ::before or ::after, an icon, a background image, or a native checkbox or radio's checked drawing.
+     * Hue alone never counts: a colour scheme is chosen to remove it.
      *
-     * @Then /^the "(?P<css>[^"]*)" element should look different from the "(?P<other>[^"]*)" element$/
+     * @Then /^the "(?P<css>[^"]*)" element should (?P<not>not )?look different from the "(?P<other>[^"]*)" element$/
      * @param string $css
+     * @param string $not "not " to check that the two look the same by that rule
      * @param string $other
      */
-    public function the_element_should_look_different_from(string $css, string $other): void {
-        $this->check_script('const props = ["background-color", "background-image", "border-top-color", "border-top-width",
-                "border-top-style", "outline-style", "outline-width", "outline-color", "box-shadow"];
-            const a = document.querySelector(' . json_encode($css) . ');
+    public function the_element_should_look_different_from(string $css, string $not, string $other): void {
+        $this->check_script($this->look_helpers() . 'const a = document.querySelector(' . json_encode($css) . ');
             const b = document.querySelector(' . json_encode($other) . ');
             if (!a || !b) {
                 return "Missing element: " + (a ? ' . json_encode($other) . ' : ' . json_encode($css) . ');
             }
-            const look = (el) => props.map((p) => p + ": " + getComputedStyle(el).getPropertyValue(p)).join("; ");
-            return look(a) === look(b) ? "Both look the same: " + look(a) : "";');
+            const how = differences(look(a), look(b));
+            const want = ' . json_encode($not === '') . ';
+            if (want) {
+                return how.length ? "" : "They look the same: " + JSON.stringify(look(a)) + " and " + JSON.stringify(look(b));
+            }
+            return how.length ? "They look different: " + how.join("; ") : "";');
+    }
+
+    /**
+     * JavaScript for the look-different step: look(el) reads an element's colours, edges and marks; differences(a, b)
+     * lists how two looks differ by the D1 rule. Needs the colour helpers.
+     *
+     * @return string JavaScript declaring look() and differences()
+     */
+    private function look_helpers(): string {
+        return 'const shadowsOf = (s) => String(s).split(/,(?![^(]*\\))/).filter((p) => p.trim() !== "none" && p.trim() !== "")
+                .map((p) => {
+                    const sizes = (p.replace(/rgba?\\([^)]*\\)/, "").match(/-?[0-9.]+px/g) || []).map((v) => Math.abs(parseFloat(v)));
+                    return {inset: /inset/.test(p), colour: parse(p), size: Math.max(sizes[0] || 0, sizes[1] || 0, (sizes[2] || 0) / 2, sizes[3] || 0)};
+                });
+            const look = (el) => {
+                const s = getComputedStyle(el);
+                const back = behind(el);
+                const out = el.parentElement ? behind(el.parentElement) : [255, 255, 255];
+                const r = el.getBoundingClientRect();
+                const half = Math.min(r.width, r.height) / 2;
+                const text = (el.innerText || el.value || "").trim();
+                let fg = parse(s.color);
+                let ink = false;
+                if (!text) {
+                    const icon = [...el.querySelectorAll("svg, i.icon, i.fa, .icon")].find((i) => i.checkVisibility());
+                    if (icon) {
+                        const is = getComputedStyle(icon);
+                        const f = icon.tagName.toLowerCase() === "svg" && is.fill && !/^(none|url)/.test(is.fill) ? is.fill : is.color;
+                        if (parse(f)) {
+                            fg = parse(f);
+                            ink = true;
+                        }
+                    }
+                }
+                const edges = new Set();
+                for (const side of ["Top", "Right", "Bottom", "Left"]) {
+                    const c = parse(s["border" + side + "Color"]);
+                    if (parseFloat(s["border" + side + "Width"]) >= 0.5 && !/none|hidden/.test(s["border" + side + "Style"]) &&
+                            c && c[3] > 0 && ratio(over(c, out), back) >= 3) {
+                        edges.add(side.toLowerCase());
+                    }
+                }
+                const oc = parse(s.outlineColor);
+                if (s.outlineStyle !== "none" && parseFloat(s.outlineWidth) >= 0.5 && oc && oc[3] > 0 &&
+                        ratio(over(oc, out), parseFloat(s.outlineOffset) < 0 ? back : out) >= 3) {
+                    edges.add("outline");
+                }
+                for (const sh of shadowsOf(s.boxShadow)) {
+                    if (sh.size < 0.75 || !sh.colour || sh.colour[3] === 0 || (sh.inset && sh.size >= half)) {
+                        continue;
+                    }
+                    const against = sh.inset ? back : out;
+                    if (ratio(over(sh.colour, against), against) >= 3) {
+                        edges.add(sh.inset ? "inset" : "ring");
+                    }
+                }
+                let opacity = 1;
+                for (let e = el; e; e = e.parentElement) {
+                    opacity *= parseFloat(getComputedStyle(e).opacity);
+                }
+                const inner = el.querySelector("a, span, strong, b, em, i:not(.icon)");
+                const is = inner ? getComputedStyle(inner) : null;
+                const pseudo = (which) => {
+                    const p = getComputedStyle(el, which);
+                    if (!p.content || p.content === "none" || p.content === "normal") {
+                        return "";
+                    }
+                    const c = parse(p.backgroundColor);
+                    return p.content !== "\"\"" || (c && c[3] > 0) || p.backgroundImage !== "none" ||
+                        parseFloat(p.borderTopWidth) > 0 ? p.content + " " + p.backgroundColor : "";
+                };
+                const icons = [...el.querySelectorAll("i.icon, i.fa, .icon, img, svg")].filter((i) => i.checkVisibility())
+                    .map((i) => i.tagName === "IMG" ? "img" : (i.getAttribute("class") || i.tagName).split(/\s+/)
+                        .filter((c) => /^fa-(?!fw|solid|regular)|^icon$/.test(c)).join(".")).join(" ");
+                return {
+                    text: !!text, ink: ink, fg: fg ? over(fg, back) : back, bg: back, edges: [...edges].sort().join(","),
+                    underline: /underline/.test(s.textDecorationLine) || (!!is && /underline/.test(is.textDecorationLine)),
+                    bold: Math.max(parseFloat(s.fontWeight), is ? parseFloat(is.fontWeight) : 0) >= 600,
+                    italic: s.fontStyle === "italic" || (!!is && is.fontStyle === "italic"),
+                    dim: opacity <= 0.7, before: pseudo("::before"), after: pseudo("::after"), icons: icons,
+                    image: s.backgroundImage !== "none" ? s.backgroundImage : "",
+                    native: /^(checkbox|radio)$/.test(el.type) && (s.appearance || s.webkitAppearance) !== "none" ? String(el.checked) : "",
+                };
+            };
+            const differences = (a, b) => {
+                const how = [];
+                if (ratio(a.bg, b.bg) >= 3) {
+                    how.push("background " + ratio(a.bg, b.bg).toFixed(2) + ":1");
+                }
+                if ((a.text || a.ink) && (b.text || b.ink) && ratio(a.fg, b.fg) >= 3) {
+                    how.push("text colour " + ratio(a.fg, b.fg).toFixed(2) + ":1");
+                }
+                if (a.edges !== b.edges) {
+                    how.push("edges [" + a.edges + "] against [" + b.edges + "]");
+                }
+                for (const k of ["underline", "bold", "italic", "dim", "before", "after", "icons", "image", "native"]) {
+                    if (a[k] !== b[k]) {
+                        how.push(k);
+                    }
+                }
+                return how;
+            };';
     }
 
     /**
@@ -640,6 +775,72 @@ class behat_local_accessibility extends behat_base {
                 <a class="dropdown-item active" id="la-test-menuitem" href="#" aria-current="true">Two</a>
             </div>
             <span class="MathJax"><span id="la-test-maths">x</span></span>
+        </div>';
+        $this->check_script('const main = document.querySelector("#region-main");
+            if (!main) {
+                return "No #region-main on this page";
+            }
+            main.insertAdjacentHTML("afterbegin", ' . json_encode($html) . ');
+            return "";');
+    }
+
+    /**
+     * Add Moodle's state markup to the main region, each state beside a neighbour without it, marked up as core's
+     * templates render them: current, chosen and pressed items; changed and overridden grades; disabled controls;
+     * statuses; a progress bar; hidden items; and a text link to focus. Ids start la-st-.
+     *
+     * @Given the main region contains Moodle state markup
+     */
+    public function the_main_region_contains_moodle_state_markup(): void {
+        $html = '<div id="la-st">
+            <nav><ul class="pagination">
+                <li class="page-item disabled"><a href="#" class="page-link" id="la-st-page-disabled" aria-disabled="true">Previous</a></li>
+                <li class="page-item"><a href="#" class="page-link" id="la-st-page-other">1</a></li>
+                <li class="page-item active"><a href="#" class="page-link" id="la-st-page-current" aria-current="page">2</a></li>
+            </ul></nav>
+            <ol class="breadcrumb"><li class="breadcrumb-item"><a href="#" id="la-st-crumb-link">Course</a></li>
+                <li class="breadcrumb-item active"><span id="la-st-crumb-current" aria-current="page">Essay</span></li></ol>
+            <div class="list-group"><a href="#" class="list-group-item list-group-item-action active" id="la-st-list-active">Chosen</a>
+                <a href="#" class="list-group-item list-group-item-action" id="la-st-list-other">Other</a></div>
+            <div class="btn-group"><button type="button" class="btn btn-outline-secondary active" aria-pressed="true" id="la-st-toggle-pressed">Card</button>
+                <button type="button" class="btn btn-outline-secondary" aria-pressed="false" id="la-st-toggle-unpressed">List</button></div>
+            <ul class="nav nav-tabs"><li class="nav-item"><a class="nav-link active" aria-current="page" href="#" id="la-st-tab-current">Current</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" id="la-st-tab-other">Other</a></li>
+                <li class="nav-item"><a class="nav-link disabled" aria-disabled="true" href="#" id="la-st-tab-disabled">Disabled</a></li></ul>
+            <table class="generaltable table"><tbody>
+                <tr class="selectedrow"><td id="la-st-row-ticked">Ticked</td><td>1</td></tr>
+                <tr class="table-active"><td id="la-st-row-active">Active</td><td>2</td></tr>
+                <tr class="table-success"><td id="la-st-row-success">Success</td><td>3</td></tr>
+                <tr class="table-warning"><td id="la-st-row-warning">Warning</td><td>4</td></tr>
+                <tr class="table-danger"><td id="la-st-row-danger">Danger</td><td>5</td></tr>
+                <tr><td id="la-st-row-plain">Plain</td><td>6</td></tr>
+                <tr><td class="quickgrademodified" id="la-st-cell-quickgrade">70</td><td class="ajaxoverridden" id="la-st-cell-overridden">80</td>
+                    <td id="la-st-cell-plain">60</td></tr>
+                <tr><td class="gradepass" id="la-st-grade-pass">Pass 70</td><td class="gradefail" id="la-st-grade-fail">Fail 20</td>
+                    <td id="la-st-grade-plain">50</td></tr>
+            </tbody></table>
+            <div class="submissionstatussubmitted" id="la-st-status-submitted">Submitted for grading</div>
+            <div class="submissionstatusdraft" id="la-st-status-draft">Draft (not submitted)</div>
+            <div class="submissionstatus" id="la-st-status-none">No submission</div>
+            <p><span class="text-warning" id="la-st-text-warning">Warning text</span> <span class="text-danger" id="la-st-text-danger">Danger text</span>
+                <span class="text-success" id="la-st-text-success">Success text</span> <span id="la-st-text-plain">Plain text</span>
+                <span class="dimmed_text" id="la-st-dimmed">Hidden from students</span> <a href="#" id="la-st-link">A text link</a></p>
+            <div class="dropdown-menu show" style="position: static">
+                <a class="dropdown-item" href="#" id="la-st-menu-enabled">Enabled</a>
+                <button type="button" class="dropdown-item" disabled id="la-st-menu-disabled-button">Disabled button</button>
+                <a class="dropdown-item disabled" aria-disabled="true" href="#" id="la-st-menu-disabled-link">Disabled link</a>
+            </div>
+            <form class="mform"><label for="la-st-field-editable" id="la-st-label">Name</label>
+                <input type="text" class="form-control" id="la-st-field-editable" value="Editable">
+                <input type="text" class="form-control is-invalid" id="la-st-field-invalid" value="Wrong">
+                <div class="invalid-feedback d-block" id="la-st-error">Required</div>
+                <input type="text" class="form-control" id="la-st-field-disabled" value="Disabled" disabled>
+                <input type="text" class="form-control" id="la-st-field-readonly" value="Read only" readonly>
+                <select class="form-select custom-select" id="la-st-select-editable"><option>Editable</option></select>
+                <select class="form-select custom-select" id="la-st-select-disabled" disabled><option>Disabled</option></select>
+            </form>
+            <div class="progress" id="la-st-progress" style="height: 1rem"><div class="progress-bar" id="la-st-progress-bar" role="progressbar"
+                style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div></div>
         </div>';
         $this->check_script('const main = document.querySelector("#region-main");
             if (!main) {
