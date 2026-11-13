@@ -640,4 +640,15 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringContainsString('background-color: var(--a11y-hover) !important', $hover[0][1]);
         $this->assertStringContainsString('.maincalendar .calendarmonth .clickable:hover', $hover[0][0]);
     }
+
+    /**
+     * Pagination, the gradebook, the assignment grading table and the quiz editing page paint their own cells; they take the scheme.
+     */
+    public function test_page_specific_tables(): void {
+        $mopup = self::rules_with('html[data-a11y-colour] body :where(#page, #page-wrapper');
+        $this->assertCount(1, $mopup, 'still one rule repaints the hardcoded surfaces');
+        foreach (['.page-link', '.gradeparent .cell', '.user-report-container', '.user-grade td', '.gradetree-wrapper td', '.gradingtable td', '.gradingtable th', '#page-mod-quiz-edit ul.slots li.activity', '#page-mod-quiz-edit .inplaceeditable', '.page-header-headings', '.fp-filename'] as $part) {
+            $this->assertStringContainsString($part . ',', $mopup[0][0] . ',', $part);
+        }
+    }
 }
