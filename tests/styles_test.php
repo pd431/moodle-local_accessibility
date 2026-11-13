@@ -706,4 +706,16 @@ final class styles_test extends \advanced_testcase {
             $this->assertStringContainsString($part, $rules[0][0], $part);
         }
     }
+
+    /**
+     * A theme that forces link colours with !important does not beat the scheme: the anchor rule carries one id's weight.
+     */
+    public function test_anchor_rule_outranks_theme_links(): void {
+        $anchors = array_values(array_filter(self::rules(), fn($r) => str_contains($r[1], 'text-decoration: var(--la-anchor-line, underline) !important')));
+        $this->assertCount(1, $anchors);
+        $this->assertStringContainsString('html[data-a11y-colour] body:not(#la-weight) :where(a:not(.btn', $anchors[0][0]);
+        $highlight = self::rules_with('html[data-a11y-colour][data-a11y-links="highlight"] body:not(#la-weight)');
+        $this->assertCount(1, $highlight, 'highlighted links keep the link colour on their surface');
+        $this->assertStringContainsString('color: var(--a11y-link) !important', $highlight[0][1]);
+    }
 }

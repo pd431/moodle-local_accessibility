@@ -189,12 +189,14 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
        clickable). Every other anchor is a link: link colour and underline, on every page.
        The control list is stated once, as --la-anchor, and the one anchor rule below reads it. Buttons keep
        their own rules, and the current page in pagination and the active menu item keep the theme's white on
-       primary (5.36:1). */
+       primary (5.36:1). A site's own SCSS may force link colours with !important and a heavy selector (course page
+       link colours are a common customisation); body:not(#la-weight) adds one id's weight so the scheme still wins,
+       as for the navbar rules. */
     html[data-a11y-colour] body :where(nav, [role="navigation"], [role="menu"], [role="menubar"], [role="tablist"], [role="tree"], [role="toolbar"], h1, h2, h3, h4, h5, h6, thead th, .activity-item .activityname, a:is([role="button"], [role="tab"], [role="menuitem"], .dropdown-item, .page-link, .nav-link, .badge, .courseindex-link), a:has(> :is(h1, h2, h3, h4, h5, h6))) {
         --la-anchor: var(--a11y-text);
         --la-anchor-line: none;
     }
-    html[data-a11y-colour] body :where(a:not(.btn, .qnbutton, .nav-link.active, .page-item.active .page-link, .dropdown-item.active, .dropdown-item:active)):where(:not(.la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
+    html[data-a11y-colour] body:not(#la-weight) :where(a:not(.btn, .qnbutton, .nav-link.active, .page-item.active .page-link, .dropdown-item.active, .dropdown-item:active)):where(:not(.la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
         color: var(--la-anchor, var(--a11y-link)) !important; /* stylelint-disable-line declaration-no-important */
         text-decoration: var(--la-anchor-line, underline) !important; /* stylelint-disable-line declaration-no-important */
     }
@@ -475,7 +477,7 @@ html[data-a11y-links="highlight"] body:not(#la-weight) :where(a:not(.btn, .qnbut
 html[data-a11y-links="highlight"] body:not(#la-weight) :where(a.nav-link:is(.active, [aria-current="true"], [aria-current="page"])):where(:not(.local-accessibility-panel, .local-accessibility-panel *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-readbar, .la-readbar *, .la-guide, .la-guide *)) {
     border-bottom-color: currentcolor !important; /* stylelint-disable-line declaration-no-important */
 }
-html[data-a11y-colour][data-a11y-links="highlight"] body :where(a:not(.btn, .qnbutton)):where(:not(.local-accessibility-panel, .local-accessibility-panel *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-readbar, .la-readbar *, .la-guide, .la-guide *)) {
+html[data-a11y-colour][data-a11y-links="highlight"] body:not(#la-weight) :where(a:not(.btn, .qnbutton)):where(:not(.local-accessibility-panel, .local-accessibility-panel *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-readbar, .la-readbar *, .la-guide, .la-guide *)) {
     background-color: var(--a11y-surface2) !important; /* stylelint-disable-line declaration-no-important */
     color: var(--a11y-link) !important; /* stylelint-disable-line declaration-no-important */
 }
