@@ -794,6 +794,7 @@ final class styles_test extends \advanced_testcase {
             'disabled' => ['.btn.disabled', '.dropdown-item.disabled', '.nav-link.disabled', '.list-group-item.disabled', '.page-item.disabled > .page-link', '.tox-tbtn--disabled'],
             'status' => ['.gradepass', '.gradefail', '.submissionstatussubmitted', '.submissiongraded', '.submissionstatusdraft', '.latesubmission', 'tr.table-success > :first-child', 'tr.table-warning > :first-child', 'tr.table-danger > :first-child'],
             'progress' => ['.progress-bar', '.progress'],
+            'hidden' => ['.dimmed_text', '.dimmed', '.usersuspended'],
         ];
     }
 
@@ -916,5 +917,16 @@ final class styles_test extends \advanced_testcase {
         $r = array_values(array_filter($rules, fn($x) => str_contains($x[0], '.progress-bar')));
         $this->assertNotEmpty($r);
         $this->assertStringContainsString('background-color: var(--a11y-mark) !important', $r[0][1]);
+    }
+
+    /**
+     * State marks: hidden.
+     */
+    public function test_state_marks_hidden(): void {
+        [, $rules] = self::state_marks();
+        $r = array_values(array_filter($rules, fn($x) => str_contains($x[0], '.usersuspended')));
+        $this->assertNotEmpty($r);
+        $this->assertStringContainsString('font-style: italic !important', $r[0][1]);
+        $this->assertStringContainsString('opacity: 1 !important', $r[0][1]);
     }
 }

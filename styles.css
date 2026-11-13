@@ -622,6 +622,12 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         background-color: var(--a11y-surface2) !important; /* stylelint-disable-line declaration-no-important */
         box-shadow: inset 0 0 0 1px var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
     }
+    /* Hidden and dimmed: an item hidden from students, a hidden course, a suspended user. Moodle greys it, which a
+       scheme replaces with its full text colour; it is set in italic instead, at full contrast. */
+    html[data-a11y-colour] body:not(#la-weight) :where(.dimmed_text, .dimmed, .usersuspended):where(:not(.local-accessibility-panel, .local-accessibility-panel *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-readbar, .la-readbar *, .la-guide, .la-guide *)) {
+        font-style: italic !important; /* stylelint-disable-line declaration-no-important */
+        opacity: 1 !important; /* stylelint-disable-line declaration-no-important */
+    }
 }
 /* 7a end */
 /* 8. Links: no layout shift; never the panel or the readbar. "outline" is underline plus outline. "highlight" keeps a
