@@ -39,10 +39,10 @@ Feature: The current navigation item is boxed in the scheme's active colour
     And the computed "outline-color" of ".primary-navigation [aria-current]:focus-visible" should be "rgb(243, 133, 24)"
     And the computed "box-shadow" of ".primary-navigation [aria-current]:focus-visible" should be "rgb(243, 133, 24) 0px 0px 0px 2px inset"
 
-  Scenario: Other schemes declare no active colour and paint as before
+  Scenario: Other schemes declare no active colour but box the current item in their mark colour (3.1.5)
     Given the following "user preferences" exist:
       | user     | preference                 | value        |
       | student1 | local_accessibility_colour | highcontrast |
     And I log in as "student1"
     Then the page root should not have attribute "data-a11y-tokens"
-    And the computed "box-shadow" of ".primary-navigation [aria-current]" should be "none"
+    And the computed "box-shadow" of ".primary-navigation [aria-current]" should be "rgb(255, 255, 0) 0px 0px 0px 2px inset"
