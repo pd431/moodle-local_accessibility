@@ -6,22 +6,24 @@ current page, a ticked row, a disabled button or a failing grade looked like the
 
 - Every scheme has a mark colour: its link colour, or its text colour where the link is under 3:1 on a surface. VS Code
   dark high contrast keeps its orange.
-- Chosen and current items (the current page, tab, pill, breadcrumb, menu and list item, a pressed toggle or editor
+- Chosen and current items (the current page, tab, pill, breadcrumb (also the plain last item Moodle shows), menu and list item, a pressed toggle or editor
   button, a ticked or active row, today in the calendar) are boxed in the mark colour on the hover surface. Before,
   only VS Code dark high contrast boxed them.
 - A changed quick grade and an overridden grade have a dashed edge in the mark colour.
 - Disabled menu items, buttons, tabs, page links, editor buttons and fields are faded to 0.6; fields that cannot be
   edited also get a dashed edge.
-- Status (a passing or failing grade, a submission's status, a coloured table row, an alert's type, an error) has an
-  edge at its leading side in the mark colour: solid for success, dotted for warning, double for danger. Status text in
-  a line is underlined in that style. No text is added.
+- Status (a passing or failing grade, a submission's status, a coloured table row or cell, an alert's type, an error)
+  has an edge at its leading side in the mark colour: solid for success, dotted for warning, double for danger. Status
+  text in a line is underlined in that style. No text is added. A coloured table cell also drops the theme's fill: on
+  Moodle 5.x it stayed pale yellow, green or red under the scheme's text (1.21:1 on the scheduled tasks page).
 - A progress bar's fill is in the mark colour, on a track with an edge.
 - Hidden items, hidden courses and suspended users are set in italic, at full contrast.
 - Keyboard focus under a scheme without its own focus colour is drawn in the mark colour, and moves inside a current
   item's box under every scheme.
 - Alert edges no longer use fixed hex colours.
-- Tests: the Behat step "should look different from" now uses a 3:1 rule (it passed on any difference before) and
-  counts Bootstrap 5's table fills as background; a new feature, state_marks, covers each state.
+- Tests: the Behat step "should look different from" now uses a 3:1 rule (it passed on any difference before),
+  counts an edge or underline in another style as another mark and Bootstrap 5's table fills as background; a new
+  feature, state_marks, covers each state. active_item_box expects the box under every scheme.
 
 # 3.1.4
 
