@@ -419,7 +419,9 @@ class behat_local_accessibility extends behat_base {
      *  - Their text colours differ by 3:1 or more, when both carry text. An element with no text that holds an icon
      *    counts the icon's ink (an SVG's fill, a font icon's colour) as its text colour.
      *  - One has an edge the other lacks, 3:1 from its own background: a border side or an inset shadow against the
-     *    element's background; an outline or an outer shadow ring against the background around it.
+     *    element's background; an outline or an outer shadow ring against the background around it. An edge drawn in
+     *    another style (solid, dotted, dashed, double) counts as a different edge.
+     *  - An underline differs, in presence or in style.
      *  - A mark that is not colour differs: underline, weight (600+ against less), italic, opacity 0.7 or less against
      *    more, a ::before or ::after, an icon, a background image, or a native checkbox or radio's checked drawing.
      * Hue alone never counts: a colour scheme is chosen to remove it.
@@ -480,13 +482,13 @@ class behat_local_accessibility extends behat_base {
                     const c = parse(s["border" + side + "Color"]);
                     if (parseFloat(s["border" + side + "Width"]) >= 0.5 && !/none|hidden/.test(s["border" + side + "Style"]) &&
                             c && c[3] > 0 && ratio(over(c, out), back) >= 3) {
-                        edges.add(side.toLowerCase());
+                        edges.add(side.toLowerCase() + ":" + s["border" + side + "Style"]);
                     }
                 }
                 const oc = parse(s.outlineColor);
                 if (s.outlineStyle !== "none" && parseFloat(s.outlineWidth) >= 0.5 && oc && oc[3] > 0 &&
                         ratio(over(oc, out), parseFloat(s.outlineOffset) < 0 ? back : out) >= 3) {
-                    edges.add("outline");
+                    edges.add("outline:" + s.outlineStyle);
                 }
                 for (const sh of shadowsOf(s.boxShadow)) {
                     if (sh.size < 0.75 || !sh.colour || sh.colour[3] === 0 || (sh.inset && sh.size >= half)) {
@@ -517,7 +519,8 @@ class behat_local_accessibility extends behat_base {
                         .filter((c) => /^fa-(?!fw|solid|regular)|^icon$/.test(c)).join(".")).join(" ");
                 return {
                     text: !!text, ink: ink, fg: fg ? over(fg, back) : back, bg: back, edges: [...edges].sort().join(","),
-                    underline: /underline/.test(s.textDecorationLine) || (!!is && /underline/.test(is.textDecorationLine)),
+                    underline: /underline/.test(s.textDecorationLine) ? s.textDecorationStyle :
+                        (!!is && /underline/.test(is.textDecorationLine) ? is.textDecorationStyle : ""),
                     bold: Math.max(parseFloat(s.fontWeight), is ? parseFloat(is.fontWeight) : 0) >= 600,
                     italic: s.fontStyle === "italic" || (!!is && is.fontStyle === "italic"),
                     dim: opacity <= 0.7, before: pseudo("::before"), after: pseudo("::after"), icons: icons,
