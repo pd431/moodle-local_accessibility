@@ -826,7 +826,12 @@ final class styles_test extends \advanced_testcase {
      */
     public function test_state_classes_named_once(): void {
         [, $rules] = self::state_marks();
-        $selectors = implode("\n", array_column($rules, 0));
+        // The chosen kind has a twin rule that adds the hover surface on schemes without their own active colour
+        // (VS Code keeps its theme fill); it repeats the chosen list by design and is not a second owner.
+        $twin = 'html[data-a11y-colour]:not([data-a11y-tokens~="active"])';
+        $owners = array_filter($rules, fn($r) => !str_starts_with($r[0], $twin));
+        $this->assertCount(count($rules) - 1, $owners, 'one twin rule');
+        $selectors = implode("\n", array_column($owners, 0));
         foreach (self::state_classes() as $kind => $classes) {
             foreach ($classes as $class) {
                 $this->assertSame(1, substr_count($selectors, $class . ',') + substr_count($selectors, $class . ')'),

@@ -275,8 +275,8 @@ final class scheme_test extends \advanced_testcase {
         $schemes['custom-dark'] = scheme::custom('#101820', '#f0f0f0', '#80c0ff', false);
         $schemes['custom-light'] = scheme::custom('#fffbe6', '#202020', '#0050a0', false);
         $schemes['custom-mid'] = scheme::custom('#777777', '#ffffff', '#ffff00', false);
-        $schemes['custom-exact-low-link'] = scheme::custom('#ffffff', '#000000', '#cccccc', true);
-        $schemes['custom-exact-low-both'] = scheme::custom('#ffffff', '#999999', '#aaaaaa', true);
+        $schemes['custom-exact-low-link'] = scheme::custom('#ffffff', '#000000', '#999999', true);
+        $schemes['custom-exact-low-both'] = scheme::custom('#ffffff', '#888888', '#999999', true);
         foreach ($schemes as $id => $s) {
             $this->assertGreaterThanOrEqual(3.0, contrast::worst($s->mark(), $s->ramp), "$id mark " . $s->mark());
             $this->assertStringContainsString('--a11y-mark:' . $s->mark() . ';', $s->css_properties(), $id);
@@ -284,5 +284,6 @@ final class scheme_test extends \advanced_testcase {
         $this->assertSame(scheme::presets()['vscodehc']->active, scheme::presets()['vscodehc']->mark(), 'vscodehc keeps its orange');
         $this->assertSame(scheme::presets()['highcontrast']->link, scheme::presets()['highcontrast']->mark(), 'the link colour first');
         $this->assertSame('#000000', $schemes['custom-exact-low-link']->mark(), 'the text colour when the link is too faint');
+        $this->assertSame('#000000', $schemes['custom-exact-low-both']->mark(), 'black or white when both are too faint');
     }
 }
