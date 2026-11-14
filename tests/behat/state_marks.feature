@@ -30,6 +30,8 @@ Feature: Every state keeps a mark under a colour scheme
     And the "#la-st-crumb-current" element should look different from the "#la-st-crumb-link" element
     And the "#la-st-list-active" element should look different from the "#la-st-list-other" element
     And the "#la-st-toggle-pressed" element should look different from the "#la-st-toggle-unpressed" element
+    And the "#la-st-tox-pressed" element should look different from the "#la-st-tox-plain" element
+    And the "#la-st-tox-disabled" element should look different from the "#la-st-tox-plain" element
     And the "#la-st-tab-current" element should look different from the "#la-st-tab-other" element
     And the "#la-st-row-ticked" element should look different from the "#la-st-row-plain" element
     And the "#la-st-row-active" element should look different from the "#la-st-row-plain" element
@@ -82,25 +84,6 @@ Feature: Every state keeps a mark under a colour scheme
     And the main region contains Moodle state markup
     Then the "#la-st-link" element should show a keyboard focus indicator
     And the computed "background-color" of "#la-st-link" should be "rgba(0, 0, 0, 0)"
-
-    Examples:
-      | scheme       |
-      | highcontrast |
-      | cream        |
-
-  Scenario Outline: The text editor's pressed and disabled buttons keep a mark under <scheme>
-    Given the following "courses" exist:
-      | fullname | shortname |
-      | Course 1 | C1        |
-    And the following "user preferences" exist:
-      | user  | preference                 | value    |
-      | admin | local_accessibility_colour | <scheme> |
-    And I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I navigate to "Settings" in current page administration
-    When I click on "Bold" "button"
-    Then the ".tox-tbtn--enabled" element should look different from the ".tox-tbtn:not(.tox-tbtn--enabled):not(.tox-tbtn--disabled)" element
-    And the ".tox-tbtn--disabled" element should look different from the ".tox-tbtn:not(.tox-tbtn--enabled):not(.tox-tbtn--disabled)" element
 
     Examples:
       | scheme       |

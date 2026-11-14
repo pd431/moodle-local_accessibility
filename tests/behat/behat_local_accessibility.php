@@ -789,7 +789,8 @@ class behat_local_accessibility extends behat_base {
 
     /**
      * Add Moodle's state markup to the main region, each state beside a neighbour without it, marked up as core's
-     * templates render them: current, chosen and pressed items; changed and overridden grades; disabled controls;
+     * templates render them: current, chosen and pressed items (a pressed editor button too, as TinyMCE marks it);
+     * changed and overridden grades; disabled controls;
      * statuses; a progress bar; hidden items; and a text link to focus. Ids start la-st-.
      *
      * @Given the main region contains Moodle state markup
@@ -807,6 +808,9 @@ class behat_local_accessibility extends behat_base {
                 <a href="#" class="list-group-item list-group-item-action" id="la-st-list-other">Other</a></div>
             <div class="btn-group"><button type="button" class="btn btn-outline-secondary active" aria-pressed="true" id="la-st-toggle-pressed">Card</button>
                 <button type="button" class="btn btn-outline-secondary" aria-pressed="false" id="la-st-toggle-unpressed">List</button></div>
+            <div class="tox"><div class="tox-toolbar"><button type="button" class="tox-tbtn tox-tbtn--enabled" aria-pressed="true" id="la-st-tox-pressed">B</button>
+                <button type="button" class="tox-tbtn" aria-pressed="false" id="la-st-tox-plain">I</button>
+                <button type="button" class="tox-tbtn tox-tbtn--disabled" aria-disabled="true" id="la-st-tox-disabled">U</button></div></div>
             <ul class="nav nav-tabs"><li class="nav-item"><a class="nav-link active" aria-current="page" href="#" id="la-st-tab-current">Current</a></li>
                 <li class="nav-item"><a class="nav-link" href="#" id="la-st-tab-other">Other</a></li>
                 <li class="nav-item"><a class="nav-link disabled" aria-disabled="true" href="#" id="la-st-tab-disabled">Disabled</a></li></ul>
