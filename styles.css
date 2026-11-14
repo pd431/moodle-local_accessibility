@@ -462,15 +462,16 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
    section 7 never sets, so these rules add them without undoing section 7; where a state needs another fill the rule
    wins by coming later with an id's weight. Never in forced colours, where the system draws states. */
 @media (forced-colors: none) {
-    /* Chosen and current: the current page, breadcrumb, tab, pill, menu and list item, a pressed toggle or editor
+    /* Chosen and current: the current page, breadcrumb (Moodle marks the current one only by being plain text at the
+       end, in a span), tab, pill, menu and list item, a pressed toggle or editor
        button, a ticked or active row, today in the calendar. A 2px box inside the item's edge, so nothing moves and the
        keyboard focus ring, which sits outside, shows on top; text in the scheme's text colour. On a scheme without its
        own active colour the item also takes the hover surface; VS Code dark high contrast keeps the theme's fill. */
-    html[data-a11y-colour] body:not(#la-weight) :where(.page-item.active > .page-link, .breadcrumb-item.active:not(:has([aria-current])), [aria-current]:not([aria-current="false"]), .list-group-item.active, .btn.active, [aria-pressed="true"], [aria-selected="true"], .nav-link.active, .mds-nav-pill--selected, .mds-nav-pill.active, .courseindex-item.pageitem, .courseindex-item.active, .dropdown-item.active, .tox-tbtn--enabled, .today .day-number-circle) {
+    html[data-a11y-colour] body:not(#la-weight) :where(.page-item.active > .page-link, .breadcrumb-item.active:not(:has([aria-current])), .breadcrumb-item:last-child > span:only-child, [aria-current]:not([aria-current="false"]), .list-group-item.active, .btn.active, [aria-pressed="true"], [aria-selected="true"], .nav-link.active, .mds-nav-pill--selected, .mds-nav-pill.active, .courseindex-item.pageitem, .courseindex-item.active, .dropdown-item.active, .tox-tbtn--enabled, .today .day-number-circle) {
         box-shadow: inset 0 0 0 2px var(--a11y-mark) !important; /* stylelint-disable-line declaration-no-important */
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
     }
-    html[data-a11y-colour]:not([data-a11y-tokens~="active"]) body:not(#la-weight) :where(.page-item.active > .page-link, .breadcrumb-item.active:not(:has([aria-current])), [aria-current]:not([aria-current="false"]), .list-group-item.active, .btn.active, [aria-pressed="true"], [aria-selected="true"], .nav-link.active, .mds-nav-pill--selected, .mds-nav-pill.active, .courseindex-item.pageitem, .courseindex-item.active, .dropdown-item.active, .tox-tbtn--enabled, .today .day-number-circle) {
+    html[data-a11y-colour]:not([data-a11y-tokens~="active"]) body:not(#la-weight) :where(.page-item.active > .page-link, .breadcrumb-item.active:not(:has([aria-current])), .breadcrumb-item:last-child > span:only-child, [aria-current]:not([aria-current="false"]), .list-group-item.active, .btn.active, [aria-pressed="true"], [aria-selected="true"], .nav-link.active, .mds-nav-pill--selected, .mds-nav-pill.active, .courseindex-item.pageitem, .courseindex-item.active, .dropdown-item.active, .tox-tbtn--enabled, .today .day-number-circle) {
         background-color: var(--a11y-hover) !important; /* stylelint-disable-line declaration-no-important */
     }
     /* A chosen row: an edge above and below each cell, and at the row's two ends, so the row reads as one box. */

@@ -795,7 +795,8 @@ final class styles_test extends \advanced_testcase {
         return [
             'chosen' => ['.page-item.active > .page-link', '.list-group-item.active', '.btn.active', '[aria-pressed="true"]',
                 '[aria-selected="true"]', '.nav-link.active', '.mds-nav-pill--selected', '.courseindex-item.pageitem',
-                '.dropdown-item.active', '.tox-tbtn--enabled', '.today .day-number-circle', 'tr.selectedrow > *'],
+                '.dropdown-item.active', '.tox-tbtn--enabled', '.today .day-number-circle', 'tr.selectedrow > *',
+                '.breadcrumb-item:last-child > span:only-child'],
             'changed' => ['.quickgrademodified', 'td.ajaxoverridden'],
             'disabled' => ['.btn.disabled', '.dropdown-item.disabled', '.nav-link.disabled', '.list-group-item.disabled', '.page-item.disabled > .page-link', '.tox-tbtn--disabled'],
             'status' => ['.gradepass', '.gradefail', '.submissionstatussubmitted', '.submissiongraded', '.submissionstatusdraft', '.latesubmission', 'tr.table-success > :first-child', 'tr.table-warning > :first-child', 'tr.table-danger > :first-child'],
