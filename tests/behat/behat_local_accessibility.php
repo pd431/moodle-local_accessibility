@@ -234,7 +234,7 @@ class behat_local_accessibility extends behat_base {
                 return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1];
             };
             // Bootstrap 5 paints striped, hovered, active and coloured table cells with an inset box-shadow of 9999px
-            // over the cell, not with a background colour: a shadow at least half the element's size is a fill.
+            // over the cell, not with a background colour: a shadow at least half the size of the element is a fill.
             const fills = (e) => {
                 const out = [];
                 const r = e.getBoundingClientRect();
