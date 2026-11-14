@@ -515,19 +515,22 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     /* Status: a grade that passes or fails, a submission's status, a coloured table row, an alert's type, an error.
        Moodle tells them apart by green, amber and red, which a scheme replaces. Each takes the scheme's text colour
        and an edge at its leading side in the mark colour, drawn by its style: solid for success, dotted for warning,
-       double for danger. Cells and blocks get a 4px stripe (a background image, so nothing moves); an alert already has
+       double for danger. Cells and blocks get a 4px stripe (a background image, so nothing moves), and a coloured
+       cell drops the theme's fill (Bootstrap 5 paints it with an inset shadow), so the scheme's surface shows; an alert already has
        a 4px leading border and takes the style on it; status text in a line is underlined in that style. Moodle's own
        words say which status it is, so no text is generated (a screen reader would read it). */
 
     html[data-a11y-colour][dir="rtl"] {
         --la-lead: right;
     }
-    html[data-a11y-colour] body:not(#la-weight) :where(.gradepass, tr.table-success > :first-child) {
+    html[data-a11y-colour] body:not(#la-weight) :where(.gradepass, td.table-success, th.table-success, tr.table-success > *) {
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
         background-size: 4px 100% !important; /* stylelint-disable-line declaration-no-important */
         background-repeat: no-repeat !important; /* stylelint-disable-line declaration-no-important */
         background-position: var(--la-lead, left) top !important; /* stylelint-disable-line declaration-no-important */
         background-image: linear-gradient(var(--a11y-mark), var(--a11y-mark)) !important; /* stylelint-disable-line declaration-no-important */
+        background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
     }
     html[data-a11y-colour] body:not(#la-weight) :where(.submissionstatussubmitted, .submissiongraded) {
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
@@ -537,12 +540,14 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         background-image: linear-gradient(var(--a11y-mark), var(--a11y-mark)) !important; /* stylelint-disable-line declaration-no-important */
         padding-inline-start: 0.75rem !important; /* stylelint-disable-line declaration-no-important */
     }
-    html[data-a11y-colour] body:not(#la-weight) :where(.latesubmission, tr.table-warning > :first-child) {
+    html[data-a11y-colour] body:not(#la-weight) :where(.latesubmission, td.table-warning, th.table-warning, tr.table-warning > *) {
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
         background-size: 4px 100% !important; /* stylelint-disable-line declaration-no-important */
         background-repeat: no-repeat !important; /* stylelint-disable-line declaration-no-important */
         background-position: var(--la-lead, left) top !important; /* stylelint-disable-line declaration-no-important */
         background-image: repeating-linear-gradient(to bottom, var(--a11y-mark) 0 4px, transparent 4px 8px) !important; /* stylelint-disable-line declaration-no-important */
+        background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
     }
     html[data-a11y-colour] body:not(#la-weight) :where(.submissionstatusdraft) {
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
@@ -552,12 +557,14 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         background-image: repeating-linear-gradient(to bottom, var(--a11y-mark) 0 4px, transparent 4px 8px) !important; /* stylelint-disable-line declaration-no-important */
         padding-inline-start: 0.75rem !important; /* stylelint-disable-line declaration-no-important */
     }
-    html[data-a11y-colour] body:not(#la-weight) :where(.gradefail, tr.table-danger > :first-child) {
+    html[data-a11y-colour] body:not(#la-weight) :where(.gradefail, td.table-danger, th.table-danger, tr.table-danger > *) {
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
         background-size: 4px 100% !important; /* stylelint-disable-line declaration-no-important */
         background-repeat: no-repeat !important; /* stylelint-disable-line declaration-no-important */
         background-position: var(--la-lead, left) top !important; /* stylelint-disable-line declaration-no-important */
         background-image: linear-gradient(to right, var(--a11y-mark) 0 1.5px, transparent 1.5px 2.5px, var(--a11y-mark) 2.5px 4px) !important; /* stylelint-disable-line declaration-no-important */
+        background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
     }
     html[data-a11y-colour] body:not(#la-weight) :where(.alert-success) {
         border-inline-start-color: var(--a11y-mark) !important; /* stylelint-disable-line declaration-no-important */

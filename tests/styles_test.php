@@ -799,7 +799,8 @@ final class styles_test extends \advanced_testcase {
                 '.breadcrumb-item:last-child > span:only-child'],
             'changed' => ['.quickgrademodified', 'td.ajaxoverridden'],
             'disabled' => ['.btn.disabled', '.dropdown-item.disabled', '.nav-link.disabled', '.list-group-item.disabled', '.page-item.disabled > .page-link', '.tox-tbtn--disabled'],
-            'status' => ['.gradepass', '.gradefail', '.submissionstatussubmitted', '.submissiongraded', '.submissionstatusdraft', '.latesubmission', 'tr.table-success > :first-child', 'tr.table-warning > :first-child', 'tr.table-danger > :first-child'],
+            'status' => ['.gradepass', '.gradefail', '.submissionstatussubmitted', '.submissiongraded', '.submissionstatusdraft', '.latesubmission', 'td.table-success', 'td.table-warning', 'td.table-danger', 'tr.table-success > *',
+                'tr.table-warning > *', 'tr.table-danger > *'],
             'progress' => ['.progress-bar', '.progress'],
             'hidden' => ['.dimmed_text', '.dimmed', '.usersuspended'],
         ];
@@ -918,6 +919,8 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringContainsString('border-inline-start-style: dotted !important', $all);
         $this->assertStringContainsString('text-decoration-style: double !important', $all);
         $this->assertStringNotContainsString('content:', $all, 'no generated text');
+        $cells = array_values(array_filter($rules, fn($r) => str_contains($r[0], 'td.table-warning')));
+        $this->assertStringContainsString('box-shadow: none !important', $cells[0][1], 'the theme fill goes');
 
     }
 
