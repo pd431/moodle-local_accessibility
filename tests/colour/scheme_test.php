@@ -288,8 +288,9 @@ final class scheme_test extends \advanced_testcase {
     }
 
     /**
-     * Status colours: text reaches 7:1 and marks 3:1 on every shade of every built-in scheme and of a spread of custom
-     * ones; a built-in scheme keeps the fixed value wherever it already passes, and only lightness moves where it does not.
+     * Status mark colours reach 3:1 on every shade of every built-in scheme and of a spread of custom ones; a built-in
+     * scheme keeps the fixed value wherever it already passes, and only lightness moves where it does not. No status
+     * text colour is emitted: status text keeps the scheme's text colour.
      */
     public function test_status_colours_meet_floors(): void {
         $schemes = scheme::presets();
@@ -298,15 +299,14 @@ final class scheme_test extends \advanced_testcase {
         $schemes['custom-mid'] = scheme::custom('#777777', '#ffffff', '#ffff00', false);
         foreach ($schemes as $id => $s) {
             $colours = $s->status_colours();
-            foreach (['ok', 'warn', 'bad'] as $name) {
-                $this->assertGreaterThanOrEqual(contrast::AAA, contrast::worst($colours[$name], $s->ramp), "$id $name text");
-                $this->assertGreaterThanOrEqual(3.0, contrast::worst($colours[$name . '-mark'], $s->ramp), "$id $name mark");
-                $this->assertStringContainsString('--a11y-' . $name . ':' . $colours[$name] . ';', $s->css_properties());
-                $this->assertStringContainsString('--a11y-' . $name . '-mark:' . $colours[$name . '-mark'] . ';', $s->css_properties());
+            $this->assertSame(['ok-mark', 'warn-mark', 'bad-mark'], array_keys($colours), $id);
+            foreach ($colours as $name => $hex) {
+                $this->assertGreaterThanOrEqual(3.0, contrast::worst($hex, $s->ramp), "$id $name");
+                $this->assertStringContainsString('--a11y-' . $name . ':' . $hex . ';', $s->css_properties());
             }
+            $this->assertStringNotContainsString('--a11y-ok:', $s->css_properties(), 'no status text colour');
         }
-        $vscode = scheme::presets()['vscodehc']->status_colours();
-        $this->assertSame(scheme::STATUS_TEXT['dark']['ok'], $vscode['ok'], 'a passing fixed value is kept');
-        $this->assertSame(scheme::STATUS_MARK['dark']['bad'], $vscode['bad-mark']);
+        $this->assertSame(scheme::STATUS_MARK['dark']['bad'], scheme::presets()['highcontrast']->status_colours()['bad-mark'],
+            'a passing fixed value is kept');
     }
 }
