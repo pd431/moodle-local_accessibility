@@ -800,8 +800,9 @@ final class styles_test extends \advanced_testcase {
             'changed' => ['.quickgrademodified', 'td.ajaxoverridden'],
             'disabled' => ['.btn.disabled', '.dropdown-item.disabled', '.nav-link.disabled', '.list-group-item.disabled', '.page-item.disabled > .page-link', '.tox-tbtn--disabled'],
             'readonly' => ['[readonly]'],
-            'status' => ['.gradepass', '.gradefail', '.submissionstatussubmitted', '.submissiongraded', '.submissionstatusdraft', '.latesubmission', 'td.table-success', 'td.table-warning', 'td.table-danger', 'tr.table-success > *',
-                'tr.table-warning > *', 'tr.table-danger > *'],
+            'status' => ['.gradepass', '.gradefail', '.submissionstatussubmitted', '.submissiongraded', '.earlysubmission',
+                '.submissionstatusdraft', '.latesubmission', 'td.table-success', 'td.table-warning', 'td.table-danger',
+                'tr.table-success > *', 'tr.table-warning > *', 'tr.table-danger > *'],
             'alert' => ['.alert-success', '.alert-warning', '.alert-danger', '.alert-info'],
             'progress' => ['.progress-bar', '.progress'],
             'hidden' => ['.dimmed_text', '.dimmed', '.usersuspended'],
@@ -894,9 +895,9 @@ final class styles_test extends \advanced_testcase {
     public function test_state_marks_changed(): void {
         [, $rules] = self::state_marks();
         $r = array_values(array_filter($rules, fn($x) => str_contains($x[0], '.quickgrademodified')));
-        $this->assertNotEmpty($r);
-        $this->assertStringContainsString('outline: 2px dashed var(--a11y-mark) !important', $r[0][1]);
-        $this->assertStringContainsString('outline-offset: -3px !important', $r[0][1]);
+        $this->assertCount(1, $r);
+        $this->assertStringContainsString('--la-status: var(--a11y-warn-mark);', $r[0][1]);
+        $this->assertStringContainsString('box-shadow: inset 0 0 0 2px var(--la-status) !important', $r[0][1]);
     }
 
     /**
@@ -966,5 +967,30 @@ final class styles_test extends \advanced_testcase {
             $this->assertCount(1, $r, $class);
             $this->assertStringContainsString('border-inline-start: 1em solid var(--a11y-' . $token . ') !important', $r[0][1], $class);
         }
+    }
+
+    /**
+     * State marks: a status cell has a solid 2px border in its status mark colour; a ticked row keeps its box and shows
+     * that border inside it; no dashed, dotted or double line anywhere in section 7a.
+     */
+    public function test_state_marks_status_cells(): void {
+        [$section, $rules] = self::state_marks();
+        foreach (['td.table-success' => 'ok', 'td.table-warning' => 'warn', 'td.table-danger' => 'bad'] as $class => $kind) {
+            $r = array_values(array_filter($rules, fn($x) => str_contains($x[0], $class)));
+            $this->assertCount(1, $r, $class);
+            $this->assertStringContainsString('--la-status: var(--a11y-' . $kind . '-mark);', $r[0][1]);
+            $this->assertStringContainsString('box-shadow: inset 0 0 0 2px var(--la-status) !important', $r[0][1]);
+            $this->assertStringContainsString('background-color: transparent !important', $r[0][1]);
+        }
+        $rows = array_values(array_filter($rules, fn($x) => str_contains($x[0], 'tr.selectedrow')));
+        foreach ($rows as $row) {
+            $this->assertStringContainsString('inset 0 0 0 4px var(--la-status, transparent)', $row[1], 'both marks in a ticked row');
+        }
+        $css = preg_replace('~/\*.*?\*/~s', '', $section);
+        foreach (['dashed', 'dotted', 'double'] as $style) {
+            $this->assertStringNotContainsString($style, $css, "no $style line");
+        }
+        $status = strpos($css, 'td.table-success');
+        $this->assertLessThan(strpos($css, 'tr.selectedrow'), $status, 'status cells come before the chosen rows that read --la-status');
     }
 }
