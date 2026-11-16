@@ -46,22 +46,24 @@ Feature: Every state keeps a mark under a colour scheme
     And the "#la-st-tab-disabled" element should look different from the "#la-st-tab-other" element
     And the "#la-st-field-disabled" element should look different from the "#la-st-field-editable" element
     And the "#la-st-field-readonly" element should look different from the "#la-st-field-editable" element
+    And the computed "opacity" of "#la-st-field-readonly" should be "1"
     And the "#la-st-select-disabled" element should look different from the "#la-st-select-editable" element
-    # Status.
-    And the "#la-st-grade-pass" element should look different from the "#la-st-grade-plain" element
-    And the "#la-st-grade-fail" element should look different from the "#la-st-grade-plain" element
-    And the "#la-st-grade-pass" element should look different from the "#la-st-grade-fail" element
+    # Status. Status text against plain text, and one status against another, differ by hue alone (accepted);
+    # a bordered status cell or block must still look different from a plain one.
+    And the "#la-st-grade-pass" element should differ in hue from the "#la-st-grade-plain" element
+    And the "#la-st-grade-fail" element should differ in hue from the "#la-st-grade-plain" element
+    And the "#la-st-grade-pass" element should differ in hue from the "#la-st-grade-fail" element
     And the "#la-st-status-submitted" element should look different from the "#la-st-status-none" element
     And the "#la-st-status-draft" element should look different from the "#la-st-status-none" element
-    And the "#la-st-text-warning" element should look different from the "#la-st-text-plain" element
-    And the "#la-st-text-danger" element should look different from the "#la-st-text-plain" element
-    And the "#la-st-text-success" element should look different from the "#la-st-text-plain" element
-    And the "#la-st-error" element should look different from the "#la-st-label" element
+    And the "#la-st-text-warning" element should differ in hue from the "#la-st-text-plain" element
+    And the "#la-st-text-danger" element should differ in hue from the "#la-st-text-plain" element
+    And the "#la-st-text-success" element should differ in hue from the "#la-st-text-plain" element
+    And the "#la-st-error" element should differ in hue from the "#la-st-label" element
     And the "#la-st-field-invalid" element should look different from the "#la-st-field-editable" element
     And the "#la-st-row-success" element should look different from the "#la-st-row-plain" element
     And the "#la-st-row-warning" element should look different from the "#la-st-row-plain" element
     And the "#la-st-row-danger" element should look different from the "#la-st-row-plain" element
-    And the "#la-st-row-warning" element should look different from the "#la-st-row-danger" element
+    And the "#la-st-row-warning" element should differ in hue from the "#la-st-row-danger" element
     # Progress and hidden.
     And the "#la-st-progress-bar" element should look different from the "#la-st-progress" element
     And the "#la-st-dimmed" element should look different from the "#la-st-text-plain" element

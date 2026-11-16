@@ -420,7 +420,8 @@ class behat_local_accessibility extends behat_base {
      *    counts the icon's ink (an SVG's fill, a font icon's colour) as its text colour.
      *  - One has an edge the other lacks, 3:1 from its own background: a border side or an inset shadow against the
      *    element's background; an outline or an outer shadow ring against the background around it. An edge drawn in
-     *    another style (solid, dotted, dashed, double) counts as a different edge.
+     *    another style (solid, dotted, dashed, double), at another weight (under 1.5px against 1.5px or more) or, for a
+     *    shadow, in another shape counts as a different edge.
      *  - An underline differs, in presence or in style.
      *  - A mark that is not colour differs: underline, weight (600+ against less), italic, opacity 0.7 or less against
      *    more, a ::before or ::after, an icon, a background image, or a native checkbox or radio's checked drawing.
@@ -446,6 +447,52 @@ class behat_local_accessibility extends behat_base {
     }
 
     /**
+     * Check that two elements' text colours, or their status marks (first shadow or leading border), differ in hue and
+     * lightness by a CIE76 Delta E of 15 or more. This is not
+     * the look-different rule: it records a state Moodle and the plugin tell apart by colour alone (status text against
+     * plain text, one status against another), which is accepted for status colours. The look-different step still
+     * fails such a pair.
+     *
+     * @Then /^the "(?P<css>[^"]*)" element should differ in hue from the "(?P<other>[^"]*)" element$/
+     * @param string $css
+     * @param string $other
+     */
+    public function the_element_should_differ_in_hue_from(string $css, string $other): void {
+        $this->check_script('const a = document.querySelector(' . json_encode($css) . ');
+            const b = document.querySelector(' . json_encode($other) . ');
+            if (!a || !b) {
+                return "Missing element: " + (a ? ' . json_encode($other) . ' : ' . json_encode($css) . ');
+            }
+            const lab = (rgb) => {
+                const f = (v) => {
+                    v /= 255;
+                    return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+                };
+                const [r, g, bl] = rgb.map(f);
+                const x = (r * 0.4124 + g * 0.3576 + bl * 0.1805) / 0.95047;
+                const y = r * 0.2126 + g * 0.7152 + bl * 0.0722;
+                const z = (r * 0.0193 + g * 0.1192 + bl * 0.9505) / 1.08883;
+                const t = (v) => v > 0.008856 ? Math.cbrt(v) : 7.787 * v + 16 / 116;
+                return [116 * t(y) - 16, 500 * (t(x) - t(y)), 200 * (t(y) - t(z))];
+            };
+            const ink = (el) => over(parse(getComputedStyle(el).color), behind(el));
+            // A status mark: the colour of the first shadow, else of the leading border.
+            const mark = (el) => {
+                const s = getComputedStyle(el);
+                const c = parse(s.boxShadow) || (parseFloat(s.borderInlineStartWidth) > 0 ? parse(s.borderInlineStartColor) : null);
+                return c ? over(c, behind(el)) : null;
+            };
+            const de = (x, y) => {
+                const p = lab(x);
+                const q = lab(y);
+                return Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]);
+            };
+            const best = Math.max(de(ink(a), ink(b)), mark(a) && mark(b) ? de(mark(a), mark(b)) : 0);
+            return best >= 15 ? "" : "Delta E " + best.toFixed(1) + " between " + ' . json_encode($css) . ' + " and " +
+                ' . json_encode($other) . ';');
+    }
+
+    /**
      * JavaScript for the look-different step: look(el) reads an element's colours, edges and marks; differences(a, b)
      * lists how two looks differ by the D1 rule. Needs the colour helpers.
      *
@@ -455,7 +502,9 @@ class behat_local_accessibility extends behat_base {
         return 'const shadowsOf = (s) => String(s).split(/,(?![^(]*\\))/).filter((p) => p.trim() !== "none" && p.trim() !== "")
                 .map((p) => {
                     const sizes = (p.replace(/rgba?\\([^)]*\\)/, "").match(/-?[0-9.]+px/g) || []).map((v) => Math.abs(parseFloat(v)));
-                    return {inset: /inset/.test(p), colour: parse(p), size: Math.max(sizes[0] || 0, sizes[1] || 0, (sizes[2] || 0) / 2, sizes[3] || 0)};
+                    const geo = (p.replace(/rgba?\\([^)]*\\)/, "").match(/-?[0-9.]+px/g) || []).join(" ");
+                    return {inset: /inset/.test(p), colour: parse(p), geo: geo,
+                        size: Math.max(sizes[0] || 0, sizes[1] || 0, (sizes[2] || 0) / 2, sizes[3] || 0)};
                 });
             const look = (el) => {
                 const s = getComputedStyle(el);
@@ -482,13 +531,14 @@ class behat_local_accessibility extends behat_base {
                     const c = parse(s["border" + side + "Color"]);
                     if (parseFloat(s["border" + side + "Width"]) >= 0.5 && !/none|hidden/.test(s["border" + side + "Style"]) &&
                             c && c[3] > 0 && ratio(over(c, out), back) >= 3) {
-                        edges.add(side.toLowerCase() + ":" + s["border" + side + "Style"]);
+                        edges.add(side.toLowerCase() + ":" + s["border" + side + "Style"] + ":" +
+                            (parseFloat(s["border" + side + "Width"]) >= 1.5 ? "thick" : "thin"));
                     }
                 }
                 const oc = parse(s.outlineColor);
                 if (s.outlineStyle !== "none" && parseFloat(s.outlineWidth) >= 0.5 && oc && oc[3] > 0 &&
                         ratio(over(oc, out), parseFloat(s.outlineOffset) < 0 ? back : out) >= 3) {
-                    edges.add("outline:" + s.outlineStyle);
+                    edges.add("outline:" + s.outlineStyle + ":" + (parseFloat(s.outlineWidth) >= 1.5 ? "thick" : "thin"));
                 }
                 for (const sh of shadowsOf(s.boxShadow)) {
                     if (sh.size < 0.75 || !sh.colour || sh.colour[3] === 0 || (sh.inset && sh.size >= half)) {
@@ -496,7 +546,7 @@ class behat_local_accessibility extends behat_base {
                     }
                     const against = sh.inset ? back : out;
                     if (ratio(over(sh.colour, against), against) >= 3) {
-                        edges.add(sh.inset ? "inset" : "ring");
+                        edges.add((sh.inset ? "inset:" : "ring:") + sh.geo);
                     }
                 }
                 let opacity = 1;
