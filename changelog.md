@@ -1,10 +1,11 @@
 # Changelog
 
-## [3.1.5] - 2026-11-14
+## [3.1.5] - 2026-11-16
 
-- States keep their mark under every colour scheme: current and chosen items are boxed, changed grades have a dashed
-  edge, disabled controls are faded, statuses have a solid, dotted or double leading edge, hidden items are italic, and
-  keyboard focus is drawn in the scheme's mark colour. See CHANGES.md.
+- States keep their mark under every colour scheme: current and chosen items are boxed, status cells and changed
+  grades have a solid border in the status colour, alerts a solid marker in their type's colour, status text keeps its
+  hue, disabled controls are faded, read-only fields have a heavier edge, hidden items are italic, and keyboard focus is
+  drawn in the scheme's mark colour. See CHANGES.md.
 
 ## [3.1.4] - 2026-11-13
 

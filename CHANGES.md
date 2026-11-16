@@ -3,27 +3,34 @@
 States keep their mark under every colour scheme. A scheme gives a state and its neighbour the same colours, so the
 current page, a ticked row, a disabled button or a failing grade looked like the items around it. Found by checking
 97 states on Moodle 4.5, 5.2 and 5.3 under every scheme, against upstream 3.0.9 and under core Boost and Boost Union.
+Revised after review on 16 November: no dashed, dotted or double lines; status colours return.
 
 - Every scheme has a mark colour: its link colour, or its text colour where the link is under 3:1 on a surface. VS Code
   dark high contrast keeps its orange.
-- Chosen and current items (the current page, tab, pill, breadcrumb (also the plain last item Moodle shows), menu and list item, a pressed toggle or editor
-  button, a ticked or active row, today in the calendar) are boxed in the mark colour on the hover surface. Before,
-  only VS Code dark high contrast boxed them.
-- A changed quick grade and an overridden grade have a dashed edge in the mark colour.
-- Disabled menu items, buttons, tabs, page links, editor buttons and fields are faded to 0.6; fields that cannot be
-  edited also get a dashed edge.
-- Status (a passing or failing grade, a submission's status, a coloured table row or cell, an alert's type, an error)
-  has an edge at its leading side in the mark colour: solid for success, dotted for warning, double for danger. Status
-  text in a line is underlined in that style. No text is added. A coloured table cell also drops the theme's fill: on
-  Moodle 5.x it stayed pale yellow, green or red under the scheme's text (1.21:1 on the scheduled tasks page).
+- Every scheme has status colours for ok, warning and bad: for text, 7:1 on every surface; for marks, 3:1. They come
+  from two fixed sets, one for light and one for dark schemes, with lightness moved where a value falls short.
+- Chosen and current items (the current page, tab, pill, breadcrumb (also the plain last item Moodle shows), menu and
+  list item, a pressed toggle or editor button, a ticked or active row, today in the calendar) are boxed in the mark
+  colour on the hover surface. Before, only VS Code dark high contrast boxed them.
+- Status cells (a submission's status, a late or early submission, a coloured table cell or row) drop the theme's fill
+  and have a solid 2px border in the status mark colour. A changed quick grade or an overridden grade has the same
+  border in the warning colour. A status cell in a ticked row shows both marks.
+- Alerts show their type as a solid marker 1em wide at the leading edge, in the type's colour (info in the link
+  colour).
+- Status text (success, warning and danger text, passing and failing grades, error messages) keeps its hue in the
+  scheme's status colours. A field with an error takes an edge in the danger colour.
+- Disabled menu items, buttons, tabs, page links, editor buttons and fields are faded to 0.6. Read-only fields keep
+  full contrast and take a solid 2px edge in the text colour.
 - A progress bar's fill is in the mark colour, on a track with an edge.
 - Hidden items, hidden courses and suspended users are set in italic, at full contrast.
 - Keyboard focus under a scheme without its own focus colour is drawn in the mark colour, and moves inside a current
   item's box under every scheme.
 - Alert edges no longer use fixed hex colours.
-- Tests: the Behat step "should look different from" now uses a 3:1 rule (it passed on any difference before),
-  counts an edge or underline in another style as another mark and Bootstrap 5's table fills as background; a new
-  feature, state_marks, covers each state. active_item_box expects the box under every scheme.
+- Tests: the Behat step "should look different from" uses a 3:1 rule (it passed on any difference before), counts an
+  edge or underline in another style or weight, or a shadow of another shape, as another mark, and counts Bootstrap
+  5's table fills as background. A new step, "should differ in hue from", records status colours told apart by hue
+  alone. A new feature, state_marks, covers each state. active_item_box expects the box under every scheme;
+  link_purpose and vscode_scheme expect VS Code's link colour since 3.1.4 (#a3d5ff).
 
 # 3.1.4
 
