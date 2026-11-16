@@ -64,6 +64,14 @@ Feature: Every state keeps a mark under a colour scheme
     And the "#la-st-row-warning" element should look different from the "#la-st-row-plain" element
     And the "#la-st-row-danger" element should look different from the "#la-st-row-plain" element
     And the "#la-st-row-warning" element should differ in hue from the "#la-st-row-danger" element
+    # Badges and pills: painted like alerts, a coloured one differs from a grey one by its marker.
+    And the "#la-st-badge-ok" element should look different from the "#la-st-badge-grey" element
+    And the "#la-st-badge-bad" element should look different from the "#la-st-badge-grey" element
+    And the "#la-st-pill-warn" element should look different from the "#la-st-badge-grey" element
+    And the "#la-st-badge-ok" element should differ in hue from the "#la-st-badge-bad" element
+    And the "#la-st-badge-ok" element should have a text contrast of at least 7:1
+    And the "#la-st-badge-bad" element should have a text contrast of at least 7:1
+    And the "#la-st-pill-warn" element should have a text contrast of at least 7:1
     # Progress and hidden.
     And the "#la-st-progress-bar" element should look different from the "#la-st-progress" element
     And the "#la-st-dimmed" element should look different from the "#la-st-text-plain" element

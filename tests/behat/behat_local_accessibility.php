@@ -854,7 +854,7 @@ class behat_local_accessibility extends behat_base {
     /**
      * Add Moodle's state markup to the main region, each state beside a neighbour without it, marked up as core's
      * templates render them: current, chosen and pressed items (a pressed editor button too, as TinyMCE marks it);
-     * changed and overridden grades; disabled controls;
+     * changed and overridden grades; disabled controls; coloured and grey badges and a pill;
      * statuses; a progress bar; hidden items; and a text link to focus. Ids start la-st-.
      *
      * @Given the main region contains Moodle state markup
@@ -910,6 +910,10 @@ class behat_local_accessibility extends behat_base {
                 <select class="form-select custom-select" id="la-st-select-editable"><option>Editable</option></select>
                 <select class="form-select custom-select" id="la-st-select-disabled" disabled><option>Disabled</option></select>
             </form>
+            <p><span class="badge bg-success text-white" id="la-st-badge-ok">Done</span>
+                <span class="badge bg-danger text-white" id="la-st-badge-bad">Overdue</span>
+                <span class="badge bg-secondary text-dark" id="la-st-badge-grey">Draft</span>
+                <span class="badge rounded-pill bg-warning text-dark" id="la-st-pill-warn">3</span></p>
             <div class="progress" id="la-st-progress" style="height: 1rem"><div class="progress-bar" id="la-st-progress-bar" role="progressbar"
                 style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div></div>
         </div>';
