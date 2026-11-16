@@ -529,7 +529,7 @@ final class styles_test extends \advanced_testcase {
         $focus = array_values(array_filter($token, fn($r) => str_contains($r[0], ':focus-visible')));
         $this->assertCount(3, $focus);
         $this->assertStringContainsString('outline: 2px dashed var(--a11y-focus) !important', $focus[0][1]);
-        $this->assertStringContainsString('outline-offset: -2px !important', $focus[0][1], 'the ring sits inside');
+        $this->assertStringContainsString('outline-offset: var(--la-focus-offset, -2px) !important', $focus[0][1], 'the ring sits inside');
         $this->assertStringContainsString(':focus-visible', $focus[0][0]);
         $this->assertStringNotContainsString(':hover', implode('', array_column($token, 0)), 'the pointer gets no ring');
         $this->assertStringNotContainsString('solid var(--a11y-focus)', self::css(), 'focus is never solid');
@@ -540,11 +540,10 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringContainsString('[data-a11y-focus="thick"]', $focus[2][0]);
         $this->assertStringContainsString('outline-width: 5px !important', $focus[2][1]);
         $this->assertStringContainsString('outline-offset: -5px !important', $focus[2][1]);
-        $current = self::rules_with('html[data-a11y-colour] body:not(#la-weight) :where(.nav-link.active, .nav-link[aria-current]');
-        $this->assertCount(1, $current, 'a current item moves the ring in, under every scheme');
-        $this->assertStringContainsString('.courseindex-item.pageitem', $current[0][0]);
-        $this->assertStringContainsString('.mds-nav-pill--selected', $current[0][0]);
-        $this->assertStringContainsString('outline-offset: -4px !important', $current[0][1]);
+        $this->assertStringContainsString('outline-offset: var(--la-focus-offset, -2px) !important', $focus[0][1],
+            'a current item moves the ring in through the variable the chosen rule sets');
+        $this->assertCount(0, self::rules_with('body:not(#la-weight) :where(.nav-link.active, .nav-link[aria-current]'),
+            'no second list of current items');
         $this->assertStringNotContainsString('outline-offset: 2px !important', implode('', array_column($token, 1)));
         $selection = self::rules_with('html[data-a11y-tokens~="selection"]');
         $this->assertCount(1, $selection);
@@ -732,7 +731,7 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringContainsString('outline: 2px solid var(--a11y-mark) !important', $ring[0][1]);
         [, $rules] = self::state_marks();
         $this->assertContains($ring[0], $rules, 'in section 7a');
-        $this->assertStringContainsString('outline-offset: -2px !important', $ring[0][1]);
+        $this->assertStringContainsString('outline-offset: var(--la-focus-offset, -2px) !important', $ring[0][1]);
         $nofill = self::rules_with('html[data-a11y-colour]:not([data-a11y-tokens~="focus"]) body :where(a:not(.nav-link, .mds-nav-pill))');
         $this->assertCount(1, $nofill);
         $this->assertStringContainsString('background-color: transparent !important', $nofill[0][1]);
@@ -831,12 +830,7 @@ final class styles_test extends \advanced_testcase {
      */
     public function test_state_classes_named_once(): void {
         [, $rules] = self::state_marks();
-        // The chosen kind has a twin rule that adds the hover surface on schemes without their own active colour
-        // (VS Code keeps its theme fill); it repeats the chosen list by design and is not a second owner.
-        $twin = 'html[data-a11y-colour]:not([data-a11y-tokens~="active"])';
-        $owners = array_filter($rules, fn($r) => !str_starts_with($r[0], $twin));
-        $this->assertCount(count($rules) - 1, $owners, 'one twin rule');
-        $selectors = implode("\n", array_column($owners, 0));
+        $selectors = implode("\n", array_column($rules, 0));
         foreach (self::state_classes() as $kind => $classes) {
             foreach ($classes as $class) {
                 $this->assertSame(1, substr_count($selectors, $class . ',') + substr_count($selectors, $class . ')'),
@@ -874,11 +868,10 @@ final class styles_test extends \advanced_testcase {
     public function test_state_marks_chosen(): void {
         [, $rules] = self::state_marks();
         $chosen = array_values(array_filter($rules, fn($r) => str_contains($r[0], '.page-item.active > .page-link')));
-        $this->assertCount(2, $chosen);
+        $this->assertCount(1, $chosen, 'one rule names the chosen items');
         $this->assertStringContainsString('box-shadow: inset 0 0 0 2px var(--a11y-mark) !important', $chosen[0][1]);
-        $this->assertStringNotContainsString('background-color', $chosen[0][1], 'VS Code keeps the theme fill');
-        $this->assertStringContainsString(':not([data-a11y-tokens~="active"])', $chosen[1][0]);
-        $this->assertStringContainsString('background-color: var(--a11y-hover) !important', $chosen[1][1]);
+        $this->assertStringContainsString('background-color: var(--a11y-hover) !important', $chosen[0][1]);
+        $this->assertStringContainsString('--la-focus-offset: -4px;', $chosen[0][1]);
         $this->assertStringNotContainsString('font-weight', implode('', array_column($rules, 1)), 'no bold: it shifts layout');
         $rows = array_values(array_filter($rules, fn($r) => str_contains($r[0], 'tr.selectedrow')));
         $this->assertCount(3, $rows, 'every cell, the first and the last');
