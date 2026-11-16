@@ -830,7 +830,11 @@ final class styles_test extends \advanced_testcase {
      */
     public function test_state_classes_named_once(): void {
         [, $rules] = self::state_marks();
-        $selectors = implode("\n", array_column($rules, 0));
+        // The status icon rule and the dot rule read --la-dot for every status kind, so they repeat the status text
+        // classes: CSS cannot select an element by a custom property it carries (style queries are not in every browser).
+        $owners = array_filter($rules, fn($r) => !str_contains($r[0], '::before') && !str_contains($r[0], ':where(i, .icon, .fa'));
+        $this->assertCount(count($rules) - 2, $owners, 'only those two rules repeat them');
+        $selectors = implode("\n", array_column($owners, 0));
         foreach (self::state_classes() as $kind => $classes) {
             foreach ($classes as $class) {
                 $this->assertSame(1, substr_count($selectors, $class . ',') + substr_count($selectors, $class . ')'),
@@ -843,7 +847,8 @@ final class styles_test extends \advanced_testcase {
     }
 
     /**
-     * No rule after 7a sets an edge, an outline, opacity or font style on a state class, so nothing undoes a mark.
+     * No rule after 7a sets an edge, an outline, opacity or font style on a state class, or the content, background or
+     * display of a status dot, so nothing undoes a mark.
      */
     public function test_nothing_after_state_marks_undoes_them(): void {
         $raw = file_get_contents(__DIR__ . '/../styles.css');
@@ -857,6 +862,10 @@ final class styles_test extends \advanced_testcase {
                 }
                 $this->assertDoesNotMatchRegularExpression('/(^|[;\s])(box-shadow|outline|outline-color|outline-style|outline-width|opacity|font-style)\s*:/',
                     $r[2], trim($r[1]) . " sets a mark property on $class");
+                if (str_contains($r[1], '::before')) {
+                    $this->assertDoesNotMatchRegularExpression('/(^|[;\s])(content|background|background-color|display)\s*:/',
+                        $r[2], trim($r[1]) . " changes the status dot of $class");
+                }
             }
         }
     }
@@ -908,14 +917,24 @@ final class styles_test extends \advanced_testcase {
      */
     public function test_state_marks_status(): void {
         [, $rules] = self::state_marks();
-        $all = implode("\n", array_column($rules, 1));
-        foreach (['.text-success' => 'var(--a11y-ok)', '.text-warning' => 'var(--a11y-warn)', '.text-danger' => 'var(--a11y-bad)'] as $class => $colour) {
-            $r = array_values(array_filter($rules, fn($x) => str_contains($x[0], $class)));
-            $this->assertStringContainsString('color: ' . $colour . ' !important', $r[0][1], $class);
-            $this->assertStringNotContainsString('text-decoration', $r[0][1], $class . ': no underline');
-            $this->assertStringNotContainsString('font-weight', $r[0][1], $class . ': no bold');
+        foreach (['.text-success' => 'ok', '.text-warning' => 'warn', '.text-danger' => 'bad'] as $class => $kind) {
+            $r = array_values(array_filter($rules, fn($x) => str_contains($x[0], ':where(' . $class)));
+            $this->assertStringContainsString('--la-dot: var(--a11y-' . $kind . '-mark);', $r[0][1], $class);
+            $this->assertStringContainsString('color: var(--a11y-text) !important', $r[0][1], $class . ': the words keep the text colour');
         }
-        $this->assertStringNotContainsString('content:', $all, 'no generated text');
+        $dots = array_values(array_filter($rules, fn($x) => str_contains($x[0], '::before') && str_contains($x[0], '.text-success')));
+        $this->assertCount(1, $dots, 'one dot rule');
+        $this->assertStringContainsString('content: "" !important', $dots[0][1], 'nothing for assistive technology to read');
+        $this->assertStringContainsString('background-color: var(--la-dot) !important', $dots[0][1]);
+        $this->assertStringContainsString('display: var(--la-dot-display, inline-block) !important', $dots[0][1]);
+        foreach (['i, .icon, .fa, [class*="fa-"], svg, img', '.badge', ':has('] as $excluded) {
+            $this->assertStringContainsString($excluded, $dots[0][0], 'no dot on ' . $excluded);
+        }
+        $icons = array_values(array_filter($rules, fn($x) => str_contains($x[0], ':where(i, .icon, .fa')));
+        $this->assertCount(1, $icons);
+        $this->assertStringContainsString('color: var(--la-dot) !important', $icons[0][1], 'a status icon takes the mark colour');
+        $cells = array_values(array_filter($rules, fn($x) => str_contains($x[0], 'td.table-success')));
+        $this->assertStringContainsString('--la-dot-display: none;', $cells[0][1], 'no dot inside a bordered status cell');
     }
 
     /**

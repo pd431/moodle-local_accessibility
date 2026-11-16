@@ -468,18 +468,21 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
        is --la-status, so a cell in a ticked row shows both the row's box and its own border (the chosen rows below). */
     html[data-a11y-colour] body:not(#la-weight) :where(.submissionstatussubmitted, .submissiongraded, .earlysubmission, td.table-success, th.table-success, tr.table-success > *) {
         --la-status: var(--a11y-ok-mark);
+        --la-dot-display: none;
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
         background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
         box-shadow: inset 0 0 0 2px var(--la-status) !important; /* stylelint-disable-line declaration-no-important */
     }
     html[data-a11y-colour] body:not(#la-weight) :where(.submissionstatusdraft, .latesubmission, td.table-warning, th.table-warning, tr.table-warning > *) {
         --la-status: var(--a11y-warn-mark);
+        --la-dot-display: none;
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
         background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
         box-shadow: inset 0 0 0 2px var(--la-status) !important; /* stylelint-disable-line declaration-no-important */
     }
     html[data-a11y-colour] body:not(#la-weight) :where(td.table-danger, th.table-danger, tr.table-danger > *) {
         --la-status: var(--a11y-bad-mark);
+        --la-dot-display: none;
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
         background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
         box-shadow: inset 0 0 0 2px var(--la-status) !important; /* stylelint-disable-line declaration-no-important */
@@ -488,6 +491,7 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
        cell, in the warning mark colour. */
     html[data-a11y-colour] body:not(#la-weight) :where(.quickgrademodified, td.ajaxoverridden) {
         --la-status: var(--a11y-warn-mark);
+        --la-dot-display: none;
         box-shadow: inset 0 0 0 2px var(--la-status) !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Chosen and current: the current page, breadcrumb (Moodle marks the current one only by being plain text at the
@@ -549,18 +553,40 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     html[data-a11y-colour] body:not(#la-weight) :where(.alert-info) {
         border-inline-start: 1em solid var(--a11y-link) !important; /* stylelint-disable-line declaration-no-important */
     }
-    /* Status text: a passing or failing grade, success, warning and danger text, an error message. Each keeps its
-       hue in the scheme's status colour for text (7:1 on every shade: classes/colour/scheme.php), with no underline
-       and no change of weight. A field with an error keeps Bootstrap's error icon and takes an edge in the danger mark
-       colour. */
+    /* Status text: a passing or failing grade, success, warning and danger text, an error message. The words keep the
+       scheme's text colour, at full contrast; a dot before them, in the status mark colour (3:1 on every shade:
+       classes/colour/scheme.php), carries the status. The dot is a ::before with no content, so assistive technology
+       reads nothing, sized in em and set inline, so the line keeps its height. Each kind sets --la-dot; the two rules
+       after them read it. */
     html[data-a11y-colour] body:not(#la-weight) :where(.text-success, .gradepass) {
-        color: var(--a11y-ok) !important; /* stylelint-disable-line declaration-no-important */
+        --la-dot: var(--a11y-ok-mark);
+        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
     }
     html[data-a11y-colour] body:not(#la-weight) :where(.text-warning) {
-        color: var(--a11y-warn) !important; /* stylelint-disable-line declaration-no-important */
+        --la-dot: var(--a11y-warn-mark);
+        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
     }
     html[data-a11y-colour] body:not(#la-weight) :where(.text-danger, .gradefail, .invalid-feedback) {
-        color: var(--a11y-bad) !important; /* stylelint-disable-line declaration-no-important */
+        --la-dot: var(--a11y-bad-mark);
+        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* An icon that carries a status class, or sits inside status text, is already a shape: it takes the mark colour,
+       and the text around it gets no dot (one mark per item). A Font Awesome icon draws its glyph with ::before, so the
+       dot never applies to an icon, an image or a badge. */
+    html[data-a11y-colour] body:not(#la-weight) :where(.text-success, .gradepass, .text-warning, .text-danger, .gradefail, .invalid-feedback):where(i, .icon, .fa, [class*="fa-"], svg, img), html[data-a11y-colour] body:not(#la-weight) :where(.text-success, .gradepass, .text-warning, .text-danger, .gradefail, .invalid-feedback) :where(i, .icon, .fa, [class*="fa-"], svg, img) {
+        color: var(--la-dot) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* The dot. --la-dot-display is none inside a status cell, which already has its border, so a status word there gets
+       no second mark. */
+    html[data-a11y-colour] body:not(#la-weight) :where(.text-success, .gradepass, .text-warning, .text-danger, .gradefail, .invalid-feedback):not(i, .icon, .fa, [class*="fa-"], svg, img, .badge, :has(i, .icon, .fa, [class*="fa-"], svg, img))::before {
+        content: "" !important; /* stylelint-disable-line declaration-no-important */
+        display: var(--la-dot-display, inline-block) !important; /* stylelint-disable-line declaration-no-important */
+        width: 0.75em !important; /* stylelint-disable-line declaration-no-important */
+        height: 0.75em !important; /* stylelint-disable-line declaration-no-important */
+        margin-inline-end: 0.35em !important; /* stylelint-disable-line declaration-no-important */
+        border-radius: 50% !important; /* stylelint-disable-line declaration-no-important */
+        vertical-align: -0.05em !important; /* stylelint-disable-line declaration-no-important */
+        background-color: var(--la-dot) !important; /* stylelint-disable-line declaration-no-important */
     }
     html[data-a11y-colour] body:not(#la-weight) :where(.is-invalid) {
         border-color: var(--a11y-bad-mark) !important; /* stylelint-disable-line declaration-no-important */
