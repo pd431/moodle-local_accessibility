@@ -834,8 +834,11 @@ final class styles_test extends \advanced_testcase {
         [, $rules] = self::state_marks();
         // The status icon rule and the dot rule read --la-dot for every status kind, so they repeat the status text
         // classes: CSS cannot select an element by a custom property it carries (style queries are not in every browser).
-        $owners = array_filter($rules, fn($r) => !(str_contains($r[0], '::before') && str_contains($r[0], '.text-success')) && !str_contains($r[0], ':where(i, .icon, .fa'));
-        $this->assertCount(count($rules) - 2, $owners, 'only those two rules repeat them');
+        // The chosen kind's hover-surface twin repeats the chosen list too (VS Code keeps its own fills per element).
+        $twin = 'html[data-a11y-colour]:not([data-a11y-tokens~="active"])';
+        $owners = array_filter($rules, fn($r) => !(str_contains($r[0], '::before') && str_contains($r[0], '.text-success'))
+            && !str_contains($r[0], ':where(i, .icon, .fa') && !str_starts_with($r[0], $twin));
+        $this->assertCount(count($rules) - 3, $owners, 'only those three rules repeat them');
         $selectors = implode("\n", array_column($owners, 0));
         foreach (self::state_classes() as $kind => $classes) {
             foreach ($classes as $class) {
@@ -879,10 +882,12 @@ final class styles_test extends \advanced_testcase {
     public function test_state_marks_chosen(): void {
         [, $rules] = self::state_marks();
         $chosen = array_values(array_filter($rules, fn($r) => str_contains($r[0], '.page-item.active > .page-link')));
-        $this->assertCount(1, $chosen, 'one rule names the chosen items');
+        $this->assertCount(2, $chosen, 'the chosen rule and its hover-surface twin');
         $this->assertStringContainsString('box-shadow: inset 0 0 0 2px var(--a11y-mark) !important', $chosen[0][1]);
-        $this->assertStringContainsString('background-color: var(--a11y-hover) !important', $chosen[0][1]);
+        $this->assertStringNotContainsString('background-color', $chosen[0][1], 'VS Code keeps its own fills');
         $this->assertStringContainsString('--la-focus-offset: -4px;', $chosen[0][1]);
+        $this->assertStringContainsString(':not([data-a11y-tokens~="active"])', $chosen[1][0]);
+        $this->assertStringContainsString('background-color: var(--a11y-hover) !important', $chosen[1][1]);
         $this->assertStringNotContainsString('font-weight', implode('', array_column($rules, 1)), 'no bold: it shifts layout');
         $rows = array_values(array_filter($rules, fn($r) => str_contains($r[0], 'tr.selectedrow')));
         $this->assertCount(3, $rows, 'every cell, the first and the last');
