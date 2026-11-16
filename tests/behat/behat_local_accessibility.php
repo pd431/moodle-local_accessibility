@@ -447,7 +447,8 @@ class behat_local_accessibility extends behat_base {
     }
 
     /**
-     * Check that two elements' text colours, or their status marks (first shadow or leading border), differ in hue and
+     * Check that two elements' text colours, or their status marks (the dot before them, the first shadow or the
+     * leading border), differ in hue and
      * lightness by a CIE76 Delta E of 15 or more. This is not
      * the look-different rule: it records a state Moodle and the plugin tell apart by colour alone (status text against
      * plain text, one status against another), which is accepted for status colours. The look-different step still
@@ -476,10 +477,12 @@ class behat_local_accessibility extends behat_base {
                 return [116 * t(y) - 16, 500 * (t(x) - t(y)), 200 * (t(y) - t(z))];
             };
             const ink = (el) => over(parse(getComputedStyle(el).color), behind(el));
-            // A status mark: the colour of the first shadow, else of the leading border.
+            // A status mark: the colour of the dot before it, else of the first shadow, else of the leading border.
             const mark = (el) => {
                 const s = getComputedStyle(el);
-                const c = parse(s.boxShadow) || (parseFloat(s.borderInlineStartWidth) > 0 ? parse(s.borderInlineStartColor) : null);
+                const dot = getComputedStyle(el, "::before");
+                const c = (dot.content === "\"\"" && dot.display !== "none" ? parse(dot.backgroundColor) : null) || parse(s.boxShadow) ||
+                    (parseFloat(s.borderInlineStartWidth) > 0 ? parse(s.borderInlineStartColor) : null);
                 return c ? over(c, behind(el)) : null;
             };
             const de = (x, y) => {
@@ -560,9 +563,20 @@ class behat_local_accessibility extends behat_base {
                     if (!p.content || p.content === "none" || p.content === "normal") {
                         return "";
                     }
+                    if (p.display === "none") {
+                        return "";
+                    }
                     const c = parse(p.backgroundColor);
-                    return p.content !== "\"\"" || (c && c[3] > 0) || p.backgroundImage !== "none" ||
-                        parseFloat(p.borderTopWidth) > 0 ? p.content + " " + p.backgroundColor : "";
+                    if (p.content === "\"\"") {
+                        // An empty pseudo-element is a mark only when it is drawn: a filled shape with a size, 3:1
+                        // against what is behind the element.
+                        const size = parseFloat(p.width) > 0 && parseFloat(p.height) > 0;
+                        const filled = c && c[3] > 0 && ratio(over(c, back), back) >= 3;
+                        // Its shape counts as a mark, not its colour: two dots of different hues are the same mark.
+                        return size && (filled || p.backgroundImage !== "none" || parseFloat(p.borderTopWidth) > 0) ?
+                            "shape " + p.width + " " + p.height + " " + p.borderRadius : "";
+                    }
+                    return p.content;
                 };
                 const icons = [...el.querySelectorAll("i.icon, i.fa, .icon, img, svg")].filter((i) => i.checkVisibility())
                     .map((i) => i.tagName === "IMG" ? "img" : (i.getAttribute("class") || i.tagName).split(/\s+/)
