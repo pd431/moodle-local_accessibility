@@ -539,18 +539,19 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         background-color: var(--a11y-field) !important; /* stylelint-disable-line declaration-no-important */
         border: 2px solid var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
     }
-    /* Badges and pills, painted like alerts: every badge but the primary, light and dark ones and the quiz's
+    /* Badges and pills, painted like alerts: every badge that has a colour class (bg-*, badge-*, text-bg-*; an
+       uncoloured badge, such as an empty activity badge, stays as Moodle draws it), but the primary, light and dark ones and the quiz's
        correctness badges (which Moodle colours by its own .correct, .partiallycorrect and .incorrect) takes the second surface,
        the scheme's text colour and a 1px edge in the border colour (else the text colour), so a pill still reads as a
        pill on a surface of its own shade; VS Code's border-token edge is the same edge, not a second one. Its links
        and icons take the text colour. A coloured badge's leading edge is its marker (below): this rule carries no
        weight beyond the id's (all in :where), so the marker rule after it wins. Navigation pills are not badges. */
-    html[data-a11y-colour] body:not(#la-weight) :where(.badge:not(.bg-primary, .badge-primary, .text-bg-primary, .bg-light, .badge-light, .text-bg-light, .bg-dark, .badge-dark, .text-bg-dark, .correctness)) {
+    html[data-a11y-colour] body:not(#la-weight) :where(.badge:is([class*="bg-"], [class*="badge-"]):not(.bg-primary, .badge-primary, .text-bg-primary, .bg-light, .badge-light, .text-bg-light, .bg-dark, .badge-dark, .text-bg-dark, .correctness)) {
         background-color: var(--a11y-surface2) !important; /* stylelint-disable-line declaration-no-important */
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
         border: 1px solid var(--a11y-border, var(--a11y-text)) !important; /* stylelint-disable-line declaration-no-important */
     }
-    html[data-a11y-colour] body:not(#la-weight) :where(.badge:not(.bg-primary, .badge-primary, .text-bg-primary, .bg-light, .badge-light, .text-bg-light, .bg-dark, .badge-dark, .text-bg-dark, .correctness)) :where(a, i, .icon, svg) {
+    html[data-a11y-colour] body:not(#la-weight) :where(.badge:is([class*="bg-"], [class*="badge-"]):not(.bg-primary, .badge-primary, .text-bg-primary, .bg-light, .badge-light, .text-bg-light, .bg-dark, .badge-dark, .text-bg-dark, .correctness)) :where(a, i, .icon, svg) {
         color: inherit !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Alerts and coloured badges: section 7 gives every alert the second surface and the text colour; the type shows

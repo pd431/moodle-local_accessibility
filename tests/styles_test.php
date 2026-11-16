@@ -991,7 +991,7 @@ final class styles_test extends \advanced_testcase {
      */
     public function test_state_marks_badges(): void {
         [, $rules] = self::state_marks();
-        $shape = array_values(array_filter($rules, fn($x) => str_ends_with($x[0], ':where(.badge:not(.bg-primary, .badge-primary, .text-bg-primary, .bg-light, .badge-light, .text-bg-light, .bg-dark, .badge-dark, .text-bg-dark, .correctness))')));
+        $shape = array_values(array_filter($rules, fn($x) => str_ends_with($x[0], ':where(.badge:is([class*="bg-"], [class*="badge-"]):not(.bg-primary, .badge-primary, .text-bg-primary, .bg-light, .badge-light, .text-bg-light, .bg-dark, .badge-dark, .text-bg-dark, .correctness))')));
         $this->assertCount(1, $shape);
         $this->assertStringContainsString('background-color: var(--a11y-surface2) !important', $shape[0][1]);
         $this->assertStringContainsString('color: var(--a11y-text) !important', $shape[0][1]);
