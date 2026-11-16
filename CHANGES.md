@@ -19,7 +19,8 @@ status text and as solid borders and markers.
   border in the warning colour. A status cell in a ticked row shows both marks.
 - Alerts show their type as a solid marker 1em wide at the leading edge, in the type's colour (info in the link
   colour). Badges and pills are painted the same way: the second surface, the scheme's text colour, a 1px edge, and for a
-  success, warning, danger or info badge a marker 0.75em wide. Primary, light and dark badges keep the theme's colours.
+  success, warning, danger or info badge a marker 1em wide in place of its leading edge. Primary, light and dark badges
+  keep the theme's colours.
   Coloured buttons are not painted yet.
 - Status text (success, warning and danger text, passing and failing grades, error messages) keeps the scheme's text
   colour, with a dot before it in the status mark colour. An icon that carries a status takes the mark colour instead.
