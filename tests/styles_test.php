@@ -979,23 +979,24 @@ final class styles_test extends \advanced_testcase {
         foreach (['.alert-success' => 'ok-mark', '.alert-warning' => 'warn-mark', '.alert-danger' => 'bad-mark', '.alert-info' => 'link'] as $class => $token) {
             $r = array_values(array_filter($rules, fn($x) => str_contains($x[0], $class)));
             $this->assertCount(1, $r, $class);
-            $this->assertStringContainsString('border-inline-start: var(--la-marker-width, 1em) solid var(--a11y-' . $token . ') !important', $r[0][1], $class);
+            $this->assertStringContainsString('border-inline-start: 1em solid var(--a11y-' . $token . ') !important', $r[0][1], $class);
             $this->assertStringContainsString('.badge:is(', $r[0][0], $class . ': one rule for the alert and the badge of that type');
         }
     }
 
     /**
-     * State marks: badges and pills are painted like alerts: second surface, text colour, a 1px edge, and for a coloured
-     * badge a 0.75em leading marker; primary, light and dark badges are left alone; nothing inside takes another colour.
+     * State marks: badges and pills are painted like alerts: second surface, text colour, a 1px edge in the border or
+     * text colour, and for a coloured badge a 1em leading marker in place of that side's edge; primary, light and dark
+     * badges are left alone.
      */
     public function test_state_marks_badges(): void {
         [, $rules] = self::state_marks();
         $shape = array_values(array_filter($rules, fn($x) => str_ends_with($x[0], ':where(.badge):not(.bg-primary, .badge-primary, .text-bg-primary, .bg-light, .badge-light, .text-bg-light, .bg-dark, .badge-dark, .text-bg-dark)')));
         $this->assertCount(1, $shape);
-        $this->assertStringContainsString('--la-marker-width: 0.75em;', $shape[0][1]);
         $this->assertStringContainsString('background-color: var(--a11y-surface2) !important', $shape[0][1]);
         $this->assertStringContainsString('color: var(--a11y-text) !important', $shape[0][1]);
-        $this->assertStringContainsString('border: 1px solid var(--a11y-text) !important', $shape[0][1]);
+        $this->assertStringContainsString('border: 1px solid var(--a11y-border, var(--a11y-text)) !important', $shape[0][1]);
+        $this->assertStringNotContainsString('--la-marker-width', file_get_contents(__DIR__ . '/../styles.css'), 'one marker width, 1em');
         $raw = file_get_contents(__DIR__ . '/../styles.css');
         $this->assertLessThan(strpos($raw, ':where(.alert-success, .badge:is('), strpos($raw, ':where(.badge):not(.bg-primary'),
             'the badge edge comes before the marker that replaces its leading side');
