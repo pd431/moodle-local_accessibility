@@ -881,7 +881,7 @@ final class styles_test extends \advanced_testcase {
         $chosen = array_values(array_filter($rules, fn($r) => str_contains($r[0], '.page-item.active > .page-link')));
         $this->assertCount(1, $chosen, 'one rule names the chosen items');
         $this->assertStringContainsString('box-shadow: inset 0 0 0 2px var(--a11y-mark) !important', $chosen[0][1]);
-        $this->assertStringContainsString('background-color: var(--a11y-chosen, var(--a11y-hover)) !important', $chosen[0][1]);
+        $this->assertStringContainsString('background-color: var(--a11y-hover) !important', $chosen[0][1]);
         $this->assertStringContainsString('--la-focus-offset: -4px;', $chosen[0][1]);
         $this->assertStringNotContainsString('font-weight', implode('', array_column($rules, 1)), 'no bold: it shifts layout');
         $rows = array_values(array_filter($rules, fn($r) => str_contains($r[0], 'tr.selectedrow')));

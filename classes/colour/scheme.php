@@ -326,16 +326,6 @@ final class scheme {
     ];
 
     /**
-     * The surface behind a chosen or current item: the hover surface, or for a scheme with its own active colour (VS Code
-     * dark high contrast) its second surface, as that scheme draws a selected item. Styles read it as --a11y-chosen.
-     *
-     * @return string normalised colour
-     */
-    public function chosen_surface(): string {
-        return $this->active !== null ? $this->ramp['surface2'] : $this->ramp['hover'];
-    }
-
-    /**
      * Status mark colours under this scheme (the dot before status text, a status cell's border, an alert's marker):
      * ok, warn and bad, each at least 3:1 on every shade. Each starts from the fixed set for the scheme's mode (light or
      * dark); where a fixed value falls short on this scheme's shades, its lightness is moved until it passes (hue kept),
@@ -370,7 +360,7 @@ final class scheme {
     public function css_properties(): string {
         $props = $this->ramp + ['text' => $this->text, 'link' => $this->link, 'border' => $this->border,
             'focus' => $this->focus, 'selection' => $this->selection, 'selection-text' => $this->selectiontext,
-            'active' => $this->active, 'mark' => $this->mark(), 'chosen' => $this->chosen_surface()] + $this->status_colours();
+            'active' => $this->active, 'mark' => $this->mark()] + $this->status_colours();
         foreach ($this->icon_colours() as $id => $hex) {
             $props['icon-' . $id] = $hex;
         }
