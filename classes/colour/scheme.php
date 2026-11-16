@@ -319,6 +319,38 @@ final class scheme {
         return self::best_bw($this->ramp);
     }
 
+    /** @var array<string, array<string, string>> Status text colours by scheme mode: hue kept, aiming at 7:1 on every shade. */
+    public const STATUS_TEXT = [
+        'dark' => ['ok' => '#6fdc8c', 'warn' => '#ffc857', 'bad' => '#ffa59c'],
+        'light' => ['ok' => '#1b5e20', 'warn' => '#7a4a00', 'bad' => '#9b1c1c'],
+    ];
+
+    /** @var array<string, array<string, string>> Status mark colours (cell borders, alert markers) by mode, 3:1 floor. */
+    public const STATUS_MARK = [
+        'dark' => ['ok' => '#5cb85c', 'warn' => '#f0ad4e', 'bad' => '#ff6b6b'],
+        'light' => ['ok' => '#2e7d32', 'warn' => '#b26a00', 'bad' => '#c62828'],
+    ];
+
+    /**
+     * Status colours under this scheme: for each of ok, warn and bad, a text colour that reaches 7:1 and a mark colour
+     * that reaches 3:1 on every shade. Each starts from the fixed set for the scheme's mode (light or dark); where a
+     * fixed value falls short on this scheme's shades, its lightness is moved until it passes (hue kept), and if no
+     * lightness of that hue passes, the scheme's text colour stands in. Styles read them as --a11y-ok, --a11y-warn,
+     * --a11y-bad and --a11y-ok-mark, --a11y-warn-mark, --a11y-bad-mark.
+     *
+     * @return array<string, string> e.g. ['ok' => '#71de8e', ..., 'ok-mark' => '#5cb85c', ...]
+     */
+    public function status_colours(): array {
+        $out = [];
+        foreach (self::STATUS_TEXT[$this->mode] as $name => $hex) {
+            $out[$name] = adjust::towards($hex, $this->ramp, contrast::AAA) ?? $this->text;
+        }
+        foreach (self::STATUS_MARK[$this->mode] as $name => $hex) {
+            $out[$name . '-mark'] = adjust::towards($hex, $this->ramp, 3.0) ?? $this->text;
+        }
+        return $out;
+    }
+
     /**
      * Activity purpose colours under this scheme (see purpose).
      *
@@ -337,7 +369,7 @@ final class scheme {
     public function css_properties(): string {
         $props = $this->ramp + ['text' => $this->text, 'link' => $this->link, 'border' => $this->border,
             'focus' => $this->focus, 'selection' => $this->selection, 'selection-text' => $this->selectiontext,
-            'active' => $this->active, 'mark' => $this->mark()];
+            'active' => $this->active, 'mark' => $this->mark()] + $this->status_colours();
         foreach ($this->icon_colours() as $id => $hex) {
             $props['icon-' . $id] = $hex;
         }

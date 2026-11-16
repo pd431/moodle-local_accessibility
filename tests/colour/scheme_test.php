@@ -286,4 +286,27 @@ final class scheme_test extends \advanced_testcase {
         $this->assertSame('#000000', $schemes['custom-exact-low-link']->mark(), 'the text colour when the link is too faint');
         $this->assertSame('#000000', $schemes['custom-exact-low-both']->mark(), 'black or white when both are too faint');
     }
+
+    /**
+     * Status colours: text reaches 7:1 and marks 3:1 on every shade of every built-in scheme and of a spread of custom
+     * ones; a built-in scheme keeps the fixed value wherever it already passes, and only lightness moves where it does not.
+     */
+    public function test_status_colours_meet_floors(): void {
+        $schemes = scheme::presets();
+        $schemes['custom-dark'] = scheme::custom('#101820', '#f0f0f0', '#80c0ff', false);
+        $schemes['custom-light'] = scheme::custom('#fffbe6', '#202020', '#0050a0', false);
+        $schemes['custom-mid'] = scheme::custom('#777777', '#ffffff', '#ffff00', false);
+        foreach ($schemes as $id => $s) {
+            $colours = $s->status_colours();
+            foreach (['ok', 'warn', 'bad'] as $name) {
+                $this->assertGreaterThanOrEqual(contrast::AAA, contrast::worst($colours[$name], $s->ramp), "$id $name text");
+                $this->assertGreaterThanOrEqual(3.0, contrast::worst($colours[$name . '-mark'], $s->ramp), "$id $name mark");
+                $this->assertStringContainsString('--a11y-' . $name . ':' . $colours[$name] . ';', $s->css_properties());
+                $this->assertStringContainsString('--a11y-' . $name . '-mark:' . $colours[$name . '-mark'] . ';', $s->css_properties());
+            }
+        }
+        $vscode = scheme::presets()['vscodehc']->status_colours();
+        $this->assertSame(scheme::STATUS_TEXT['dark']['ok'], $vscode['ok'], 'a passing fixed value is kept');
+        $this->assertSame(scheme::STATUS_MARK['dark']['bad'], $vscode['bad-mark']);
+    }
 }
