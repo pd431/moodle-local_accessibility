@@ -991,14 +991,14 @@ final class styles_test extends \advanced_testcase {
      */
     public function test_state_marks_badges(): void {
         [, $rules] = self::state_marks();
-        $shape = array_values(array_filter($rules, fn($x) => str_ends_with($x[0], ':where(.badge):not(.bg-primary, .badge-primary, .text-bg-primary, .bg-light, .badge-light, .text-bg-light, .bg-dark, .badge-dark, .text-bg-dark)')));
+        $shape = array_values(array_filter($rules, fn($x) => str_ends_with($x[0], ':where(.badge:not(.bg-primary, .badge-primary, .text-bg-primary, .bg-light, .badge-light, .text-bg-light, .bg-dark, .badge-dark, .text-bg-dark))')));
         $this->assertCount(1, $shape);
         $this->assertStringContainsString('background-color: var(--a11y-surface2) !important', $shape[0][1]);
         $this->assertStringContainsString('color: var(--a11y-text) !important', $shape[0][1]);
         $this->assertStringContainsString('border: 1px solid var(--a11y-border, var(--a11y-text)) !important', $shape[0][1]);
         $this->assertStringNotContainsString('--la-marker-width', file_get_contents(__DIR__ . '/../styles.css'), 'one marker width, 1em');
         $raw = file_get_contents(__DIR__ . '/../styles.css');
-        $this->assertLessThan(strpos($raw, ':where(.alert-success, .badge:is('), strpos($raw, ':where(.badge):not(.bg-primary'),
+        $this->assertLessThan(strpos($raw, ':where(.alert-success, .badge:is('), strpos($raw, ':where(.badge:not(.bg-primary'),
             'the badge edge comes before the marker that replaces its leading side');
     }
 

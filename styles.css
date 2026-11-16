@@ -542,14 +542,14 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     /* Badges and pills, painted like alerts: every badge but the primary, light and dark ones takes the second surface,
        the scheme's text colour and a 1px edge in the border colour (else the text colour), so a pill still reads as a
        pill on a surface of its own shade; VS Code's border-token edge is the same edge, not a second one. Its links
-       and icons take the text colour. A coloured badge's leading edge is its marker (below). Navigation pills are not
-       badges. */
-    html[data-a11y-colour] body:not(#la-weight) :where(.badge):not(.bg-primary, .badge-primary, .text-bg-primary, .bg-light, .badge-light, .text-bg-light, .bg-dark, .badge-dark, .text-bg-dark) {
+       and icons take the text colour. A coloured badge's leading edge is its marker (below): this rule carries no
+       weight beyond the id's (all in :where), so the marker rule after it wins. Navigation pills are not badges. */
+    html[data-a11y-colour] body:not(#la-weight) :where(.badge:not(.bg-primary, .badge-primary, .text-bg-primary, .bg-light, .badge-light, .text-bg-light, .bg-dark, .badge-dark, .text-bg-dark)) {
         background-color: var(--a11y-surface2) !important; /* stylelint-disable-line declaration-no-important */
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
         border: 1px solid var(--a11y-border, var(--a11y-text)) !important; /* stylelint-disable-line declaration-no-important */
     }
-    html[data-a11y-colour] body:not(#la-weight) :where(.badge):not(.bg-primary, .badge-primary, .text-bg-primary, .bg-light, .badge-light, .text-bg-light, .bg-dark, .badge-dark, .text-bg-dark) :where(a, i, .icon, svg) {
+    html[data-a11y-colour] body:not(#la-weight) :where(.badge:not(.bg-primary, .badge-primary, .text-bg-primary, .bg-light, .badge-light, .text-bg-light, .bg-dark, .badge-dark, .text-bg-dark)) :where(a, i, .icon, svg) {
         color: inherit !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Alerts and coloured badges: section 7 gives every alert the second surface and the text colour; the type shows
