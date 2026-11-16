@@ -502,15 +502,16 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         outline: 2px dashed var(--a11y-mark) !important; /* stylelint-disable-line declaration-no-important */
         outline-offset: -3px !important; /* stylelint-disable-line declaration-no-important */
     }
-    /* Disabled: a control that cannot be used, and a field that cannot be edited. Section 7 gives it the same text
-       colour as the enabled control beside it, so it is faded to 0.6, as Bootstrap fades a disabled button (WCAG asks
-       no contrast of an inactive control). A field also gets a dashed edge in the text colour. */
-    html[data-a11y-colour] body:not(#la-weight) :where(:is(button, input, select, textarea, .btn):disabled, .btn.disabled, .dropdown-item.disabled, .nav-link.disabled, .list-group-item.disabled, .page-item.disabled > .page-link, :is(a, button, .btn, [role="button"], [role="menuitem"], [role="tab"])[aria-disabled="true"], .tox-tbtn--disabled, :is(.form-control, .form-select, .custom-select)[readonly]) {
+    /* Disabled: a control that cannot be used. Section 7 gives it the same text colour as the enabled control beside
+       it, so it is faded to 0.6, as Bootstrap fades a disabled button (WCAG asks no contrast of an inactive control). */
+    html[data-a11y-colour] body:not(#la-weight) :where(:is(button, input, select, textarea, .btn):disabled, .btn.disabled, .dropdown-item.disabled, .nav-link.disabled, .list-group-item.disabled, .page-item.disabled > .page-link, :is(a, button, .btn, [role="button"], [role="menuitem"], [role="tab"])[aria-disabled="true"], .tox-tbtn--disabled) {
         opacity: 0.6 !important; /* stylelint-disable-line declaration-no-important */
     }
-    html[data-a11y-colour] body:not(#la-weight) :where(:is(.form-control, .form-select, .custom-select):is(:disabled, [readonly])) {
-        border-style: dashed !important; /* stylelint-disable-line declaration-no-important */
-        border-color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+    /* Read only: a field whose text is content, so it is not faded. It keeps the field colour and takes a solid 2px
+       edge in the text colour, against an editable field's 1px. */
+    html[data-a11y-colour] body:not(#la-weight) :where(:is(.form-control, .form-select, .custom-select)[readonly]) {
+        background-color: var(--a11y-field) !important; /* stylelint-disable-line declaration-no-important */
+        border: 2px solid var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Status: a grade that passes or fails, a submission's status, a coloured table row, an alert's type, an error.
        Moodle tells them apart by green, amber and red, which a scheme replaces. Each takes the scheme's text colour

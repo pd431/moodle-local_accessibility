@@ -799,6 +799,7 @@ final class styles_test extends \advanced_testcase {
                 '.breadcrumb-item:last-child > span:only-child'],
             'changed' => ['.quickgrademodified', 'td.ajaxoverridden'],
             'disabled' => ['.btn.disabled', '.dropdown-item.disabled', '.nav-link.disabled', '.list-group-item.disabled', '.page-item.disabled > .page-link', '.tox-tbtn--disabled'],
+            'readonly' => ['[readonly]'],
             'status' => ['.gradepass', '.gradefail', '.submissionstatussubmitted', '.submissiongraded', '.submissionstatusdraft', '.latesubmission', 'td.table-success', 'td.table-warning', 'td.table-danger', 'tr.table-success > *',
                 'tr.table-warning > *', 'tr.table-danger > *'],
             'progress' => ['.progress-bar', '.progress'],
@@ -943,5 +944,16 @@ final class styles_test extends \advanced_testcase {
         $this->assertNotEmpty($r);
         $this->assertStringContainsString('font-style: italic !important', $r[0][1]);
         $this->assertStringContainsString('opacity: 1 !important', $r[0][1]);
+    }
+
+    /**
+     * State marks: a read-only field is not faded; it keeps the field colour with a solid 2px edge.
+     */
+    public function test_state_marks_readonly(): void {
+        [, $rules] = self::state_marks();
+        $r = array_values(array_filter($rules, fn($x) => str_contains($x[0], '[readonly]')));
+        $this->assertCount(1, $r);
+        $this->assertStringContainsString('border: 2px solid var(--a11y-text) !important', $r[0][1]);
+        $this->assertStringNotContainsString('opacity', $r[0][1]);
     }
 }
