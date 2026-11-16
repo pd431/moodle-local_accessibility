@@ -914,15 +914,13 @@ final class styles_test extends \advanced_testcase {
     public function test_state_marks_status(): void {
         [, $rules] = self::state_marks();
         $all = implode("\n", array_column($rules, 1));
-        $this->assertStringContainsString('background-image: linear-gradient(var(--a11y-mark), var(--a11y-mark)) !important', $all, 'success solid');
-        $this->assertStringContainsString('repeating-linear-gradient(to bottom, var(--a11y-mark) 0 4px', $all, 'warning dotted');
-        $this->assertStringContainsString('transparent 1.5px 2.5px, var(--a11y-mark) 2.5px 4px', $all, 'danger double');
-        $this->assertStringContainsString('border-inline-start-style: dotted !important', $all);
-        $this->assertStringContainsString('text-decoration-style: double !important', $all);
+        foreach (['.text-success' => 'var(--a11y-ok)', '.text-warning' => 'var(--a11y-warn)', '.text-danger' => 'var(--a11y-bad)'] as $class => $colour) {
+            $r = array_values(array_filter($rules, fn($x) => str_contains($x[0], $class)));
+            $this->assertStringContainsString('color: ' . $colour . ' !important', $r[0][1], $class);
+            $this->assertStringNotContainsString('text-decoration', $r[0][1], $class . ': no underline');
+            $this->assertStringNotContainsString('font-weight', $r[0][1], $class . ': no bold');
+        }
         $this->assertStringNotContainsString('content:', $all, 'no generated text');
-        $cells = array_values(array_filter($rules, fn($r) => str_contains($r[0], 'td.table-warning')));
-        $this->assertStringContainsString('box-shadow: none !important', $cells[0][1], 'the theme fill goes');
-
     }
 
     /**

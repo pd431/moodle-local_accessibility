@@ -524,7 +524,7 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     html[data-a11y-colour][dir="rtl"] {
         --la-lead: right;
     }
-    html[data-a11y-colour] body:not(#la-weight) :where(.gradepass, td.table-success, th.table-success, tr.table-success > *) {
+    html[data-a11y-colour] body:not(#la-weight) :where(td.table-success, th.table-success, tr.table-success > *) {
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
         background-size: 4px 100% !important; /* stylelint-disable-line declaration-no-important */
         background-repeat: no-repeat !important; /* stylelint-disable-line declaration-no-important */
@@ -558,7 +558,7 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         background-image: repeating-linear-gradient(to bottom, var(--a11y-mark) 0 4px, transparent 4px 8px) !important; /* stylelint-disable-line declaration-no-important */
         padding-inline-start: 0.75rem !important; /* stylelint-disable-line declaration-no-important */
     }
-    html[data-a11y-colour] body:not(#la-weight) :where(.gradefail, td.table-danger, th.table-danger, tr.table-danger > *) {
+    html[data-a11y-colour] body:not(#la-weight) :where(td.table-danger, th.table-danger, tr.table-danger > *) {
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
         background-size: 4px 100% !important; /* stylelint-disable-line declaration-no-important */
         background-repeat: no-repeat !important; /* stylelint-disable-line declaration-no-important */
@@ -579,32 +579,21 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         border-inline-start-color: var(--a11y-mark) !important; /* stylelint-disable-line declaration-no-important */
         border-inline-start-style: double !important; /* stylelint-disable-line declaration-no-important */
     }
-    html[data-a11y-colour] body:not(#la-weight) :where(.is-invalid) {
-        border-inline-start: 4px double var(--a11y-mark) !important; /* stylelint-disable-line declaration-no-important */
-    }
-    html[data-a11y-colour] body:not(#la-weight) :where(.text-success) {
-        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
-        text-decoration-line: underline !important; /* stylelint-disable-line declaration-no-important */
-        text-decoration-color: var(--a11y-mark) !important; /* stylelint-disable-line declaration-no-important */
-        text-decoration-thickness: 2px !important; /* stylelint-disable-line declaration-no-important */
-        text-underline-offset: 0.2em !important; /* stylelint-disable-line declaration-no-important */
-        text-decoration-style: solid !important; /* stylelint-disable-line declaration-no-important */
+    /* Status text: a passing or failing grade, success, warning and danger text, an error message. Each keeps its
+       hue in the scheme's status colour for text (7:1 on every shade: classes/colour/scheme.php), with no underline
+       and no change of weight. A field with an error keeps Bootstrap's error icon and takes an edge in the danger mark
+       colour. */
+    html[data-a11y-colour] body:not(#la-weight) :where(.text-success, .gradepass) {
+        color: var(--a11y-ok) !important; /* stylelint-disable-line declaration-no-important */
     }
     html[data-a11y-colour] body:not(#la-weight) :where(.text-warning) {
-        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
-        text-decoration-line: underline !important; /* stylelint-disable-line declaration-no-important */
-        text-decoration-color: var(--a11y-mark) !important; /* stylelint-disable-line declaration-no-important */
-        text-decoration-thickness: 2px !important; /* stylelint-disable-line declaration-no-important */
-        text-underline-offset: 0.2em !important; /* stylelint-disable-line declaration-no-important */
-        text-decoration-style: dotted !important; /* stylelint-disable-line declaration-no-important */
+        color: var(--a11y-warn) !important; /* stylelint-disable-line declaration-no-important */
     }
-    html[data-a11y-colour] body:not(#la-weight) :where(.text-danger, .invalid-feedback) {
-        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
-        text-decoration-line: underline !important; /* stylelint-disable-line declaration-no-important */
-        text-decoration-color: var(--a11y-mark) !important; /* stylelint-disable-line declaration-no-important */
-        text-decoration-thickness: 2px !important; /* stylelint-disable-line declaration-no-important */
-        text-underline-offset: 0.2em !important; /* stylelint-disable-line declaration-no-important */
-        text-decoration-style: double !important; /* stylelint-disable-line declaration-no-important */
+    html[data-a11y-colour] body:not(#la-weight) :where(.text-danger, .gradefail, .invalid-feedback) {
+        color: var(--a11y-bad) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-colour] body:not(#la-weight) :where(.is-invalid) {
+        border-color: var(--a11y-bad-mark) !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Progress: a bar's fill in the mark colour on a track of the second surface with a 1px edge in the text colour,
        so the filled part stands out from the empty part and the track from the page. */
