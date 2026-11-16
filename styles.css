@@ -539,19 +539,33 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         background-color: var(--a11y-field) !important; /* stylelint-disable-line declaration-no-important */
         border: 2px solid var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
     }
-    /* Alerts: section 7 gives every alert the second surface and the text colour; its type shows as a solid marker
-       1em wide at its leading edge, in the type's mark colour (info in the link colour). */
-    html[data-a11y-colour] body:not(#la-weight) :where(.alert-success) {
-        border-inline-start: 1em solid var(--a11y-ok-mark) !important; /* stylelint-disable-line declaration-no-important */
+    /* Badges and pills, painted like alerts: every badge but the primary, light and dark ones takes the second surface,
+       the scheme's text colour and a 1px edge in the text colour (one edge: it replaces VS Code's border-token edge), so
+       a pill still reads as a pill; its links and icons take the text colour. A coloured badge also carries the
+       leading marker of its type (below), 0.75em wide, the size of a status dot. Navigation pills are not badges. */
+    html[data-a11y-colour] body:not(#la-weight) :where(.badge):not(.bg-primary, .badge-primary, .text-bg-primary, .bg-light, .badge-light, .text-bg-light, .bg-dark, .badge-dark, .text-bg-dark) {
+        --la-marker-width: 0.75em;
+        background-color: var(--a11y-surface2) !important; /* stylelint-disable-line declaration-no-important */
+        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+        border: 1px solid var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
     }
-    html[data-a11y-colour] body:not(#la-weight) :where(.alert-warning, .environmenttable .warn) {
-        border-inline-start: 1em solid var(--a11y-warn-mark) !important; /* stylelint-disable-line declaration-no-important */
+    html[data-a11y-colour] body:not(#la-weight) :where(.badge):not(.bg-primary, .badge-primary, .text-bg-primary, .bg-light, .badge-light, .text-bg-light, .bg-dark, .badge-dark, .text-bg-dark) :where(a, i, .icon, svg) {
+        color: inherit !important; /* stylelint-disable-line declaration-no-important */
     }
-    html[data-a11y-colour] body:not(#la-weight) :where(.alert-danger) {
-        border-inline-start: 1em solid var(--a11y-bad-mark) !important; /* stylelint-disable-line declaration-no-important */
+    /* Alerts and coloured badges: section 7 gives every alert the second surface and the text colour; the type shows
+       as a solid marker at the leading edge in the type's mark colour (info in the link colour), 1em wide on an alert
+       and --la-marker-width on a badge. On a pill the thick leading border follows the rounded end. */
+    html[data-a11y-colour] body:not(#la-weight) :where(.alert-success, .badge:is(.bg-success, .badge-success, .text-bg-success)) {
+        border-inline-start: var(--la-marker-width, 1em) solid var(--a11y-ok-mark) !important; /* stylelint-disable-line declaration-no-important */
     }
-    html[data-a11y-colour] body:not(#la-weight) :where(.alert-info) {
-        border-inline-start: 1em solid var(--a11y-link) !important; /* stylelint-disable-line declaration-no-important */
+    html[data-a11y-colour] body:not(#la-weight) :where(.alert-warning, .environmenttable .warn, .badge:is(.bg-warning, .badge-warning, .text-bg-warning)) {
+        border-inline-start: var(--la-marker-width, 1em) solid var(--a11y-warn-mark) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-colour] body:not(#la-weight) :where(.alert-danger, .badge:is(.bg-danger, .badge-danger, .text-bg-danger)) {
+        border-inline-start: var(--la-marker-width, 1em) solid var(--a11y-bad-mark) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-colour] body:not(#la-weight) :where(.alert-info, .badge:is(.bg-info, .badge-info, .text-bg-info)) {
+        border-inline-start: var(--la-marker-width, 1em) solid var(--a11y-link) !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Status text: a passing or failing grade, success, warning and danger text, an error message. The words keep the
        scheme's text colour, at full contrast; a dot before them, in the status mark colour (3:1 on every shade:
