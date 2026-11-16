@@ -834,7 +834,7 @@ final class styles_test extends \advanced_testcase {
         [, $rules] = self::state_marks();
         // The status icon rule and the dot rule read --la-dot for every status kind, so they repeat the status text
         // classes: CSS cannot select an element by a custom property it carries (style queries are not in every browser).
-        $owners = array_filter($rules, fn($r) => !str_contains($r[0], '::before') && !str_contains($r[0], ':where(i, .icon, .fa'));
+        $owners = array_filter($rules, fn($r) => !(str_contains($r[0], '::before') && str_contains($r[0], '.text-success')) && !str_contains($r[0], ':where(i, .icon, .fa'));
         $this->assertCount(count($rules) - 2, $owners, 'only those two rules repeat them');
         $selectors = implode("\n", array_column($owners, 0));
         foreach (self::state_classes() as $kind => $classes) {
