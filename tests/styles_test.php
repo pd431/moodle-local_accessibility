@@ -802,6 +802,7 @@ final class styles_test extends \advanced_testcase {
             'readonly' => ['[readonly]'],
             'status' => ['.gradepass', '.gradefail', '.submissionstatussubmitted', '.submissiongraded', '.submissionstatusdraft', '.latesubmission', 'td.table-success', 'td.table-warning', 'td.table-danger', 'tr.table-success > *',
                 'tr.table-warning > *', 'tr.table-danger > *'],
+            'alert' => ['.alert-success', '.alert-warning', '.alert-danger', '.alert-info'],
             'progress' => ['.progress-bar', '.progress'],
             'hidden' => ['.dimmed_text', '.dimmed', '.usersuspended'],
         ];
@@ -953,5 +954,17 @@ final class styles_test extends \advanced_testcase {
         $this->assertCount(1, $r);
         $this->assertStringContainsString('border: 2px solid var(--a11y-text) !important', $r[0][1]);
         $this->assertStringNotContainsString('opacity', $r[0][1]);
+    }
+
+    /**
+     * State marks: an alert's type is a solid 1em marker at its leading edge in the type's mark colour.
+     */
+    public function test_state_marks_alerts(): void {
+        [, $rules] = self::state_marks();
+        foreach (['.alert-success' => 'ok-mark', '.alert-warning' => 'warn-mark', '.alert-danger' => 'bad-mark', '.alert-info' => 'link'] as $class => $token) {
+            $r = array_values(array_filter($rules, fn($x) => str_contains($x[0], $class)));
+            $this->assertCount(1, $r, $class);
+            $this->assertStringContainsString('border-inline-start: 1em solid var(--a11y-' . $token . ') !important', $r[0][1], $class);
+        }
     }
 }

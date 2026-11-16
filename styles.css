@@ -567,17 +567,19 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
         box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
     }
+    /* Alerts: section 7 gives every alert the second surface and the text colour; its type shows as a solid marker
+       1em wide at its leading edge, in the type's mark colour (info in the link colour). */
     html[data-a11y-colour] body:not(#la-weight) :where(.alert-success) {
-        border-inline-start-color: var(--a11y-mark) !important; /* stylelint-disable-line declaration-no-important */
-        border-inline-start-style: solid !important; /* stylelint-disable-line declaration-no-important */
+        border-inline-start: 1em solid var(--a11y-ok-mark) !important; /* stylelint-disable-line declaration-no-important */
     }
     html[data-a11y-colour] body:not(#la-weight) :where(.alert-warning, .environmenttable .warn) {
-        border-inline-start-color: var(--a11y-mark) !important; /* stylelint-disable-line declaration-no-important */
-        border-inline-start-style: dotted !important; /* stylelint-disable-line declaration-no-important */
+        border-inline-start: 1em solid var(--a11y-warn-mark) !important; /* stylelint-disable-line declaration-no-important */
     }
     html[data-a11y-colour] body:not(#la-weight) :where(.alert-danger) {
-        border-inline-start-color: var(--a11y-mark) !important; /* stylelint-disable-line declaration-no-important */
-        border-inline-start-style: double !important; /* stylelint-disable-line declaration-no-important */
+        border-inline-start: 1em solid var(--a11y-bad-mark) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-colour] body:not(#la-weight) :where(.alert-info) {
+        border-inline-start: 1em solid var(--a11y-link) !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Status text: a passing or failing grade, success, warning and danger text, an error message. Each keeps its
        hue in the scheme's status colour for text (7:1 on every shade: classes/colour/scheme.php), with no underline
