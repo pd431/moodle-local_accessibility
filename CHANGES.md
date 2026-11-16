@@ -3,12 +3,14 @@
 States keep their mark under every colour scheme. A scheme gives a state and its neighbour the same colours, so the
 current page, a ticked row, a disabled button or a failing grade looked like the items around it. Found by checking
 97 states on Moodle 4.5, 5.2 and 5.3 under every scheme, against upstream 3.0.9 and under core Boost and Boost Union.
-Revised after review on 16 November: no dashed, dotted or double lines; status colours return.
+Revised after review on 16 November: no dashed, dotted or double lines; status shows in colour again, as a dot before
+status text and as solid borders and markers.
 
 - Every scheme has a mark colour: its link colour, or its text colour where the link is under 3:1 on a surface. VS Code
   dark high contrast keeps its orange.
-- Every scheme has status colours for ok, warning and bad: for text, 7:1 on every surface; for marks, 3:1. They come
-  from two fixed sets, one for light and one for dark schemes, with lightness moved where a value falls short.
+- Every scheme has status mark colours for ok, warning and bad, 3:1 on every surface, from two fixed sets (the 3.1.4
+  colours for dark schemes, darker ones of the same tone for light schemes), with lightness moved where a value falls
+  short.
 - Chosen and current items (the current page, tab, pill, breadcrumb (also the plain last item Moodle shows), menu and
   list item, a pressed toggle or editor button, a ticked or active row, today in the calendar) are boxed in the mark
   colour on the hover surface. Before, only VS Code dark high contrast boxed them.
@@ -17,8 +19,9 @@ Revised after review on 16 November: no dashed, dotted or double lines; status c
   border in the warning colour. A status cell in a ticked row shows both marks.
 - Alerts show their type as a solid marker 1em wide at the leading edge, in the type's colour (info in the link
   colour).
-- Status text (success, warning and danger text, passing and failing grades, error messages) keeps its hue in the
-  scheme's status colours. A field with an error takes an edge in the danger colour.
+- Status text (success, warning and danger text, passing and failing grades, error messages) keeps the scheme's text
+  colour, with a dot before it in the status mark colour. An icon that carries a status takes the mark colour instead.
+  A field with an error takes an edge in the danger colour.
 - Disabled menu items, buttons, tabs, page links, editor buttons and fields are faded to 0.6. Read-only fields keep
   full contrast and take a solid 2px edge in the text colour.
 - A progress bar's fill is in the mark colour, on a track with an edge.
@@ -28,8 +31,8 @@ Revised after review on 16 November: no dashed, dotted or double lines; status c
 - Alert edges no longer use fixed hex colours.
 - Tests: the Behat step "should look different from" uses a 3:1 rule (it passed on any difference before), counts an
   edge or underline in another style or weight, or a shadow of another shape, as another mark, and counts Bootstrap
-  5's table fills as background. A new step, "should differ in hue from", records status colours told apart by hue
-  alone. A new feature, state_marks, covers each state. active_item_box expects the box under every scheme;
+  5's table fills as background. A drawn pseudo-element (a status dot) counts as a mark. A new step, "should
+  differ in hue from", records one status against another, told apart by hue alone. A new feature, state_marks, covers each state. active_item_box expects the box under every scheme;
   link_purpose and vscode_scheme expect VS Code's link colour since 3.1.4 (#a3d5ff).
 
 # 3.1.4

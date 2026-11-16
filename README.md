@@ -98,9 +98,9 @@ Nothing is stored on the server for them. Logged-in users' settings are stored a
 - Images covers background images only when they are set in the page itself (as Tiles and the Dashboard course
   cards do). A background image set in a theme's or plugin's stylesheet is not hidden or dimmed.
 - The Moodle mobile app does not load the plugin.
-- Under a colour scheme, status text (success, warning, danger) differs from plain text, and one status from another,
-  by hue alone, in colours that reach 7:1; status cells and alerts also carry a solid border or marker. Coloured badges
-  keep their words and the theme's colours.
+- Under a colour scheme, status text (success, warning, danger) keeps the scheme's text colour with a coloured dot
+  before it; one status differs from another by the dot's hue alone. Status cells and alerts carry a solid border or
+  marker. Coloured badges keep their words and the theme's colours.
 - The colour contrast guarantee covers only the surfaces the plugin recolours. Content with its own
   colours, such as images or embedded media, is not guaranteed.
 - Under a colour scheme the text editor's editing area keeps the author's own colours; its toolbar takes the scheme.
