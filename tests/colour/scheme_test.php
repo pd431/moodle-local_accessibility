@@ -309,4 +309,15 @@ final class scheme_test extends \advanced_testcase {
         $this->assertSame(scheme::STATUS_MARK['dark']['bad'], scheme::presets()['highcontrast']->status_colours()['bad-mark'],
             'a passing fixed value is kept');
     }
+
+    /**
+     * A chosen item sits on the hover surface, or on the second surface for a scheme with its own active colour.
+     */
+    public function test_chosen_surface(): void {
+        $vscode = scheme::presets()['vscodehc'];
+        $this->assertSame($vscode->ramp['surface2'], $vscode->chosen_surface());
+        $hc = scheme::presets()['highcontrast'];
+        $this->assertSame($hc->ramp['hover'], $hc->chosen_surface());
+        $this->assertStringContainsString('--a11y-chosen:' . $hc->ramp['hover'] . ';', $hc->css_properties());
+    }
 }

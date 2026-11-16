@@ -497,12 +497,13 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     /* Chosen and current: the current page, breadcrumb (Moodle marks the current one only by being plain text at the
        end, in a span), tab, pill, menu and list item, a pressed toggle or editor
        button, a ticked or active row, today in the calendar. A 2px box inside the item's edge, so nothing moves and the
-       keyboard focus ring, which sits outside, shows on top; text in the scheme's text colour, on the hover surface. A
+       keyboard focus ring, which sits outside, shows on top; text in the scheme's text colour, on the chosen surface
+       (--a11y-chosen: the hover surface, VS Code's second surface). A
        focused chosen item draws its focus ring 4px in, inside the box (--la-focus-offset, read by the focus rules). */
     html[data-a11y-colour] body:not(#la-weight) :where(.page-item.active > .page-link, .breadcrumb-item.active:not(:has([aria-current])), .breadcrumb-item:last-child > span:only-child, [aria-current]:not([aria-current="false"]), .list-group-item.active, .btn.active, [aria-pressed="true"], [aria-selected="true"], .nav-link.active, .mds-nav-pill--selected, .mds-nav-pill.active, .courseindex-item.pageitem, .courseindex-item.active, .dropdown-item.active, .tox-tbtn--enabled, .today .day-number-circle) {
         box-shadow: inset 0 0 0 2px var(--a11y-mark) !important; /* stylelint-disable-line declaration-no-important */
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
-        background-color: var(--a11y-hover) !important; /* stylelint-disable-line declaration-no-important */
+        background-color: var(--a11y-chosen, var(--a11y-hover)) !important; /* stylelint-disable-line declaration-no-important */
         --la-focus-offset: -4px;
     }
     /* A chosen row: an edge above and below each cell, and at the row's two ends, so the row reads as one box. A
