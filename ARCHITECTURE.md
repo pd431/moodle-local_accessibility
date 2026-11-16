@@ -9,7 +9,7 @@ One owner per rule. A change goes in the owner; a new rule gets an owner and a g
 | Scheme colours, tokens and their contrast floors | `classes/colour/scheme.php` | `tests/colour/scheme_test.php` |
 | Mark colour for states (`--a11y-mark`, 3:1 on every shade) | `classes/colour/scheme.php`, `mark()` | `tests/colour/scheme_test.php::test_mark_meets_floor` |
 | Status mark colours (`--a11y-ok-mark/-warn-mark/-bad-mark`, 3:1 on every shade), by scheme mode | `classes/colour/scheme.php`, `status_colours()` | `scheme_test::test_status_colours_meet_floors` |
-| State marks: status cells, changed, chosen/current, disabled, read only, alerts, status text, progress, hidden, keyboard focus (the only place a state class is named) | `styles.css` s7a | `styles_test::test_state_marks_*`, `test_state_marks_follow_section_7`, `test_state_classes_named_once`, `test_nothing_after_state_marks_undoes_them`; `tests/behat/state_marks.feature` |
+| State marks: status cells, changed, chosen/current, disabled, read only, badges and alerts, status text (dot), progress, hidden, keyboard focus (the only place a state class is named; the status dot and status icon rules repeat the status text classes) | `styles.css` s7a | `styles_test::test_state_marks_*`, `test_state_marks_follow_section_7`, `test_state_classes_named_once`, `test_nothing_after_state_marks_undoes_them`; `tests/behat/state_marks.feature` |
 | Contrast maths (WCAG ratio, APCA) | `classes/colour/contrast.php` | `tests/colour/contrast_test.php` |
 | Scheme variables onto Bootstrap variables | `styles.css` s7, `html[data-a11y-colour]` | `styles_test::test_new_variables_and_values` |
 | Links by purpose (control anchors, link anchors, link-styled buttons) | `styles.css` s7, the `--la-anchor` rules | `styles_test::test_links_by_purpose` |
@@ -38,3 +38,6 @@ One owner per rule. A change goes in the owner; a new rule gets an owner and a g
 | Panel, launcher, read bar | `templates/`, `amd/src/`, `styles.css` s13 to s15 | `tests/behat/panel*.feature`, `styles_test` |
 
 `styles.css` is written by hand. The reasons for each rule are in the comment above it.
+
+Planned, not built: coloured buttons (`.btn-success`, `.btn-warning`, `.btn-danger` and their outline forms) are not yet
+painted under a colour scheme; they keep the theme's fills. To be scoped as its own change.

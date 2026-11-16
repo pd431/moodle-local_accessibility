@@ -3,7 +3,7 @@
 ## [3.1.5] - 2026-11-16
 
 - States keep their mark under every colour scheme: current and chosen items are boxed, status cells and changed
-  grades have a solid border in the status colour, alerts a solid marker in their type's colour, status text has a
+  grades have a solid border in the status colour, alerts, badges and pills a solid marker in their type's colour, status text has a
   coloured dot before it, disabled controls are faded, read-only fields have a heavier edge, hidden items are italic, and keyboard focus is
   drawn in the scheme's mark colour. See CHANGES.md.
 
