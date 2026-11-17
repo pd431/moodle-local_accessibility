@@ -466,34 +466,43 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     /* Status cells: a coloured table cell or row. Each cell drops
        the theme's fill (Bootstrap 5 paints it with an inset shadow), keeps the scheme's text colour and takes a solid
        2px border all round, inside its edge, in the status mark colour (classes/colour/scheme.php). The border colour
-       is --la-status, so a cell in a ticked row shows both the row's box and its own border (the chosen rows below). */
+       is --la-status and its width --la-status-w, so a cell in a ticked row shows both the row's box and its own border
+       (the chosen rows below).
+       The border shows only where core colours the cell: Bootstrap 4 (Moodle 4.5) fills a success, warning or danger
+       cell; Moodle 5's tables make a cell inherit its row's background, which Bootstrap 5 leaves transparent, so core
+       shows no colour there and neither does the scheme. The signal is Bootstrap 4's own root token --breakpoint-xs
+       (0, and absent from Bootstrap 5): 2px * (1 + 0) on Bootstrap 4, 2px * (1 - 1) = 0 on Bootstrap 5. */
     html[data-a11y-colour] body:not(#la-weight) :where(td.table-success, th.table-success, tr.table-success > *) {
         --la-status: var(--a11y-ok-mark);
         --la-dot-display: none;
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+        --la-status-w: calc(2px * (1 + var(--breakpoint-xs, -1)));
         background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
-        box-shadow: inset 0 0 0 2px var(--la-status) !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: inset 0 0 0 var(--la-status-w) var(--la-status) !important; /* stylelint-disable-line declaration-no-important */
     }
     html[data-a11y-colour] body:not(#la-weight) :where(td.table-warning, th.table-warning, tr.table-warning > *) {
         --la-status: var(--a11y-warn-mark);
         --la-dot-display: none;
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+        --la-status-w: calc(2px * (1 + var(--breakpoint-xs, -1)));
         background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
-        box-shadow: inset 0 0 0 2px var(--la-status) !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: inset 0 0 0 var(--la-status-w) var(--la-status) !important; /* stylelint-disable-line declaration-no-important */
     }
     html[data-a11y-colour] body:not(#la-weight) :where(td.table-danger, th.table-danger, tr.table-danger > *) {
         --la-status: var(--a11y-bad-mark);
         --la-dot-display: none;
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+        --la-status-w: calc(2px * (1 + var(--breakpoint-xs, -1)));
         background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
-        box-shadow: inset 0 0 0 2px var(--la-status) !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: inset 0 0 0 var(--la-status-w) var(--la-status) !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Changed: a grade typed but not saved (quick grading) or overridden in the gradebook. The same border as a status
        cell, in the warning mark colour. */
     html[data-a11y-colour] body:not(#la-weight) :where(.quickgrademodified, td.ajaxoverridden) {
         --la-status: var(--a11y-warn-mark);
+        --la-status-w: 2px;
         --la-dot-display: none;
-        box-shadow: inset 0 0 0 2px var(--la-status) !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: inset 0 0 0 var(--la-status-w) var(--la-status) !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Chosen and current: the current page, breadcrumb (Moodle marks the current one only by being plain text at the
        end, in a span), tab, pill, menu and list item, a pressed toggle or editor button, a selected option, a ticked or
@@ -522,17 +531,18 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         background-color: var(--a11y-hover) !important; /* stylelint-disable-line declaration-no-important */
     }
     /* A chosen row: an edge above and below each cell, and at the row's two ends, so the row reads as one box. A
-       status cell in the row keeps its own border inside the box (--la-status, set by the status cell rules above). */
+       status cell in the row keeps its own border inside the box (--la-status and --la-status-w, set by the status cell
+       rules above; no border where the width is 0). */
     html[data-a11y-colour] body:not(#la-weight) :where(tr.selectedrow > *, tr.table-active > *, .table-active > td) {
-        box-shadow: inset 0 2px 0 var(--a11y-mark), inset 0 -2px 0 var(--a11y-mark), inset 0 0 0 4px var(--la-status, transparent) !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: inset 0 2px 0 var(--a11y-mark), inset 0 -2px 0 var(--a11y-mark), inset 0 0 0 calc(var(--la-status-w, 0px) * 2) var(--la-status, transparent) !important; /* stylelint-disable-line declaration-no-important */
         background-color: var(--a11y-hover) !important; /* stylelint-disable-line declaration-no-important */
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
     }
     html[data-a11y-colour] body:not(#la-weight) :where(tr.selectedrow > :first-child, tr.table-active > :first-child) {
-        box-shadow: inset 2px 2px 0 var(--a11y-mark), inset 0 -2px 0 var(--a11y-mark), inset 0 0 0 4px var(--la-status, transparent) !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: inset 2px 2px 0 var(--a11y-mark), inset 0 -2px 0 var(--a11y-mark), inset 0 0 0 calc(var(--la-status-w, 0px) * 2) var(--la-status, transparent) !important; /* stylelint-disable-line declaration-no-important */
     }
     html[data-a11y-colour] body:not(#la-weight) :where(tr.selectedrow > :last-child, tr.table-active > :last-child) {
-        box-shadow: inset -2px 2px 0 var(--a11y-mark), inset 0 -2px 0 var(--a11y-mark), inset 0 0 0 4px var(--la-status, transparent) !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: inset -2px 2px 0 var(--a11y-mark), inset 0 -2px 0 var(--a11y-mark), inset 0 0 0 calc(var(--la-status-w, 0px) * 2) var(--la-status, transparent) !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Moodle 5.3 draws the current navigation pill with a fill and a dot; the box is the one mark. */
     html[data-a11y-colour] body:not(#la-weight) :where(.mds-nav-pill__indicator, .mds-nav-pill.active::before) {
