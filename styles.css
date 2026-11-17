@@ -298,6 +298,14 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         background-color: var(--a11y-page) !important; /* stylelint-disable-line declaration-no-important */
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
     }
+    /* Behind the page: #page-wrapper (painted with #page by the mop-up rule) is one viewport tall and the document
+       scrolls past it, so where the page has one, html and body take its surface too. Otherwise the gutters beside a
+       floating drawer (Boost Union on Moodle 5.3) turn from the surface to the page colour as the page scrolls, with
+       the edge between them travelling up the screen. */
+    html[data-a11y-colour]:has(#page-wrapper),
+    html[data-a11y-colour]:has(#page-wrapper) body {
+        background-color: var(--a11y-surface1) !important; /* stylelint-disable-line declaration-no-important */
+    }
     /* Theme-coloured controls (Task 22 browser pass): secondary, outline and icon buttons take the scheme, and so
        does a plain .btn with no variant class (drawer and user menu toggles, the activity Completion dropdown),
        which Boost paints in its own dark text and, for the dropdown, white. Primary, success, danger, warning,
