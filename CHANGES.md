@@ -13,9 +13,12 @@ status text and as solid borders and markers.
   short.
 - Chosen and current items (the current page, tab, pill, breadcrumb (also the plain last item Moodle shows), menu and
   list item, a pressed toggle or editor button, a ticked or active row, today in the calendar) are boxed in the mark
-  colour on the hover surface. Before, only VS Code dark high contrast boxed them.
-- Status cells (a submission's status, a late or early submission, a coloured table cell or row) drop the theme's fill
-  and have a solid 2px border in the status mark colour. A changed quick grade or an overridden grade has the same
+  colour on the hover surface. Before, only VS Code dark high contrast boxed them. aria-selected counts only on tabs,
+  listbox and grid options and activity chooser options: in the course index the current page's item is the one
+  chosen item (Moodle's tree marks the section keyboard navigation starts from as selected, and that is not boxed).
+- Status cells (a coloured table cell or row) drop the theme's fill and have a solid 2px border in the status mark
+  colour. An assignment submission's status (draft, submitted, graded, early, late) is not marked: its words say it,
+  core's fills are under 3:1, and every status block takes the second surface and the text colour. A changed quick grade or an overridden grade has the same
   border in the warning colour. A status cell in a ticked row shows both marks.
 - Alerts show their type as a solid marker 1em wide at the leading edge, in the type's colour (info in the link
   colour). Badges and pills are painted the same way: the second surface, the scheme's text colour, a 1px edge, and for a
@@ -25,8 +28,9 @@ status text and as solid borders and markers.
 - Status text (success, warning and danger text, passing and failing grades, error messages) keeps the scheme's text
   colour, with a dot before it in the status mark colour. An icon that carries a status takes the mark colour instead.
   A field with an error takes an edge in the danger colour.
-- Disabled menu items, buttons, tabs, page links, editor buttons and fields are faded to 0.6. Read-only fields keep
-  full contrast and take a solid 2px edge in the text colour.
+- Disabled menu items, buttons, checkboxes, radios, switches, tabs, page links and editor buttons are faded to 0.6.
+  Read-only and disabled text fields, textareas and selects look the same: full contrast (their text is still read,
+  WCAG 1.4.3) and a solid 2px edge in the text colour.
 - A progress bar's fill is in the mark colour, on a track with an edge.
 - Hidden items, hidden courses and suspended users are set in italic, at full contrast.
 - Keyboard focus under a scheme without its own focus colour is drawn in the mark colour, and moves inside a current
