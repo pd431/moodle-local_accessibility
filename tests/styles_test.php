@@ -659,7 +659,7 @@ final class styles_test extends \advanced_testcase {
         $this->assertCount(1, $panels, 'one rule for small panels');
         $this->assertStringContainsString('background-color: var(--a11y-surface2) !important', $panels[0][1]);
         $this->assertStringContainsString('color: var(--a11y-text) !important', $panels[0][1]);
-        foreach (['.submissionstatus', '.userinitials', '.bg-secondary', '.bg-primary-light', '.path-mod-book .btn-next'] as $part) {
+        foreach (['.submissionstatus,', '.submissionstatusdraft', '.submissionstatussubmitted', '.latesubmission', '.userinitials', '.bg-secondary', '.bg-primary-light', '.path-mod-book .btn-next'] as $part) {
             $this->assertStringContainsString($part, $panels[0][0], $part);
         }
         $edge = self::rules_with('html[data-a11y-colour] body :where(.alert)');
@@ -793,14 +793,14 @@ final class styles_test extends \advanced_testcase {
     private static function state_classes(): array {
         return [
             'chosen' => ['.page-item.active > .page-link', '.list-group-item.active', '.btn.active', '[aria-pressed="true"]',
-                '[aria-selected="true"]', '.nav-link.active', '.mds-nav-pill--selected', '.courseindex-item.pageitem',
+                '[data-region="chooser-option-container"])[aria-selected="true"]:not(:is([role="tree"], .courseindex) *)',
+                '.nav-link.active', '.mds-nav-pill--selected', '.courseindex-item.pageitem',
                 '.dropdown-item.active', '.tox-tbtn--enabled', '.today .day-number-circle', 'tr.selectedrow > *',
                 '.breadcrumb-item:last-child > span:only-child'],
             'changed' => ['.quickgrademodified', 'td.ajaxoverridden'],
             'disabled' => ['.btn.disabled', '.dropdown-item.disabled', '.nav-link.disabled', '.list-group-item.disabled', '.page-item.disabled > .page-link', '.tox-tbtn--disabled'],
             'readonly' => ['[readonly]'],
-            'status' => ['.gradepass', '.gradefail', '.submissionstatussubmitted', '.submissiongraded', '.earlysubmission',
-                '.submissionstatusdraft', '.latesubmission', 'td.table-success', 'td.table-warning', 'td.table-danger',
+            'status' => ['.gradepass', '.gradefail', 'td.table-success', 'td.table-warning', 'td.table-danger',
                 'tr.table-success > *', 'tr.table-warning > *', 'tr.table-danger > *'],
             'alert' => ['.alert-success', '.alert-warning', '.alert-danger', '.alert-info'],
             'badge' => ['.badge:is(.bg-success, .badge-success, .text-bg-success)', '.badge:is(.bg-warning, .badge-warning, .text-bg-warning)',
@@ -972,8 +972,39 @@ final class styles_test extends \advanced_testcase {
         [, $rules] = self::state_marks();
         $r = array_values(array_filter($rules, fn($x) => str_contains($x[0], '[readonly]')));
         $this->assertCount(1, $r);
+        $this->assertStringContainsString(':is([readonly], :disabled)', $r[0][0], 'one look for read-only and disabled fields');
+        foreach (['.form-control', '.form-select', '.custom-select', 'textarea', 'select'] as $field) {
+            $this->assertStringContainsString($field, $r[0][0], $field);
+        }
         $this->assertStringContainsString('border: 2px solid var(--a11y-text) !important', $r[0][1]);
-        $this->assertStringNotContainsString('opacity', $r[0][1]);
+        $this->assertStringContainsString('color: var(--a11y-text) !important', $r[0][1], 'full-strength text');
+        $this->assertStringContainsString('opacity: 1 !important', $r[0][1], 'not faded');
+    }
+
+    /**
+     * State marks: a disabled text field, textarea or select is not faded; buttons, checkboxes, radios and switches are.
+     */
+    public function test_state_marks_disabled_fields_not_faded(): void {
+        [, $rules] = self::state_marks();
+        $r = array_values(array_filter($rules, fn($x) => str_contains($x[1], 'opacity: 0.6 !important')
+            && str_contains($x[0], ':disabled')));
+        $this->assertCount(1, $r);
+        $this->assertStringContainsString(':is(button, .btn, input:is([type="checkbox"], [type="radio"]', $r[0][0]);
+        foreach (['textarea', 'select', '.form-control'] as $field) {
+            $this->assertStringNotContainsString($field, $r[0][0], $field . ' is not faded');
+        }
+    }
+
+    /**
+     * State marks: aria-selected counts as chosen only on tabs, options and activity chooser options, never in a tree.
+     */
+    public function test_state_marks_aria_selected_scoped(): void {
+        [$section] = self::state_marks();
+        $plain = preg_replace('~/\*.*?\*/~s', '', $section);
+        $this->assertSame(0, preg_match('/[,(]\s*\[aria-selected="true"\]/', $plain), 'no bare aria-selected');
+        $scoped = ':is([role="tab"], [role="option"], [role="gridcell"], [data-region="chooser-option-container"])'
+            . '[aria-selected="true"]:not(:is([role="tree"], .courseindex) *)';
+        $this->assertSame(2, substr_count($plain, $scoped), 'the chosen rule and its hover-surface twin');
     }
 
     /**

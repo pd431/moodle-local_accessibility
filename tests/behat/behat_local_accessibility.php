@@ -387,6 +387,26 @@ class behat_local_accessibility extends behat_base {
     }
 
     /**
+     * Check that two elements have the same computed value of one property.
+     *
+     * @Then /^the computed "(?P<property>[^"]*)" of "(?P<css>[^"]*)" should match that of "(?P<other>[^"]*)"$/
+     * @param string $property
+     * @param string $css
+     * @param string $other
+     */
+    public function the_computed_style_should_match(string $property, string $css, string $other): void {
+        $this->check_script('const a = document.querySelector(' . json_encode($css) . ');
+            const b = document.querySelector(' . json_encode($other) . ');
+            if (!a || !b) {
+                return "Missing element: " + (a ? ' . json_encode($other) . ' : ' . json_encode($css) . ');
+            }
+            const p = ' . json_encode($property) . ';
+            const va = getComputedStyle(a).getPropertyValue(p);
+            const vb = getComputedStyle(b).getPropertyValue(p);
+            return va === vb ? "" : p + ": " + va + " against " + vb;');
+    }
+
+    /**
      * Check that a checked box or radio is distinguishable from an unchecked one. A natively drawn control (Bootstrap 4,
      * Moodle 4.5) shows its own check mark; a restyled one (appearance: none, Bootstrap 5) must differ in background.
      *
@@ -909,6 +929,9 @@ class behat_local_accessibility extends behat_base {
                 <input type="text" class="form-control" id="la-st-field-readonly" value="Read only" readonly>
                 <select class="form-select custom-select" id="la-st-select-editable"><option>Editable</option></select>
                 <select class="form-select custom-select" id="la-st-select-disabled" disabled><option>Disabled</option></select>
+                <textarea class="form-control" id="la-st-area-disabled" disabled>Disabled</textarea>
+                <button type="button" class="btn btn-secondary" id="la-st-btn-disabled" disabled>Save</button>
+                <button type="button" class="btn btn-secondary" id="la-st-btn-enabled">Save</button>
             </form>
             <p><span class="badge bg-success text-white" id="la-st-badge-ok">Done</span>
                 <span class="badge bg-danger text-white" id="la-st-badge-bad">Overdue</span>

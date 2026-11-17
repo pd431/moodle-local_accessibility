@@ -48,13 +48,31 @@ Feature: Every state keeps a mark under a colour scheme
     And the "#la-st-field-readonly" element should look different from the "#la-st-field-editable" element
     And the computed "opacity" of "#la-st-field-readonly" should be "1"
     And the "#la-st-select-disabled" element should look different from the "#la-st-select-editable" element
+    # A disabled text field, textarea or select looks like a read-only one: not faded, text at full contrast.
+    And the computed "opacity" of "#la-st-field-disabled" should be "1"
+    And the computed "opacity" of "#la-st-select-disabled" should be "1"
+    And the computed "opacity" of "#la-st-area-disabled" should be "1"
+    And the computed "border-top-width" of "#la-st-field-disabled" should match that of "#la-st-field-readonly"
+    And the computed "border-top-color" of "#la-st-field-disabled" should match that of "#la-st-field-readonly"
+    And the computed "background-color" of "#la-st-field-disabled" should match that of "#la-st-field-readonly"
+    And the computed "color" of "#la-st-field-disabled" should match that of "#la-st-field-readonly"
+    And the "#la-st-field-disabled" element should have a text contrast of at least 4.5:1
+    And the "#la-st-field-readonly" element should have a text contrast of at least 4.5:1
+    And the "#la-st-select-disabled" element should have a text contrast of at least 4.5:1
+    # Other disabled controls still fade.
+    And the computed "opacity" of "#la-st-btn-disabled" should be "0.6"
+    And the "#la-st-btn-disabled" element should look different from the "#la-st-btn-enabled" element
     # Status. Status text has a dot before it, so it looks different from plain text; one status against another
-    # differs by the dot's hue alone (accepted). A bordered status cell or block must look different from a plain one.
+    # differs by the dot's hue alone (accepted). A bordered status cell must look different from a plain one.
     And the "#la-st-grade-pass" element should look different from the "#la-st-grade-plain" element
     And the "#la-st-grade-fail" element should look different from the "#la-st-grade-plain" element
     And the "#la-st-grade-pass" element should differ in hue from the "#la-st-grade-fail" element
-    And the "#la-st-status-submitted" element should look different from the "#la-st-status-none" element
-    And the "#la-st-status-draft" element should look different from the "#la-st-status-none" element
+    # An assignment submission's status is said in words; core's fills are under 3:1, so it takes no state mark.
+    And the computed "box-shadow" of "#la-st-status-submitted" should be "none"
+    And the computed "box-shadow" of "#la-st-status-draft" should be "none"
+    And the "#la-st-status-submitted" element should not look different from the "#la-st-status-none" element
+    And the "#la-st-status-draft" element should have a text contrast of at least 4.5:1
+    And the "#la-st-status-submitted" element should have a text contrast of at least 4.5:1
     And the "#la-st-text-warning" element should look different from the "#la-st-text-plain" element
     And the "#la-st-text-danger" element should look different from the "#la-st-text-plain" element
     And the "#la-st-text-success" element should look different from the "#la-st-text-plain" element
@@ -128,6 +146,25 @@ Feature: Every state keeps a mark under a colour scheme
       | scheme       |
       | highcontrast |
       | blackwhite   |
+
+  Scenario Outline: Only the course index's page item is chosen, while tabs and listbox options keep aria-selected under <scheme>
+    Given the following "user preferences" exist:
+      | user     | preference                 | value    |
+      | student1 | local_accessibility_colour | <scheme> |
+    And I log in as "student1"
+    When the HTML "<div class='courseindex' role='tree'><div class='courseindex-section' id='la-ci-section' tabindex='0' aria-selected='true'><div class='courseindex-item courseindex-section-title'>General</div><ul><li class='courseindex-item pageitem' id='la-ci-page' aria-selected='false'>Essay</li><li class='courseindex-item' id='la-ci-other' aria-selected='false'>Quiz</li></ul></div></div><ul role='tablist'><li><a role='tab' href='#' id='la-ci-tab' aria-selected='true'>One</a></li><li><a role='tab' href='#' id='la-ci-tab-other' aria-selected='false'>Two</a></li></ul><ul role='listbox'><li role='option' id='la-ci-option' aria-selected='true'>Red</li><li role='option' id='la-ci-option-other' aria-selected='false'>Blue</li></ul>" is added to the main region
+    Then the computed "box-shadow" of "#la-ci-section" should be "none"
+    And the "#la-ci-page" element should look different from the "#la-ci-other" element
+    And the computed "box-shadow" of "#la-ci-other" should be "none"
+    And the "#la-ci-tab" element should look different from the "#la-ci-tab-other" element
+    And the computed "box-shadow" of "#la-ci-tab-other" should be "none"
+    And the "#la-ci-option" element should look different from the "#la-ci-option-other" element
+    And the computed "box-shadow" of "#la-ci-option-other" should be "none"
+
+    Examples:
+      | scheme       |
+      | highcontrast |
+      | yellowblack  |
 
   Scenario: With no scheme chosen the state marks change nothing
     Given I log in as "student1"
