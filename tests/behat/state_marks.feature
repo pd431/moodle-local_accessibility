@@ -26,13 +26,19 @@ Feature: Every state keeps a mark under a colour scheme
     And I log in as "student1"
     And the main region contains Moodle state markup
     # Chosen and current.
-    Then the "#la-st-page-current" element should look different from the "#la-st-page-other" element
-    And the "#la-st-crumb-current" element should look different from the "#la-st-crumb-link" element
-    And the "#la-st-list-active" element should look different from the "#la-st-list-other" element
+    # The current page link, breadcrumb, list item and tab are navigation: no box, the hover surface with the scheme's
+    # text colour on it at 4.5:1 or more (told apart by fill alone, as in core).
+    Then the computed "box-shadow" of "#la-st-page-current" should be "none"
+    And the computed "box-shadow" of "#la-st-crumb-current" should be "none"
+    And the computed "box-shadow" of "#la-st-list-active" should be "none"
+    And the computed "box-shadow" of "#la-st-tab-current" should be "none"
+    And the "#la-st-page-current" element should have a text contrast of at least 4.5:1
+    And the "#la-st-crumb-current" element should have a text contrast of at least 4.5:1
+    And the "#la-st-list-active" element should have a text contrast of at least 4.5:1
+    And the "#la-st-tab-current" element should have a text contrast of at least 4.5:1
     And the "#la-st-toggle-pressed" element should look different from the "#la-st-toggle-unpressed" element
     And the "#la-st-tox-pressed" element should look different from the "#la-st-tox-plain" element
     And the "#la-st-tox-disabled" element should look different from the "#la-st-tox-plain" element
-    And the "#la-st-tab-current" element should look different from the "#la-st-tab-other" element
     And the "#la-st-row-ticked" element should look different from the "#la-st-row-plain" element
     And the "#la-st-row-active" element should look different from the "#la-st-row-plain" element
     # Changed.
@@ -78,10 +84,6 @@ Feature: Every state keeps a mark under a colour scheme
     And the "#la-st-text-success" element should look different from the "#la-st-text-plain" element
     And the "#la-st-error" element should look different from the "#la-st-label" element
     And the "#la-st-field-invalid" element should look different from the "#la-st-field-editable" element
-    And the "#la-st-row-success" element should look different from the "#la-st-row-plain" element
-    And the "#la-st-row-warning" element should look different from the "#la-st-row-plain" element
-    And the "#la-st-row-danger" element should look different from the "#la-st-row-plain" element
-    And the "#la-st-row-warning" element should differ in hue from the "#la-st-row-danger" element
     # Badges and pills: painted like alerts, a coloured one differs from a grey one by its marker.
     And the "#la-st-badge-ok" element should look different from the "#la-st-badge-grey" element
     And the "#la-st-badge-bad" element should look different from the "#la-st-badge-grey" element
@@ -147,17 +149,20 @@ Feature: Every state keeps a mark under a colour scheme
       | highcontrast |
       | blackwhite   |
 
-  Scenario Outline: Only the course index's page item is chosen, while tabs and listbox options keep aria-selected under <scheme>
+  Scenario Outline: Only the course index's page item is chosen, a tab is chosen without a box, and a listbox option keeps its box under <scheme>
     Given the following "user preferences" exist:
       | user     | preference                 | value    |
       | student1 | local_accessibility_colour | <scheme> |
     And I log in as "student1"
     When the HTML "<div class='courseindex' role='tree'><div class='courseindex-section' id='la-ci-section' tabindex='0' aria-selected='true'><div class='courseindex-item courseindex-section-title'>General</div><ul><li class='courseindex-item pageitem' id='la-ci-page' aria-selected='false'>Essay</li><li class='courseindex-item' id='la-ci-other' aria-selected='false'>Quiz</li></ul></div></div><ul role='tablist'><li><a role='tab' href='#' id='la-ci-tab' aria-selected='true'>One</a></li><li><a role='tab' href='#' id='la-ci-tab-other' aria-selected='false'>Two</a></li></ul><ul role='listbox'><li role='option' id='la-ci-option' aria-selected='true'>Red</li><li role='option' id='la-ci-option-other' aria-selected='false'>Blue</li></ul>" is added to the main region
     Then the computed "box-shadow" of "#la-ci-section" should be "none"
-    And the "#la-ci-page" element should look different from the "#la-ci-other" element
-    And the computed "box-shadow" of "#la-ci-other" should be "none"
-    And the "#la-ci-tab" element should look different from the "#la-ci-tab-other" element
-    And the computed "box-shadow" of "#la-ci-tab-other" should be "none"
+    And the computed "box-shadow" of "#la-ci-page" should be "none"
+    And the computed "background-color" of "#la-ci-page" should differ from that of "#la-ci-other"
+    And the "#la-ci-page" element should have a text contrast of at least 4.5:1
+    And the computed "background-color" of "#la-ci-section" should match that of "#la-ci-other"
+    And the computed "box-shadow" of "#la-ci-tab" should be "none"
+    And the computed "background-color" of "#la-ci-tab" should differ from that of "#la-ci-tab-other"
+    And the "#la-ci-tab" element should have a text contrast of at least 4.5:1
     And the "#la-ci-option" element should look different from the "#la-ci-option-other" element
     And the computed "box-shadow" of "#la-ci-option-other" should be "none"
 
@@ -165,6 +170,24 @@ Feature: Every state keeps a mark under a colour scheme
       | scheme       |
       | highcontrast |
       | yellowblack  |
+
+  Scenario Outline: A success, warning or danger table row keeps a status border only where core colours it, under <scheme>
+    Given the following "user preferences" exist:
+      | user     | preference                 | value    |
+      | student1 | local_accessibility_colour | <scheme> |
+    And I log in as "student1"
+    And the main region contains Moodle state markup
+    # Moodle 4.5 (Bootstrap 4) fills these rows; Moodle 5's cells inherit the row's transparent background.
+    Then the "#la-st-row-success" element should look different from the "#la-st-row-plain" element if core colours table rows
+    And the "#la-st-row-warning" element should look different from the "#la-st-row-plain" element if core colours table rows
+    And the "#la-st-row-danger" element should look different from the "#la-st-row-plain" element if core colours table rows
+    And the "#la-st-row-warning" element should have a text contrast of at least 7:1
+    And the "#la-st-cell-quickgrade" element should look different from the "#la-st-cell-plain" element
+
+    Examples:
+      | scheme       |
+      | highcontrast |
+      | cream        |
 
   Scenario: With no scheme chosen the state marks change nothing
     Given I log in as "student1"

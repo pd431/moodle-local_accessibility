@@ -433,6 +433,31 @@ class behat_local_accessibility extends behat_base {
     }
 
     /**
+     * Where core colours a success, warning or danger table row (Bootstrap 4, Moodle 4.5, whose root defines
+     * --breakpoint-xs), the row must look different from a plain one; where it does not (Moodle 5), the row must carry
+     * no status edge either.
+     *
+     * @Then /^the "(?P<css>[^"]*)" element should look different from the "(?P<other>[^"]*)" element if core colours table rows$/
+     * @param string $css
+     * @param string $other
+     */
+    public function the_element_should_look_different_if_core_colours_rows(string $css, string $other): void {
+        $bootstrap4 = $this->evaluate_script('return getComputedStyle(document.documentElement)' .
+            '.getPropertyValue("--breakpoint-xs").trim() !== "";');
+        if ($bootstrap4) {
+            $this->the_element_should_look_different_from($css, '', $other);
+            return;
+        }
+        $this->check_script('const a = document.querySelector(' . json_encode($css) . ');
+            if (!a) {
+                return "Missing element: " + ' . json_encode($css) . ';
+            }
+            const s = getComputedStyle(a).boxShadow;
+            return s === "none" || !/[1-9][0-9.]*px inset/.test(s.replace(/0px 0px 0px /g, "")) ? "" :
+                "A status edge where core shows no colour: " + s;');
+    }
+
+    /**
      * Check that two elements look different, by the rule the contrast harness uses (distinct_score.js, D1): at least
      * one of these holds.
      *  - Their backgrounds differ by 3:1 or more.

@@ -512,12 +512,7 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringContainsString('.nav-item + .nav-item .nav-link', $tabs[2][0]);
         $this->assertStringContainsString('border-left-color: transparent !important', $tabs[2][1], 'shared edge');
         $current = self::rules_with('html[data-a11y-tokens~="border"] body:not(#la-weight) .nav-tabs .nav-link.active');
-        $this->assertCount(1, $current, 'the current tab is boxed in the mark colour alone');
-        $this->assertStringContainsString('border-color: var(--a11y-mark) !important', $current[0][1]);
-        $this->assertStringContainsString('box-shadow: inset 0 0 0 1px var(--a11y-mark) !important', $current[0][1]);
-        $css = self::css();
-        $activeat = strpos($css, 'body:not(#la-weight) :where(.page-item.active > .page-link');
-        $this->assertGreaterThan($activeat, strpos($css, '.nav-tabs .nav-link.active {'), 'after the chosen rule');
+        $this->assertCount(0, $current, 'the current tab has no box of its own: navigation items are not boxed');
         $plainlink = ':where(a:not(.nav-link, .mds-nav-pill)):where(:focus, .focus)';
         $nofill = self::rules_with('html[data-a11y-tokens~="focus"] body ' . $plainlink);
         $this->assertCount(1, $nofill, 'a focused plain link loses the theme fill and shadow; menu items keep their surface');
@@ -794,7 +789,7 @@ final class styles_test extends \advanced_testcase {
         return [
             'chosen' => ['.page-item.active > .page-link', '.list-group-item.active', '.btn.active', '[aria-pressed="true"]',
                 '[data-region="chooser-option-container"])[aria-selected="true"]:not(:is([role="tree"], .courseindex) *)',
-                '.nav-link.active', '.mds-nav-pill--selected', '.courseindex-item.pageitem',
+                '[role="tab"][aria-selected="true"]:not(:is([role="tree"], .courseindex) *)', '.nav-link.active', '.mds-nav-pill--selected', '.courseindex-item.pageitem',
                 '.dropdown-item.active', '.tox-tbtn--enabled', '.today .day-number-circle', 'tr.selectedrow > *',
                 '.breadcrumb-item:last-child > span:only-child'],
             'changed' => ['.quickgrademodified', 'td.ajaxoverridden'],
@@ -882,12 +877,26 @@ final class styles_test extends \advanced_testcase {
     public function test_state_marks_chosen(): void {
         [, $rules] = self::state_marks();
         $chosen = array_values(array_filter($rules, fn($r) => str_contains($r[0], '.page-item.active > .page-link')));
-        $this->assertCount(2, $chosen, 'the chosen rule and its hover-surface twin');
-        $this->assertStringContainsString('box-shadow: inset 0 0 0 2px var(--a11y-mark) !important', $chosen[0][1]);
+        $this->assertCount(2, $chosen, 'the navigation rule and the hover-surface twin');
+        $this->assertStringNotContainsString('box-shadow', $chosen[0][1], 'navigation and links have no box');
+        $this->assertStringContainsString('color: var(--a11y-text) !important', $chosen[0][1]);
         $this->assertStringNotContainsString('background-color', $chosen[0][1], 'VS Code keeps its own fills');
-        $this->assertStringContainsString('--la-focus-offset: -4px;', $chosen[0][1]);
         $this->assertStringContainsString(':not([data-a11y-tokens~="active"])', $chosen[1][0]);
         $this->assertStringContainsString('background-color: var(--a11y-hover) !important', $chosen[1][1]);
+        foreach (['.mds-nav-pill--selected', '.breadcrumb-item:last-child', '.courseindex-item.pageitem', '[aria-current]'] as $nav) {
+            $this->assertStringContainsString($nav, $chosen[0][0], $nav . ': no box');
+        }
+        $boxed = array_values(array_filter($rules, fn($r) => str_contains($r[0], '.tox-tbtn--enabled')
+            && !str_contains($r[0], 'data-a11y-tokens')));
+        $this->assertCount(1, $boxed, 'pressed and selected controls');
+        $this->assertStringContainsString('box-shadow: inset 0 0 0 2px var(--a11y-mark) !important', $boxed[0][1]);
+        $this->assertStringContainsString('--la-focus-offset: -4px;', $boxed[0][1]);
+        foreach (['.btn.active', '[aria-pressed="true"]', '[role="option"]', '.today .day-number-circle'] as $control) {
+            $this->assertStringContainsString($control, $boxed[0][0], $control . ': boxed');
+        }
+        foreach (['.page-link', '.nav-link', '.mds-nav-pill', 'aria-current', '.courseindex', '.breadcrumb', '[role="tab"]'] as $nav) {
+            $this->assertStringNotContainsString($nav . '.', str_replace(':not(:is([role="tree"], .courseindex) *)', '', $boxed[0][0]), $nav);
+        }
         $this->assertStringNotContainsString('font-weight', implode('', array_column($rules, 1)), 'no bold: it shifts layout');
         $rows = array_values(array_filter($rules, fn($r) => str_contains($r[0], 'tr.selectedrow')));
         $this->assertCount(3, $rows, 'every cell, the first and the last');
@@ -906,7 +915,8 @@ final class styles_test extends \advanced_testcase {
         $r = array_values(array_filter($rules, fn($x) => str_contains($x[0], '.quickgrademodified')));
         $this->assertCount(1, $r);
         $this->assertStringContainsString('--la-status: var(--a11y-warn-mark);', $r[0][1]);
-        $this->assertStringContainsString('box-shadow: inset 0 0 0 2px var(--la-status) !important', $r[0][1]);
+        $this->assertStringContainsString('--la-status-w: 2px;', $r[0][1], 'core colours a changed grade on every version');
+        $this->assertStringContainsString('box-shadow: inset 0 0 0 var(--la-status-w) var(--la-status) !important', $r[0][1]);
     }
 
     /**
@@ -1002,9 +1012,11 @@ final class styles_test extends \advanced_testcase {
         [$section] = self::state_marks();
         $plain = preg_replace('~/\*.*?\*/~s', '', $section);
         $this->assertSame(0, preg_match('/[,(]\s*\[aria-selected="true"\]/', $plain), 'no bare aria-selected');
-        $scoped = ':is([role="tab"], [role="option"], [role="gridcell"], [data-region="chooser-option-container"])'
-            . '[aria-selected="true"]:not(:is([role="tree"], .courseindex) *)';
-        $this->assertSame(2, substr_count($plain, $scoped), 'the chosen rule and its hover-surface twin');
+        $notree = '[aria-selected="true"]:not(:is([role="tree"], .courseindex) *)';
+        $this->assertSame(substr_count($plain, '[aria-selected="true"]'), substr_count($plain, $notree), 'never inside a tree');
+        $this->assertSame(1, substr_count($plain, '[role="tab"]' . $notree), 'a tab: navigation, no box');
+        $this->assertSame(1, substr_count($plain, ':is([role="option"], [role="gridcell"], [data-region="chooser-option-container"])'
+            . $notree), 'an option: boxed');
     }
 
     /**
@@ -1048,12 +1060,16 @@ final class styles_test extends \advanced_testcase {
             $r = array_values(array_filter($rules, fn($x) => str_contains($x[0], $class)));
             $this->assertCount(1, $r, $class);
             $this->assertStringContainsString('--la-status: var(--a11y-' . $kind . '-mark);', $r[0][1]);
-            $this->assertStringContainsString('box-shadow: inset 0 0 0 2px var(--la-status) !important', $r[0][1]);
+            $this->assertStringContainsString('--la-status-w: calc(2px * (1 + var(--breakpoint-xs, -1)));', $r[0][1],
+                'a border only where core colours the cell: Bootstrap 4 defines --breakpoint-xs, Bootstrap 5 does not');
+            $this->assertStringContainsString('box-shadow: inset 0 0 0 var(--la-status-w) var(--la-status) !important', $r[0][1]);
             $this->assertStringContainsString('background-color: transparent !important', $r[0][1]);
         }
+        $this->assertStringNotContainsString('--breakpoint-xs:', self::css(), 'the plugin never sets the signal itself');
         $rows = array_values(array_filter($rules, fn($x) => str_contains($x[0], 'tr.selectedrow')));
         foreach ($rows as $row) {
-            $this->assertStringContainsString('inset 0 0 0 4px var(--la-status, transparent)', $row[1], 'both marks in a ticked row');
+            $this->assertStringContainsString('inset 0 0 0 calc(var(--la-status-w, 0px) * 2) var(--la-status, transparent)', $row[1],
+                'both marks in a ticked row, the cell border following its width');
         }
         $css = preg_replace('~/\*.*?\*/~s', '', $section);
         foreach (['dashed', 'dotted', 'double'] as $style) {
@@ -1061,5 +1077,18 @@ final class styles_test extends \advanced_testcase {
         }
         $status = strpos($css, 'td.table-success');
         $this->assertLessThan(strpos($css, 'tr.selectedrow'), $status, 'status cells come before the chosen rows that read --la-status');
+    }
+
+    /**
+     * Behind the page: where the page has #page-wrapper, html and body take the wrapper's surface, so the area the
+     * document scrolls past the one-viewport wrapper (the gutters beside a floating drawer) keeps the same colour.
+     */
+    public function test_page_wrapper_surface_behind_the_page(): void {
+        $r = self::rules_with('html[data-a11y-colour]:has(#page-wrapper),');
+        $this->assertCount(1, $r);
+        $this->assertStringContainsString('html[data-a11y-colour]:has(#page-wrapper) body', $r[0][0]);
+        $this->assertStringContainsString('background-color: var(--a11y-surface1) !important', $r[0][1]);
+        $mopup = self::rules_with('html[data-a11y-colour] body :where(#page, #page-wrapper,');
+        $this->assertStringContainsString('background-color: var(--a11y-surface1) !important', $mopup[0][1], 'the same surface');
     }
 }
