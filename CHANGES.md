@@ -16,8 +16,12 @@ status text and as solid borders and markers.
   colour on the hover surface. Before, only VS Code dark high contrast boxed them. aria-selected counts only on tabs,
   listbox and grid options and activity chooser options: in the course index the current page's item is the one
   chosen item (Moodle's tree marks the section keyboard navigation starts from as selected, and that is not boxed).
+  Navigation and links (the current page link, breadcrumb item, navigation pill, tab, list, menu and course index item)
+  have no box under any scheme, VS Code's included: the scheme's text colour on the hover surface, at 4.5:1 or more,
+  shown by that fill alone as in core. Pressed toggles and editor buttons, selected options and today keep the box.
 - Status cells (a coloured table cell or row) drop the theme's fill and have a solid 2px border in the status mark
-  colour. An assignment submission's status (draft, submitted, graded, early, late) is not marked: its words say it,
+  colour where core colours them: on Moodle 4.5 (Bootstrap 4), not on Moodle 5, whose table cells show no colour for a
+  success, warning or danger row. An assignment submission's status (draft, submitted, graded, early, late) is not marked: its words say it,
   core's fills are under 3:1, and every status block takes the second surface and the text colour. A changed quick grade or an overridden grade has the same
   border in the warning colour. A status cell in a ticked row shows both marks.
 - Alerts show their type as a solid marker 1em wide at the leading edge, in the type's colour (info in the link
@@ -35,6 +39,7 @@ status text and as solid borders and markers.
 - Hidden items, hidden courses and suspended users are set in italic, at full contrast.
 - Keyboard focus under a scheme without its own focus colour is drawn in the mark colour, and moves inside a current
   item's box under every scheme.
+- The page's side gutters keep one surface while a long page scrolls (on Moodle 5.3 they turned from grey to black).
 - Alert edges no longer use fixed hex colours.
 - Tests: the Behat step "should look different from" uses a 3:1 rule (it passed on any difference before), counts an
   edge or underline in another style or weight, or a shadow of another shape, as another mark, and counts Bootstrap
