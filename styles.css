@@ -496,14 +496,21 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         box-shadow: inset 0 0 0 2px var(--la-status) !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Chosen and current: the current page, breadcrumb (Moodle marks the current one only by being plain text at the
-       end, in a span), tab, pill, menu and list item, a pressed toggle or editor
-       button, a ticked or active row, today in the calendar. aria-selected counts only on a tab, a listbox or grid
-       option and an activity chooser option: a tree (the course index) sets it on the node the arrow keys start from,
-       which is not chosen, so the course index's one chosen item is its page item. A 2px box inside the item's edge, so nothing moves and the
-       keyboard focus ring, which sits outside, shows on top; text in the scheme's text colour (the surface: the rule
-       after this one). A
-       focused chosen item draws its focus ring 4px in, inside the box (--la-focus-offset, read by the focus rules). */
-    html[data-a11y-colour] body:not(#la-weight) :where(.page-item.active > .page-link, .breadcrumb-item.active:not(:has([aria-current])), .breadcrumb-item:last-child > span:only-child, [aria-current]:not([aria-current="false"]), .list-group-item.active, .btn.active, [aria-pressed="true"], :is([role="tab"], [role="option"], [role="gridcell"], [data-region="chooser-option-container"])[aria-selected="true"]:not(:is([role="tree"], .courseindex) *), .nav-link.active, .mds-nav-pill--selected, .mds-nav-pill.active, .courseindex-item.pageitem, .courseindex-item.active, .dropdown-item.active, .tox-tbtn--enabled, .today .day-number-circle) {
+       end, in a span), tab, pill, menu and list item, a pressed toggle or editor button, a selected option, a ticked or
+       active row, today in the calendar. aria-selected counts only on a tab, a listbox or grid option and an activity
+       chooser option: a tree (the course index) sets it on the node the arrow keys start from, which is not chosen, so
+       the course index's one chosen item is its page item. Every chosen item takes the scheme's text colour on the hover
+       surface (the twin rule after these two).
+       Navigation and links (the current page link, breadcrumb, navigation and tab item, list, menu and course index
+       item) have no box: that is all they show. */
+    html[data-a11y-colour] body:not(#la-weight) :where(.page-item.active > .page-link, .breadcrumb-item.active:not(:has([aria-current])), .breadcrumb-item:last-child > span:only-child, [aria-current]:not([aria-current="false"]), .list-group-item.active, [role="tab"][aria-selected="true"]:not(:is([role="tree"], .courseindex) *), .nav-link.active, .mds-nav-pill--selected, .mds-nav-pill.active, .courseindex-item.pageitem, .courseindex-item.active, .dropdown-item.active) {
+        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* Pressed and selected controls (a toggle, an editor button, a listbox, grid or activity chooser option) and today
+       in the calendar keep a 2px box inside the item's edge in the mark colour, so nothing moves and the keyboard focus
+       ring, which sits outside, shows on top. A focused boxed item draws its focus ring 4px in, inside the box
+       (--la-focus-offset, read by the focus rules). */
+    html[data-a11y-colour] body:not(#la-weight) :where(.btn.active, [aria-pressed="true"], :is([role="option"], [role="gridcell"], [data-region="chooser-option-container"])[aria-selected="true"]:not(:is([role="tree"], .courseindex) *), .tox-tbtn--enabled, .today .day-number-circle) {
         box-shadow: inset 0 0 0 2px var(--a11y-mark) !important; /* stylelint-disable-line declaration-no-important */
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
         --la-focus-offset: -4px;
@@ -530,12 +537,6 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     /* Moodle 5.3 draws the current navigation pill with a fill and a dot; the box is the one mark. */
     html[data-a11y-colour] body:not(#la-weight) :where(.mds-nav-pill__indicator, .mds-nav-pill.active::before) {
         display: none !important; /* stylelint-disable-line declaration-no-important */
-    }
-    /* The current tab where the scheme also has a border colour (VS Code): its edge turns to the mark colour and the
-       inset line drops to 1px, so one 2px box and no second colour around it. */
-    html[data-a11y-tokens~="border"] body:not(#la-weight) .nav-tabs .nav-link.active {
-        border-color: var(--a11y-mark) !important; /* stylelint-disable-line declaration-no-important */
-        box-shadow: inset 0 0 0 1px var(--a11y-mark) !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Disabled: a control that cannot be used. Section 7 gives it the same text colour as the enabled control beside
        it, so it is faded to 0.6, as Bootstrap fades a disabled button (WCAG asks no contrast of an inactive control).
@@ -757,13 +758,15 @@ html[data-a11y-focus="thick"] :focus-visible {
 /* 11a. Focus token (data-a11y-tokens): the scheme's own focus colour, dashed so it is never mistaken for the active
    token's solid box, on keyboard focus. The pointer gets no ring: a hovered item takes the scheme's hover surface, as
    under every scheme. The ring is drawn inside the item's edge, on its own surface, so it needs no halo: 2px where the
-   Focus ring tile is off; "ring" and "thick" keep their thickness. A current item carries the chosen box inside its
-   edge (section 7a), which sets --la-focus-offset so the ring moves in by 4px to sit inside that box. Never in forced colours,
+   Focus ring tile is off; "ring" and "thick" keep their thickness. The theme's focus shadow goes (Boost 4.5's blue ring on a
+   navigation link). A pressed or selected control carries the chosen box inside its edge (section 7a, which outweighs
+   this rule), and sets --la-focus-offset so the ring moves in by 4px to sit inside that box. Never in forced colours,
    where the system draws focus. */
 @media (forced-colors: none) {
     html[data-a11y-tokens~="focus"] :focus-visible {
         outline: 2px dashed var(--a11y-focus) !important; /* stylelint-disable-line declaration-no-important */
         outline-offset: var(--la-focus-offset, -2px) !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
     }
     html[data-a11y-tokens~="focus"][data-a11y-focus="ring"] :focus-visible {
         outline-width: 3px !important; /* stylelint-disable-line declaration-no-important */

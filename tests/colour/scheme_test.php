@@ -309,4 +309,17 @@ final class scheme_test extends \advanced_testcase {
         $this->assertSame(scheme::STATUS_MARK['dark']['bad'], scheme::presets()['highcontrast']->status_colours()['bad-mark'],
             'a passing fixed value is kept');
     }
+
+    /**
+     * A current navigation item has no box: it is shown by the hover surface (or, on VS Code, the surface it keeps), so
+     * its text must reach 4.5:1 on that fill under every built-in scheme. The presets hold their text at 7:1 on every
+     * shade of the ramp, the hover surface included, so no fill needs moving.
+     */
+    public function test_current_item_text_on_its_fill(): void {
+        foreach (scheme::presets() as $id => $s) {
+            foreach (['hover', 'surface2', 'page'] as $tier) {
+                $this->assertGreaterThanOrEqual(4.5, contrast::ratio($s->text, $s->ramp[$tier]), "$id text on $tier");
+            }
+        }
+    }
 }
