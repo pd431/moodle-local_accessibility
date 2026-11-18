@@ -45,3 +45,16 @@ function local_accessibility_pluginfile($course, $cm, $context, $filearea, $args
     $options += ['immutable' => true];
     send_file($file, $file->get_filename(), YEARSECS, 0, false, false, $r['mimetype'], false, $options);
 }
+
+/**
+ * The floating launcher, for local_floatingbuttons (when installed): it stacks above Moodle's footer button in the
+ * slot the admin gives it there, slot 1 by default. Not registered when the launcher lives in the user menu only.
+ *
+ * @return array
+ */
+function local_accessibility_floatingbuttons(): array {
+    if ((get_config('local_accessibility', 'launcher') ?: 'both') === 'menu') {
+        return [];
+    }
+    return [['id' => 'launcher', 'name' => get_string('pluginname', 'local_accessibility'), 'defaultslot' => 1]];
+}

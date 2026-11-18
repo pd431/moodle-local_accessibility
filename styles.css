@@ -1328,13 +1328,12 @@ html[data-a11y-colour] .local-accessibility-panel {
     }
 }
 
-/* 14. Launcher (.btn doubled for specificity over the theme's .btn). Sized and placed in rem so it grows with the
-   user's text size together with Boost's footer button (bottom: 2rem) under it, and keeps its place above that button
-   (44px, 80px from the bottom, at 100%). z-index 777 keeps it below chat and other docked panels. */
+/* 14. Launcher (.btn doubled for specificity over the theme's .btn). Sized in rem so it grows with the user's text
+   size together with Boost's footer button. z-index 777 keeps it below chat and other docked panels. Where it sits:
+   local_floatingbuttons places it when installed (its slot classes, slot 1 by default, following core's corner
+   buttons through CSS anchor positioning); otherwise .la-launcher-own below. */
 .btn.local-accessibility-launcher {
     position: fixed;
-    inset-block-end: 5rem;
-    inset-inline-end: 24px;
     z-index: 777;
     inline-size: 2.75rem;
     block-size: 2.75rem;
@@ -1352,13 +1351,46 @@ html[data-a11y-colour] .local-accessibility-panel {
     max-inline-size: none;
     max-block-size: none;
 }
+/* Without local_floatingbuttons: one gap (core's 0.75rem) above where core rests its footer button (2rem from the
+   bottom and the inline end, 2.25rem across), on that button's centre line, and over a sticky footer as core raises
+   its own buttons (1rem above it; theme/boost/scss/moodle/core.scss, .hasstickyfooter). Whether the "?" is shown or
+   not, the launcher never covers it. */
+.btn.local-accessibility-launcher.la-launcher-own {
+    inset-block-end: calc(2rem + 2.25rem + 0.75rem);
+    inset-inline-end: calc(2rem + 1.125rem);
+    translate: 50% 0;
+}
+.btn.local-accessibility-launcher.la-launcher-own:dir(rtl) {
+    translate: -50% 0;
+}
+body.hasstickyfooter .btn.local-accessibility-launcher.la-launcher-own {
+    inset-block-end: calc(1rem + var(--sticky-footer-total-height, max(80px, 3rem)) + 2.25rem + 0.75rem);
+}
+/* Keep the floating launcher off the focused element (WCAG 2.4.11, panel.js): it moves up four rows. */
 .btn.local-accessibility-launcher.la-launcher-shifted {
     inset-block-end: 9rem;
 }
+body.hasstickyfooter .btn.local-accessibility-launcher.la-launcher-own.la-launcher-shifted {
+    inset-block-end: calc(1rem + var(--sticky-footer-total-height, max(80px, 3rem)) + 7rem);
+}
 /* The footer HTML lands inside #page (#region-main), so a sibling selector cannot match.
-   Boost only docks the right drawer (315px) from the lg breakpoint; below it the drawer overlays. */
+   Boost only docks the right drawer (315px) from the lg breakpoint; below it the drawer overlays. The own launcher
+   moves left of a docked drawer with core's "?" (and stays clear of it on 5.3 pages where core leaves the "?"). */
 @media (min-width: 992px) {
-    body:has(#page.drawers.show-drawer-right) .local-accessibility-launcher,
+    body:has(#page.drawers.show-drawer-right) .btn.local-accessibility-launcher.la-launcher-own {
+        inset-inline-end: calc(315px + 2rem + 1.125rem);
+    }
+    /* Where the browser has anchor positioning, the own launcher keeps one gap clear of an open right drawer's edge
+       wherever the theme puts the drawer (Boost Union 5.3 floats it 40px in). Only while an own launcher is on the
+       page, so it never takes the anchor name local_floatingbuttons gives the drawer. */
+    @supports (anchor-name: --a) {
+        body:has(.la-launcher-own) .drawer.drawer-right.show {
+            anchor-name: --la-drawer;
+        }
+        body:has(#page.drawers.show-drawer-right) .btn.local-accessibility-launcher.la-launcher-own {
+            inset-inline-end: max(calc(315px + 2rem + 1.125rem), calc(anchor(--la-drawer start, 0px) + 0.75rem + 1.375rem));
+        }
+    }
     body:has(#page.drawers.show-drawer-right) .local-accessibility-panel {
         inset-inline-end: calc(315px + 24px);
     }
