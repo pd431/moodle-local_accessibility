@@ -45,6 +45,9 @@ status text and as solid borders and markers.
   installed it takes the slot an admin gives it there (slot 1 by default), placed with CSS anchor positioning so it
   follows core and the theme; without it, it sits one gap above core's resting spot for the "?", on its centre line,
   lifted over a sticky footer and clear of an open block drawer.
+- Plain controls Moodle draws with no side padding (the grading table's filters, an admin page's heading select) get
+  0.5em of inline padding under a scheme, so the scheme's edge does not touch their text.
+- The navbar takes the scheme's surface under every scheme, also when the theme paints it in the brand colour.
 - Alert edges no longer use fixed hex colours.
 - Tests: the Behat step "should look different from" uses a 3:1 rule (it passed on any difference before), counts an
   edge or underline in another style or weight, or a shadow of another shape, as another mark, and counts Bootstrap
