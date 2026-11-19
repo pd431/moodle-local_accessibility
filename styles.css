@@ -282,6 +282,14 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     html[data-a11y-colour] body :where(.drawer, .navbar, .secondary-navigation):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
         background-color: var(--a11y-surface2) !important; /* stylelint-disable-line declaration-no-important */
     }
+    /* A navbar the theme paints with the brand colour (Boost Union's coloured navbar, .navbar.bg-primary, with
+       !important) takes the scheme's surface too, under every scheme, so the scheme's text, icons and focus ring sit
+       on the scheme's own colours: on a light scheme they were dark on the brand colour. body:not(#la-weight) adds one
+       id's weight, as for the navbar controls. */
+    html[data-a11y-colour] body:not(#la-weight) :where(.navbar) {
+        background-color: var(--a11y-surface2) !important; /* stylelint-disable-line declaration-no-important */
+        background-image: none !important; /* stylelint-disable-line declaration-no-important */
+    }
     /* Text-entry fields only: buttons, checkboxes, radios and switches keep the theme's look (their state colours).
        A field's edge is the scheme's border colour, or its text colour where the scheme has none: Bootstrap 4's grey
        edge is faint on a dark field. An input group's add-on (.input-group-text) is part of the field. */
