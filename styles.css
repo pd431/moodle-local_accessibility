@@ -318,6 +318,15 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     html[data-a11y-colour] body :where(.btn-secondary, .btn-light, .btn-outline-secondary, .btn-outline-primary, .btn-icon, .btn-footer-popover, .icons-collapse-expand, .mds-nav-pill--selected, .mds-nav-pill.active, .btn:not(.btn-primary, .btn-success, .btn-danger, .btn-warning, .btn-info, .btn-dark, .btn-link, [class*="btn-outline-"])):where(:hover, :focus, .active, [aria-expanded="true"]):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
         background-color: var(--a11y-hover) !important; /* stylelint-disable-line declaration-no-important */
     }
+    /* Plain controls that core draws with no inline padding and a transparent edge, so they read as text: core's
+       combobox toggles (the grading table's filters, the admin pages' heading select: div.btn.dropdown-toggle with
+       role="combobox", zeroed by .p-0 or by the tertiary navigation's own rule) and other plain .btn.p-0 controls. The rules above give them the scheme's edge, which then sat against the text: they take 0.5em of inline
+       padding, in em so a heading-sized select gets proportionally more. The caret (::after) keeps its own margin
+       inside it. Icon buttons and the theme-coloured variants keep core's padding; with no scheme nothing changes. The
+       id's weight beats .p-0's !important. */
+    html[data-a11y-colour] body:not(#la-weight) :where(.btn:is(.p-0, .px-0, .dropdown-toggle[role="combobox"]):not(.btn-primary, .btn-success, .btn-danger, .btn-warning, .btn-info, .btn-dark, .btn-link, .btn-icon, [class*="btn-outline-"], .icons-collapse-expand, .btn-footer-popover, .local-accessibility-launcher, .local-floatingbuttons-slot)) {
+        padding-inline: 0.5em !important; /* stylelint-disable-line declaration-no-important */
+    }
     /* Border token (data-a11y-tokens): a scheme whose surfaces share one shade, such as VS Code dark high contrast,
        tells them apart by a 1px edge in its border colour on every surface, field, table cell and control. Schemes
        without the token keep the theme's edges. */
