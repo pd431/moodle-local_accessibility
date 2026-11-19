@@ -1094,4 +1094,27 @@ final class styles_test extends \advanced_testcase {
         $mopup = self::rules_with('html[data-a11y-colour] body :where(#page, #page-wrapper,');
         $this->assertStringContainsString('background-color: var(--a11y-surface1) !important', $mopup[0][1], 'the same surface');
     }
+
+    /**
+     * Plain controls core draws with no inline padding (combobox toggles, .btn.p-0) take 0.5em of inline padding under
+     * a scheme; icon buttons and coloured variants are left out.
+     */
+    public function test_zero_padding_controls(): void {
+        $r = self::rules_with('html[data-a11y-colour] body:not(#la-weight) :where(.btn:is(.p-0, .px-0, .dropdown-toggle[role="combobox"])');
+        $this->assertCount(1, $r);
+        $this->assertStringContainsString('padding-inline: 0.5em !important', $r[0][1]);
+        foreach (['.btn-icon', '.btn-link', '.btn-primary', '.local-accessibility-launcher', '.local-floatingbuttons-slot'] as $out) {
+            $this->assertStringContainsString($out, $r[0][0], $out . ' keeps its padding');
+        }
+    }
+
+    /**
+     * The navbar takes the scheme's surface with an id's weight, over a theme's brand-coloured navbar.
+     */
+    public function test_navbar_scheme_surface(): void {
+        $r = self::rules_with('html[data-a11y-colour] body:not(#la-weight) :where(.navbar)');
+        $this->assertCount(1, $r);
+        $this->assertStringContainsString('background-color: var(--a11y-surface2) !important', $r[0][1]);
+        $this->assertStringContainsString('background-image: none !important', $r[0][1]);
+    }
 }

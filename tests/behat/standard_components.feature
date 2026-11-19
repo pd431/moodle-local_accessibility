@@ -88,3 +88,25 @@ Feature: Standard Moodle components keep their contrast under a colour scheme
       | vscodehc     |
       | highcontrast |
       | dark         |
+
+  Scenario Outline: Controls with no side padding get some under <scheme>, and a brand-coloured navbar takes the scheme's surface
+    Given the following "user preferences" exist:
+      | user     | preference                 | value    |
+      | student1 | local_accessibility_colour | <scheme> |
+    And I log in as "student1"
+    And the page has the extra style "nav.navbar { background-color: #003c3c !important; }"
+    When the HTML "<div class='btn dropdown-toggle p-0' role='combobox' id='la-combo' tabindex='0'>Filter by name</div><button type='button' class='btn btn-icon' id='la-iconbtn'><i class='icon fa fa-cog'></i></button>" is added to the main region
+    Then the computed "padding-left" of "#la-combo" should not be "0px"
+    And the computed "padding-right" of "#la-combo" should not be "0px"
+    And the computed "padding-left" of "#la-iconbtn" should be "0px"
+    And the computed "background-color" of "nav.navbar" should not be "rgb(0, 60, 60)"
+
+    Examples:
+      | scheme     |
+      | blackwhite |
+      | cream      |
+
+  Scenario: With no scheme a combobox toggle keeps core's padding
+    Given I log in as "student1"
+    When the HTML "<div class='btn dropdown-toggle p-0' role='combobox' id='la-combo' tabindex='0'>Filter by name</div>" is added to the main region
+    Then the computed "padding-left" of "#la-combo" should be "0px"
