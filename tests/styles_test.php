@@ -270,7 +270,7 @@ final class styles_test extends \advanced_testcase {
         }
         // Its place is local_floatingbuttons' slot, or .la-launcher-own: in rem too (floatingbuttons_test).
         $own = array_values(array_filter(self::rules(), fn($r) => $r[0] === '.btn.local-accessibility-launcher.la-launcher-own'));
-        $this->assertStringContainsString('inset-block-end: calc(2rem + 2.25rem + 0.75rem);', $own[0][1]);
+        $this->assertStringContainsString('inset-block-end: calc(2rem + var(--la-corner-size) + 0.75rem);', $own[0][1]);
         foreach (self::rules_with('.local-accessibility-launcher') as [$selector, $declarations]) {
             $this->assertDoesNotMatchRegularExpression(
                 '/(?<![-\w])(font-size|inline-size|block-size|inset-block-end):\s*\d+(\.\d+)?px/',

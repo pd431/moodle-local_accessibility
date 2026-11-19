@@ -1356,15 +1356,18 @@ html[data-a11y-colour] .local-accessibility-panel {
    its own buttons (1rem above it; theme/boost/scss/moodle/core.scss, .hasstickyfooter). Whether the "?" is shown or
    not, the launcher never covers it. */
 .btn.local-accessibility-launcher.la-launcher-own {
-    inset-block-end: calc(2rem + 2.25rem + 0.75rem);
-    inset-inline-end: calc(2rem + 1.125rem);
+    /* The "?" is 2.25rem on Moodle 4.5 and 2rem on Moodle 5: Bootstrap 4's root token --breakpoint-xs (0, absent from
+       Bootstrap 5) tells them apart. */
+    --la-corner-size: calc(2rem + 0.25rem * (1 + var(--breakpoint-xs, -1)));
+    inset-block-end: calc(2rem + var(--la-corner-size) + 0.75rem);
+    inset-inline-end: calc(2rem + var(--la-corner-size) / 2);
     translate: 50% 0;
 }
 .btn.local-accessibility-launcher.la-launcher-own:dir(rtl) {
     translate: -50% 0;
 }
 body.hasstickyfooter .btn.local-accessibility-launcher.la-launcher-own {
-    inset-block-end: calc(1rem + var(--sticky-footer-total-height, max(80px, 3rem)) + 2.25rem + 0.75rem);
+    inset-block-end: calc(1rem + var(--sticky-footer-total-height, max(80px, 3rem)) + var(--la-corner-size) + 0.75rem);
 }
 /* Keep the floating launcher off the focused element (WCAG 2.4.11, panel.js): it moves up four rows. */
 .btn.local-accessibility-launcher.la-launcher-shifted {
@@ -1378,7 +1381,7 @@ body.hasstickyfooter .btn.local-accessibility-launcher.la-launcher-own.la-launch
    moves left of a docked drawer with core's "?" (and stays clear of it on 5.3 pages where core leaves the "?"). */
 @media (min-width: 992px) {
     body:has(#page.drawers.show-drawer-right) .btn.local-accessibility-launcher.la-launcher-own {
-        inset-inline-end: calc(315px + 2rem + 1.125rem);
+        inset-inline-end: calc(315px + 2rem + var(--la-corner-size) / 2);
     }
     /* Where the browser has anchor positioning, the own launcher keeps one gap clear of an open right drawer's edge
        wherever the theme puts the drawer (Boost Union 5.3 floats it 40px in). Only while an own launcher is on the
@@ -1388,7 +1391,7 @@ body.hasstickyfooter .btn.local-accessibility-launcher.la-launcher-own.la-launch
             anchor-name: --la-drawer;
         }
         body:has(#page.drawers.show-drawer-right) .btn.local-accessibility-launcher.la-launcher-own {
-            inset-inline-end: max(calc(315px + 2rem + 1.125rem), calc(anchor(--la-drawer start, 0px) + 0.75rem + 1.375rem));
+            inset-inline-end: max(calc(315px + 2rem + var(--la-corner-size) / 2), calc(anchor(--la-drawer start, 0px) + 0.75rem + 1.375rem));
         }
     }
     body:has(#page.drawers.show-drawer-right) .local-accessibility-panel {

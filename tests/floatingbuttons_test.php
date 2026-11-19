@@ -53,8 +53,10 @@ final class floatingbuttons_test extends \advanced_testcase {
         preg_match('/\.btn\.local-accessibility-launcher \{([^}]*)\}/', $css, $base);
         $this->assertStringNotContainsString('inset-', $base[1], 'the base rule leaves the place to a slot or to la-launcher-own');
         preg_match('/\.btn\.local-accessibility-launcher\.la-launcher-own \{([^}]*)\}/', $css, $own);
-        $this->assertStringContainsString('inset-block-end: calc(2rem + 2.25rem + 0.75rem)', $own[1]);
-        $this->assertStringContainsString('inset-inline-end: calc(2rem + 1.125rem)', $own[1]);
+        $this->assertStringContainsString('--la-corner-size: calc(2rem + 0.25rem * (1 + var(--breakpoint-xs, -1)))', $own[1],
+            'the "?" is 2.25rem on Bootstrap 4 (Moodle 4.5) and 2rem on Bootstrap 5');
+        $this->assertStringContainsString('inset-block-end: calc(2rem + var(--la-corner-size) + 0.75rem)', $own[1]);
+        $this->assertStringContainsString('inset-inline-end: calc(2rem + var(--la-corner-size) / 2)', $own[1]);
         $this->assertStringContainsString('translate: 50% 0', $own[1]);
         $this->assertStringContainsString('body.hasstickyfooter .btn.local-accessibility-launcher.la-launcher-own', $css);
         $this->assertStringContainsString('.btn.local-accessibility-launcher.la-launcher-own:dir(rtl)', $css);
