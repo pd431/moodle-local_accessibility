@@ -904,8 +904,9 @@ class behat_local_accessibility extends behat_base {
 
     /**
      * Add core-style controls to the main region: a link, a plain list item, a moodleform submit input, checkboxes,
-     * radios, a text field, pagination with a current page, a menu with an active item and a MathJax span, marked up as
-     * core's templates render them.
+     * radios, a text field, a select, pagination with a current page, a menu with an active item and a MathJax span,
+     * marked up as core's templates render them. Steps name the fixture's own controls (#la-test-select), since
+     * #region-main also holds the plugin's hidden read-aloud bar and whatever the page has.
      *
      * @Given the main region contains core controls
      */
@@ -919,6 +920,7 @@ class behat_local_accessibility extends behat_base {
             <input type="radio" class="form-check-input" name="la-test-r" id="la-test-radio" checked>
             <input type="radio" class="form-check-input" name="la-test-r2" id="la-test-radio-off">
             <input type="text" class="form-control" id="la-test-text" value="Typed text">
+            <select class="custom-select form-select" id="la-test-select"><option>One</option><option>Two</option></select>
             <nav><ul class="pagination">
                 <li class="page-item"><a href="#" class="page-link">1</a></li>
                 <li class="page-item active"><a href="#" class="page-link" id="la-test-page" aria-current="page">2</a></li>

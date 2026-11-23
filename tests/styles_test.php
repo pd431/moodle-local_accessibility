@@ -746,26 +746,32 @@ final class styles_test extends \advanced_testcase {
     }
 
     /**
-     * A theme that forces link colours with !important does not beat the scheme: the anchor rule carries one id's weight.
+     * A theme that forces link colours with !important does not beat the scheme: the anchor rule carries two ids'
+     * weight, so it outranks a site rule of one id with classes and pseudo-classes (#region-main a:link:not(.btn)).
      */
     public function test_anchor_rule_outranks_theme_links(): void {
         $line = 'text-decoration: var(--la-anchor-line, underline) !important';
         $anchors = array_values(array_filter(self::rules(), fn($r) => str_contains($r[1], $line)));
         $this->assertCount(1, $anchors);
-        $this->assertStringContainsString('html[data-a11y-colour] body:not(#la-weight) :where(a:not(.btn', $anchors[0][0]);
-        $highlight = self::rules_with('html[data-a11y-colour][data-a11y-links="highlight"] body:not(#la-weight)');
+        $this->assertStringContainsString('html[data-a11y-colour]:not(#la-weight) body:not(#la-weight) :where(a:not(.btn',
+            $anchors[0][0]);
+        $highlight = self::rules_with('html[data-a11y-colour][data-a11y-links="highlight"]:not(#la-weight) body:not(#la-weight)');
         $this->assertCount(1, $highlight, 'highlighted links keep the link colour on their surface');
         $this->assertStringContainsString('color: var(--a11y-link) !important', $highlight[0][1]);
     }
 
     /**
-     * Fields, selects and input-group add-ons take the field colour and an edge in the scheme's border or text colour.
+     * Fields, selects and input-group add-ons take the field colour and an edge in the scheme's border or text colour,
+     * of the theme's width or 1px.
      */
     public function test_fields(): void {
         $rules = self::rules_with('.custom-select, .input-group-text, select, textarea, input:not(');
         $this->assertCount(1, $rules);
         $this->assertStringContainsString('background-color: var(--a11y-field) !important', $rules[0][1]);
         $this->assertStringContainsString('border-color: var(--a11y-border, var(--a11y-text)) !important', $rules[0][1]);
+        // The edge does not depend on the theme's border: Moodle 5.x draws it from --bs-border-width.
+        $this->assertStringContainsString('border-style: solid;', $rules[0][1]);
+        $this->assertStringContainsString('border-width: var(--bs-border-width, 1px);', $rules[0][1]);
     }
 
     /**

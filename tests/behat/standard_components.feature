@@ -49,7 +49,7 @@ Feature: Standard Moodle components keep their contrast under a colour scheme
     Then the "#la-focus-a" element should show a keyboard focus indicator
     And the "#la-focus-a" element should have a text contrast of at least 7:1
     And the ".local-accessibility-launcher" element should show a keyboard focus indicator
-    And the "#region-main select" element should show a keyboard focus indicator
+    And the "#la-test-select" element should show a keyboard focus indicator
 
     Examples:
       | scheme       |
@@ -67,8 +67,8 @@ Feature: Standard Moodle components keep their contrast under a colour scheme
     And I log in as "student1"
     And the page has no Bootstrap 5 custom properties
     And the main region contains core controls
-    Then the "#region-main select" element should stand out from its background
-    And the "#region-main input[type='text']" element should stand out from its background
+    Then the "#la-test-select" element should stand out from its background
+    And the "#la-test-text" element should stand out from its background
 
   Scenario Outline: Forced link colours, pagination, alerts' edges and image icons follow <scheme>
     Given the following "user preferences" exist:
