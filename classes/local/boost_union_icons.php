@@ -90,7 +90,7 @@ final class boost_union_icons {
      * The rules for a set of modules and Boost Union's settings, as Boost Union composes its own (its
      * theme_boost_union_get_scss_for_activity_icon_purpose()).
      *
-     * @param array<string, array{purpose: string, name: string}> $modules modname => default purpose and display name
+     * @param array $modules modname => [purpose => default purpose, name => display name]
      * @param array<string, string> $config Boost Union's settings
      * @return string CSS
      */
