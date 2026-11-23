@@ -40,9 +40,14 @@ status text and as solid borders and markers.
 - Keyboard focus under a scheme without its own focus colour is drawn in the mark colour, and moves inside a current
   item's box under every scheme.
 - The page's side gutters keep one surface while a long page scrolls (on Moodle 5.3 they turned from grey to black).
-- The floating launcher sits one gap above core's resting spot for its footer button (the "?") instead of a fixed
-  80px, which put it on top of the "?" on any page with a sticky footer: on the "?"'s centre line, lifted over a sticky
-  footer and clear of an open block drawer.
+- The floating launcher sits a set distance above Moodle's corner button, the "Button height offset" setting
+  (launcheroffset, in px, default 12, from 0 to 200), instead of a fixed 80px, which put it on top of the "?" on any
+  page with a sticky footer. The corner button is the topmost shown of core's footer button (the "?") and the theme's
+  back-to-top; the launcher follows it on its centre line with CSS anchor positioning, wherever core or the theme moves
+  it. With neither shown, or without anchor positioning, it sits the same distance above core's resting spot for the
+  "?", lifted over a sticky footer and clear of an open block drawer. RTL mirrors.
+- The settings panel opens beside the launcher, the same distance from its inline-start edge, with their bottom edges
+  level and the panel kept inside the viewport; below 768px it stays a full-width bottom sheet.
 - Plain controls Moodle draws with no side padding (the grading table's filters, an admin page's heading select) get
   0.5em of inline padding under a scheme, so the scheme's edge does not touch their text.
 - The navbar takes the scheme's surface under every scheme, also when the theme paints it in the brand colour.
