@@ -106,7 +106,7 @@ final class boost_union_icons {
                 && (in_array($chosen, purpose::ids(), true) || $chosen === MOD_PURPOSE_OTHER);
             $painted = $overridden ? $chosen : $default;
             if (!in_array($painted, purpose::ids(), true)) {
-                continue;       // "Other": Boost Union draws it without a filter, and so does the scheme.
+                continue;       // Other: Boost Union draws it without a filter, and so does the scheme.
             }
             $selectors = [];
             if ($overridden) {

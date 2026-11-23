@@ -66,8 +66,10 @@ final class boost_union_icons_test extends \advanced_testcase {
      */
     public function test_lti_other_and_unknown(): void {
         $css = boost_union_icons::rules(self::MODULES, ['activitypurposelti' => 'communication']);
-        $this->assertStringContainsString(self::PREFIX . '.modchoosercontainer [class*="modicon_lti"].activityiconcontainer img',
-            $css);
+        $this->assertStringContainsString(
+            self::PREFIX . '.modchoosercontainer [class*="modicon_lti"].activityiconcontainer img',
+            $css
+        );
         $this->assertStringContainsString('{filter:url("#la-icon-communication") !important}', $css);
         $this->assertSame('', boost_union_icons::rules(self::MODULES, ['activitypurposeforum' => 'other']));
         $this->assertSame('', boost_union_icons::rules(self::MODULES, ['activitypurposeforum' => 'bogus']));
@@ -89,8 +91,10 @@ final class boost_union_icons_test extends \advanced_testcase {
         $css = boost_union_icons::rules(self::MODULES, $config);
         $rules = explode('}', rtrim($css, '}'));
         $this->assertCount(3, $rules, 'forum, assign and lti; not the label');
-        $this->assertStringContainsString(self::PREFIX . '.block_timeline .theme-boost-union-mod_forum.activityiconcontainer img',
-            $rules[0]);
+        $this->assertStringContainsString(
+            self::PREFIX . '.block_timeline .theme-boost-union-mod_forum.activityiconcontainer img',
+            $rules[0]
+        );
         $this->assertStringContainsString(
             self::PREFIX . '.block_calendar_upcoming .theme-boost-union-mod_forum.activityiconcontainer img',
             $rules[0]
