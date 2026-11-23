@@ -625,18 +625,19 @@ final class styles_test extends \advanced_testcase {
     }
 
     /**
-     * Activity icons: one filter rule per purpose, Boost's selector shape, pointing at the panel's SVG filter.
-     *
+     * Activity icons: one filter rule per purpose, Boost's selector shape, pointing at the panel's SVG filter, with
+     * !important and two ids' weight.
      */
     public function test_activity_icon_filters(): void {
         $rules = self::rules_with('.activityiconcontainer.');
         $this->assertCount(6, $rules);
         foreach ($rules as [$selector, $body]) {
-            $shape = '/^html\[data-a11y-colour\] body \.activityiconcontainer\.([a-z]+):not\(\.isbranded\) '
-                . ':is\(\.activityicon, \.icon\):not\(\.nofilter\)$/';
+            // Two ids' weight and !important: a theme's !important filter on the icon (Boost Union's) does not win.
+            $shape = '/^html\[data-a11y-colour\]:not\(#la-weight\) body:not\(#la-weight\) '
+                . '\.activityiconcontainer\.([a-z]+):not\(\.isbranded\) :is\(\.activityicon, \.icon\):not\(\.nofilter\)$/';
             $this->assertMatchesRegularExpression($shape, $selector);
             preg_match('/\.activityiconcontainer\.([a-z]+)/', $selector, $m);
-            $this->assertSame('filter: url("#la-icon-' . $m[1] . '");', trim($body));
+            $this->assertStringStartsWith('filter: url("#la-icon-' . $m[1] . '") !important;', trim($body));
         }
     }
 

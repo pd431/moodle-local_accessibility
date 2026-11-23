@@ -24,6 +24,8 @@ One owner per rule. A change goes in the owner; a new rule gets an owner and a g
 | Border, focus and selection tokens (the active token is the mark colour, s7a) | `styles.css` s7 and s11a | `styles_test::test_scheme_token_rules` |
 | Focus for schemes without a focus token | `styles.css` s7a | `styles_test::test_focus_without_token` |
 | Activity icons and other monochrome image icons | `styles.css` s7, the icon filter rules | `styles_test::test_activity_icon_filters`, `test_image_icons` |
+| Activity icon colours: the theme's painted colours as baseline (`--activity<purpose>`, a filter chain on 4.5), Boost's table as fallback, held to APCA Lc 75 and WCAG 2 4.5:1 | `classes/local/theme_icons.php` (reading), `classes/colour/cssfilter.php` (filter maths), `classes/colour/purpose.php` (adjusting) | `tests/local/theme_icons_test.php`, `tests/colour/cssfilter_test.php`, `scheme_test::test_icon_colours_from_baseline` |
+| Icons Boost Union repaints (purpose overrides, block tints) under a scheme: the only place Boost Union's settings and selectors are named | `classes/local/boost_union_icons.php`, emitted by `hook_callbacks::head` | `tests/local/boost_union_icons_test.php` |
 | The text editor's toolbar | `styles.css` s7, the editor rule | `styles_test::test_editor_toolbar` |
 | Navbar, popovers, messaging (issue #4) | `styles.css` s7 | `styles_test::test_issue4_rules` |
 

@@ -17,12 +17,14 @@
 namespace local_accessibility\colour;
 
 /**
- * Activity purpose colours under a scheme: Boost's six, lifted or lowered in lightness until they reach APCA Lc 75
- * against every surface an icon sits on.
+ * Activity purpose colours under a scheme: the theme's six, lifted or lowered in lightness until they reach APCA
+ * Lc 75 and a WCAG 2 ratio of 4.5:1 against every surface an icon sits on.
  *
  * Boost paints each monologo activity icon with a CSS filter chain that yields one of these colours. On a dark
- * page they reach Lc 13 to 43 (brown and violet are the worst); on cream three of the six fall under Lc 60.
- * Lc 75 is APCA's level for body text, and the one that matches the 7:1 the schemes promise for text.
+ * page Boost's reach Lc 13 to 43 (brown and violet are the worst); on cream three of the six fall under Lc 60.
+ * Lc 75 is APCA's level for body text; 4.5:1 is the WCAG 2 text level it corresponds to, held as well because
+ * WCAG 2 is what the schemes promise everywhere else. The baseline is what the active theme paints
+ * (\local_accessibility\local\theme_icons), Boost's table when that cannot be read.
  *
  * @package    local_accessibility
  * @copyright  2026 Adam Jenkins <adam@wisecat.net>
@@ -31,6 +33,9 @@ namespace local_accessibility\colour;
 final class purpose {
     /** @var float APCA Lc every icon colour reaches against page, surface1 and surface2. */
     public const TARGET = 75.0;
+
+    /** @var float WCAG 2 ratio every icon colour reaches as well (text level; 1.4.11's 3:1 would never bind). */
+    public const WCAG = 4.5;
 
     /**
      * Boost 4.5's purpose colours (theme/boost/scss/moodle/variables.scss, $activity-icon-*-bg). Names are the
@@ -57,18 +62,22 @@ final class purpose {
     }
 
     /**
-     * One colour per purpose for a scheme: Boost's where it already reaches the target, else the nearest lightness of
-     * the same hue that does, else the scheme's text colour (no lightness of that hue reaches the target).
+     * One colour per purpose for a scheme: the baseline where it already passes both measures, else the nearest
+     * lightness of the same hue that does, else the scheme's text colour (no lightness of that hue passes).
      *
      * @param array $ramp the scheme's ramp (page, surface1, surface2 are what icons sit on)
      * @param string $text the scheme's text colour, the fallback
+     * @param array|null $baseline purpose => normalised colour the theme paints; Boost's table by default, and for
+     *      any purpose the baseline leaves out
      * @return array<string, string> purpose => normalised colour
      */
-    public static function colours(array $ramp, string $text): array {
+    public static function colours(array $ramp, string $text, ?array $baseline = null): array {
         $surfaces = ['page' => $ramp['page'], 'surface1' => $ramp['surface1'], 'surface2' => $ramp['surface2']];
+        $measure = fn(string $fg, array $bgs): float => contrast::dual_worst($fg, $bgs, self::TARGET, self::WCAG);
         $out = [];
         foreach (self::BOOST as $id => $hex) {
-            $out[$id] = adjust::towards($hex, $surfaces, self::TARGET, contrast::apca_worst(...)) ?? $text;
+            $hex = $baseline[$id] ?? $hex;
+            $out[$id] = adjust::towards($hex, $surfaces, 1.0, $measure) ?? $text;
         }
         return $out;
     }

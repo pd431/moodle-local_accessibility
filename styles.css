@@ -210,24 +210,27 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     /* Activity icons: Boost paints each monologo icon with a filter chain that yields a purpose colour (Lc 13 to 43
        on black by APCA). Under a scheme the icon takes the panel's SVG filter for its purpose instead, which floods
        its shape with --a11y-icon-<purpose>: the same hue lifted or lowered to Lc 75 (see colour\purpose). Same
-       selector shape as Boost's, so branded and unfiltered icons stay as they are. */
-    html[data-a11y-colour] body .activityiconcontainer.administration:not(.isbranded) :is(.activityicon, .icon):not(.nofilter) {
-        filter: url("#la-icon-administration");
+       selector shape as Boost's, so branded and unfiltered icons stay as they are. !important and two ids' weight:
+       a theme may force an icon's filter with !important on the img (Boost Union's purpose overrides and block
+       tints, one id at most), and the scheme's filter still wins; local\boost_union_icons aims the icons Boost Union
+       repaints in another purpose at that purpose's filter. */
+    html[data-a11y-colour]:not(#la-weight) body:not(#la-weight) .activityiconcontainer.administration:not(.isbranded) :is(.activityicon, .icon):not(.nofilter) {
+        filter: url("#la-icon-administration") !important; /* stylelint-disable-line declaration-no-important */
     }
-    html[data-a11y-colour] body .activityiconcontainer.assessment:not(.isbranded) :is(.activityicon, .icon):not(.nofilter) {
-        filter: url("#la-icon-assessment");
+    html[data-a11y-colour]:not(#la-weight) body:not(#la-weight) .activityiconcontainer.assessment:not(.isbranded) :is(.activityicon, .icon):not(.nofilter) {
+        filter: url("#la-icon-assessment") !important; /* stylelint-disable-line declaration-no-important */
     }
-    html[data-a11y-colour] body .activityiconcontainer.collaboration:not(.isbranded) :is(.activityicon, .icon):not(.nofilter) {
-        filter: url("#la-icon-collaboration");
+    html[data-a11y-colour]:not(#la-weight) body:not(#la-weight) .activityiconcontainer.collaboration:not(.isbranded) :is(.activityicon, .icon):not(.nofilter) {
+        filter: url("#la-icon-collaboration") !important; /* stylelint-disable-line declaration-no-important */
     }
-    html[data-a11y-colour] body .activityiconcontainer.communication:not(.isbranded) :is(.activityicon, .icon):not(.nofilter) {
-        filter: url("#la-icon-communication");
+    html[data-a11y-colour]:not(#la-weight) body:not(#la-weight) .activityiconcontainer.communication:not(.isbranded) :is(.activityicon, .icon):not(.nofilter) {
+        filter: url("#la-icon-communication") !important; /* stylelint-disable-line declaration-no-important */
     }
-    html[data-a11y-colour] body .activityiconcontainer.content:not(.isbranded) :is(.activityicon, .icon):not(.nofilter) {
-        filter: url("#la-icon-content");
+    html[data-a11y-colour]:not(#la-weight) body:not(#la-weight) .activityiconcontainer.content:not(.isbranded) :is(.activityicon, .icon):not(.nofilter) {
+        filter: url("#la-icon-content") !important; /* stylelint-disable-line declaration-no-important */
     }
-    html[data-a11y-colour] body .activityiconcontainer.interactivecontent:not(.isbranded) :is(.activityicon, .icon):not(.nofilter) {
-        filter: url("#la-icon-interactivecontent");
+    html[data-a11y-colour]:not(#la-weight) body:not(#la-weight) .activityiconcontainer.interactivecontent:not(.isbranded) :is(.activityicon, .icon):not(.nofilter) {
+        filter: url("#la-icon-interactivecontent") !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Other image icons (the icon beside each plugin on Plugins overview, gradebook item and aggregation icons, the
        group mode icon) are dark monochrome artwork with no purpose colour. Under a dark scheme, which carries

@@ -232,8 +232,8 @@ final class scheme_test extends \advanced_testcase {
     }
 
     /**
-     * Every preset's six activity icon colours reach APCA Lc 75 on page, surface1 and surface2, keep Boost's hue,
-     * and are emitted as --a11y-icon-<purpose>.
+     * Every preset's six activity icon colours reach APCA Lc 75 and 4.5:1 on page, surface1 and surface2, keep
+     * Boost's hue, and are emitted as --a11y-icon-<purpose>.
      */
     public function test_icon_colours(): void {
         foreach (scheme::presets() as $id => $s) {
@@ -242,6 +242,7 @@ final class scheme_test extends \advanced_testcase {
             $surfaces = [$s->ramp['page'], $s->ramp['surface1'], $s->ramp['surface2']];
             foreach ($colours as $p => $hex) {
                 $this->assertGreaterThanOrEqual(purpose::TARGET, contrast::apca_worst($hex, $surfaces), "$id $p");
+                $this->assertGreaterThanOrEqual(purpose::WCAG, contrast::worst($hex, $surfaces), "$id $p WCAG 2");
                 [, $c, $h] = oklch::from_hex($hex);
                 [, , $boosth] = oklch::from_hex(purpose::BOOST[$p]);
                 $diff = abs($h - $boosth);
@@ -332,5 +333,58 @@ final class scheme_test extends \advanced_testcase {
                 $this->assertGreaterThanOrEqual(4.5, contrast::ratio($s->text, $s->ramp[$tier]), "$id text on $tier");
             }
         }
+    }
+
+    /**
+     * Every preset's six purposes reach APCA Lc 75 and 4.5:1 on its page and surfaces, from Boost's colours (4.5, 5.2
+     * and 5.3 declare the same) and from the theme colours measured on the test sites, in the theme's hue.
+     */
+    public function test_every_preset_with_theme_baselines(): void {
+        $baselines = [
+            'Boost' => purpose::BOOST,
+            '4.5 Boost Union setting' => ['content' => '#2e7c32'] + purpose::BOOST,
+            '5.x Boost Union setting' => ['content' => '#2e7d32'] + purpose::BOOST,
+            '5.x Raw initial SCSS' => ['content' => '#6a1b9a'] + purpose::BOOST,
+        ];
+        foreach (scheme::presets() as $id => $s) {
+            $surfaces = [$s->ramp['page'], $s->ramp['surface1'], $s->ramp['surface2']];
+            foreach ($baselines as $name => $baseline) {
+                foreach ($s->icon_colours($baseline) as $p => $hex) {
+                    if ($hex === $s->text) {
+                        continue;       // No lightness of that hue reaches both: the scheme's text colour.
+                    }
+                    $this->assertGreaterThanOrEqual(1.0, contrast::dual_worst($hex, $surfaces), "$id $name $p $hex");
+                    [, , $h] = oklch::from_hex($hex);
+                    [, , $baseh] = oklch::from_hex($baseline[$p]);
+                    $diff = abs($h - $baseh);
+                    $this->assertLessThan(3, min($diff, 360 - $diff), "$id $name $p keeps the theme's hue");
+                }
+            }
+        }
+    }
+
+    /**
+     * A theme's own purpose colours are the baseline: kept exactly where they already pass both measures, moved in
+     * lightness but not hue where they do not, with Boost's table filling any purpose the theme leaves out.
+     */
+    public function test_icon_colours_from_baseline(): void {
+        $white = ['page' => '#ffffff', 'surface1' => '#ffffff', 'surface2' => '#ffffff'];
+        $passes = purpose::colours($white, '#000000', ['content' => '#1b4f72']);
+        $this->assertSame('#1b4f72', $passes['content'], 'already passes on white, kept as the theme made it');
+        $this->assertSame('#8d3d1b', $passes['interactivecontent'], 'left out of the baseline, Boost fills in');
+
+        $dark = scheme::presets()['vscodehc'];
+        $colours = $dark->icon_colours(['content' => '#336699']);
+        $surfaces = [$dark->ramp['page'], $dark->ramp['surface1'], $dark->ramp['surface2']];
+        $this->assertNotSame('#336699', $colours['content']);
+        $this->assertGreaterThanOrEqual(purpose::TARGET, contrast::apca_worst($colours['content'], $surfaces));
+        $this->assertGreaterThanOrEqual(purpose::WCAG, contrast::worst($colours['content'], $surfaces));
+        [, , $h] = oklch::from_hex($colours['content']);
+        [, , $baseh] = oklch::from_hex('#336699');
+        $diff = abs($h - $baseh);
+        $this->assertLessThan(3, min($diff, 360 - $diff), 'keeps the theme hue, not Boost\'s teal');
+        $this->assertSame($dark->icon_colours()['assessment'], $colours['assessment'], 'other purposes unchanged');
+        $css = $dark->css_properties(['content' => '#336699']);
+        $this->assertStringContainsString('--a11y-icon-content:' . $colours['content'] . ';', $css);
     }
 }

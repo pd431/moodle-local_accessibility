@@ -103,6 +103,22 @@ final class contrast {
     }
 
     /**
+     * How far a foreground is from passing both measures against every background: the smaller of |Lc| / $lc and
+     * ratio / $ratio, over the backgrounds. 1.0 or more means it passes both. APCA is the stronger reading on a dark
+     * page, but WCAG 2 is what the schemes promise, so the icon colours are held to both; normalising the two to a
+     * target of 1 lets adjust::towards search once for the smallest lightness change that satisfies both.
+     *
+     * @param string $fg normalised colour
+     * @param string[] $backgrounds normalised colours
+     * @param float $lc the Lc that counts as a pass
+     * @param float $ratio the WCAG 2 ratio that counts as a pass
+     * @return float
+     */
+    public static function dual_worst(string $fg, array $backgrounds, float $lc = 75.0, float $ratio = 4.5): float {
+        return min(self::apca_worst($fg, $backgrounds) / $lc, self::worst($fg, $backgrounds) / $ratio);
+    }
+
+    /**
      * APCA's estimated screen luminance, with its black soft clamp.
      *
      * @param string $hex normalised colour

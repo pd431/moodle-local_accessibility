@@ -757,6 +757,136 @@ class behat_local_accessibility extends behat_base {
     }
 
     /**
+     * Check the WCAG 2 contrast ratio of an activity's icon, as painted by the plugin's SVG filter, against what is
+     * behind it. The icon colours are held to APCA and WCAG 2 both; this step is the WCAG 2 half.
+     *
+     * @Then /^the activity icon for "(?P<name>[^"]*)" should have a contrast ratio of at least (?P<min>[0-9.]+)$/
+     * @param string $name activity name
+     * @param string $min ratio
+     */
+    public function the_activity_icon_should_have_contrast_ratio(string $name, string $min): void {
+        $this->check_script($this->activity_icon_script($name) . '
+            const m = String(getComputedStyle(icon).filter).match(/#(la-icon-[a-z]+)/);
+            if (!m) {
+                return "The icon of " + ' . json_encode($name) . ' + " does not use a plugin filter: " +
+                    getComputedStyle(icon).filter;
+            }
+            const flood = document.querySelector("#" + m[1] + " feFlood");
+            const fg = flood && parse(getComputedStyle(flood).floodColor);
+            if (!fg) {
+                return "No flood colour for " + m[1];
+            }
+            const back = behind(icon);
+            const r = ratio(over(fg, back), back);
+            return r >= ' . (float) $min . ' ? "" : "Contrast " + r.toFixed(2) + ":1 (icon " +
+                getComputedStyle(flood).floodColor + " on rgb(" + back.map(Math.round).join(", ") + "))";');
+    }
+
+    /**
+     * Skip the scenario unless a theme is installed (Boost Union and Classic are not in every Moodle or CI run).
+     *
+     * @Given /^the "(?P<theme>[a-z_]+)" theme is installed$/
+     * @param string $theme theme name, e.g. boost_union
+     */
+    public function the_theme_is_installed(string $theme): void {
+        if (!core_component::get_component_directory('theme_' . $theme)) {
+            throw new \Moodle\BehatExtension\Exception\SkippedException("theme_$theme is not installed");
+        }
+    }
+
+    /**
+     * Reset the theme caches, as saving a theme setting does, then compile the site theme's stylesheet and keep it in
+     * core's post-processed CSS cache, as styles.php does after sending its fallback sheet, so the next page reads the
+     * theme's own icon colours (local\theme_icons). Config set by a step does not reset the theme caches itself.
+     *
+     * @Given /^the site theme's stylesheet is compiled$/
+     */
+    public function the_site_theme_stylesheet_is_compiled(): void {
+        theme_reset_all_caches();
+        $theme = theme_config::load(get_config('core', 'theme'));
+        $theme->set_css_content_cache($theme->get_css_content());
+    }
+
+    /**
+     * Skip the scenario unless Boost paints activity icons from filter chains (Moodle 4.5) or from colours (5.x),
+     * read from Boost's own SCSS rather than the Moodle version.
+     *
+     * @Given /^Boost paints activity icons from (?P<form>filter chains|colours)$/
+     * @param string $form
+     */
+    public function boost_paints_activity_icons_from(string $form): void {
+        $variables = core_component::get_component_directory('theme_boost') . '/scss/moodle/variables.scss';
+        $chains = str_contains((string) file_get_contents($variables), '$activity-icon-administration-filter');
+        if ($chains !== ($form === 'filter chains')) {
+            throw new \Moodle\BehatExtension\Exception\SkippedException("Boost does not paint activity icons from $form");
+        }
+    }
+
+    /**
+     * Skip the scenario unless Boost Union offers a setting (its block tints exist on its Moodle 4.5 line only).
+     *
+     * @Given /^Boost Union has the "(?P<name>[a-z]+)" setting$/
+     * @param string $name setting name
+     */
+    public function boost_union_has_the_setting(string $name): void {
+        $dir = core_component::get_component_directory('theme_boost_union');
+        if (!$dir || !str_contains((string) file_get_contents($dir . '/settings.php'), "'theme_boost_union/" . $name . "'")) {
+            throw new \Moodle\BehatExtension\Exception\SkippedException("Boost Union has no $name setting");
+        }
+    }
+
+    /**
+     * Check that the scheme's colour for a purpose keeps the hue of a colour (OKLCH hue within 3 degrees), as
+     * colour\purpose lifts or lowers only its lightness.
+     *
+     * @Then /^the scheme's "(?P<purpose>[a-z]+)" icon colour should keep the hue of "(?P<hex>#[0-9a-fA-F]{6})"$/
+     * @param string $purpose
+     * @param string $hex
+     */
+    public function the_scheme_icon_colour_should_keep_the_hue(string $purpose, string $hex): void {
+        $rgb = 'rgb(' . implode(', ', array_map('hexdec', str_split(substr($hex, 1), 2))) . ')';
+        $this->check_script('const flood = document.querySelector("#la-icon-' . $purpose . ' feFlood");
+            const fg = flood && parse(getComputedStyle(flood).floodColor);
+            if (!fg) {
+                return "No flood colour for la-icon-' . $purpose . '";
+            }
+            const hue = (rgb) => {
+                const lin = rgb.slice(0, 3).map((v) => {
+                    v /= 255;
+                    return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+                });
+                const l = Math.cbrt(0.4122214708 * lin[0] + 0.5363325363 * lin[1] + 0.0514459929 * lin[2]);
+                const m = Math.cbrt(0.2119034982 * lin[0] + 0.6806995451 * lin[1] + 0.1073969566 * lin[2]);
+                const s = Math.cbrt(0.0883024619 * lin[0] + 0.2817188376 * lin[1] + 0.6299787005 * lin[2]);
+                const a = 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s;
+                const b = 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s;
+                return (Math.atan2(b, a) * 180 / Math.PI + 360) % 360;
+            };
+            const want = parse(' . json_encode($rgb) . ');
+            const d = Math.abs(hue(fg) - hue(want));
+            return Math.min(d, 360 - d) < 3 ? "" : "Hue " + hue(fg).toFixed(1) + " (" + getComputedStyle(flood).floodColor +
+                ") is not the hue of ' . $hex . ' (" + hue(want).toFixed(1) + ")";');
+    }
+
+    /**
+     * Check which filter, if any of the plugin's, paints an element (an icon outside an activity row).
+     *
+     * @Then /^the "(?P<css>[^"]*)" element should (?P<not>not )?use the filter "(?P<id>[^"]*)"$/
+     * @param string $css
+     * @param string $not
+     * @param string $id filter id, e.g. la-icon-content
+     */
+    public function the_element_should_use_filter(string $css, string $not, string $id): void {
+        $this->check_script('const el = document.querySelector(' . json_encode($css) . ');
+            if (!el) {
+                return "No element matches " + ' . json_encode($css) . ';
+            }
+            const f = String(getComputedStyle(el).filter);
+            const uses = f.indexOf("#" + ' . json_encode($id) . ') !== -1;
+            return uses === ' . ($not === '' ? 'true' : 'false') . ' ? "" : ' . json_encode($css) . ' + " has filter " + f;');
+    }
+
+    /**
      * Check which filter, if any of the plugin's, paints an activity's icon.
      *
      * @Then /^the activity icon for "(?P<name>[^"]*)" should (?P<not>not )?use the filter "(?P<id>[^"]*)"$/
