@@ -107,14 +107,25 @@ final class hook_callbacks {
 
     /**
      * Add the @font-face rule of the user's uploaded font, only while one is selected (spec §4). Bundled fonts keep
-     * their static rules in styles.css.
+     * their static rules in styles.css. Under a colour scheme, also the rules for the activity icons Boost Union
+     * repaints (local\boost_union_icons).
      *
      * @param before_standard_head_html_generation $hook
      * @return void
      */
     public static function head(before_standard_head_html_generation $hook): void {
         global $PAGE;
-        if (self::is_suppressed($PAGE) || !preferences::is_enabled('font')) {
+        if (self::is_suppressed($PAGE)) {
+            return;
+        }
+        // Under a colour scheme, the icons Boost Union repaints take the scheme's filter of the purpose they show.
+        if (isset(preferences::html_attributes()['data-a11y-colour'])) {
+            $css = local\boost_union_icons::css($PAGE->theme);
+            if ($css !== '') {
+                $hook->add_html('<style>' . $css . '</style>');
+            }
+        }
+        if (!preferences::is_enabled('font')) {
             return;
         }
         // The value is validated against the uploaded fonts, so face_css() only ever gets a listed id.

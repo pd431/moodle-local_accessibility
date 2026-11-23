@@ -109,6 +109,10 @@ Nothing is stored on the server for them. Logged-in users' settings are stored a
 - At 200% text with extra spacing on a very narrow screen (320 px), some Moodle controls that never wrap
   (dropdown buttons, badges, Timeline event names on the Dashboard) can make the page scroll sideways.
 - Read aloud uses the browser's own voices. In a browser with no voices installed the tile is hidden.
+- Under a colour scheme, activity icons start from the colours the active theme paints (its compiled
+  `--activity<purpose>` properties; Moodle's Boost colours where a theme declares none, or until the theme's CSS is
+  cached). Boost Union's flavours (per-category looks) are not read: icons in a flavoured category start from the
+  theme's main colours. On Moodle 5.3 the light mode's colours are the baseline, also when core's dark mode is on.
 
 ## Upgrading from 2.x ##
 

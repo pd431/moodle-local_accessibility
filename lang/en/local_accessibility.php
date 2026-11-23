@@ -32,6 +32,7 @@ $string['apply'] = 'Apply';
 $string['background'] = 'Background';
 $string['cachedef_enabled'] = 'Enabled accessibility features';
 $string['cachedef_iconbaseline'] = 'Activity icon colours of each theme';
+$string['cachedef_iconoverrides'] = 'Activity icons Boost Union repaints, under a colour scheme';
 $string['characters'] = '{$a} characters';
 $string['closepanel'] = 'Close accessibility settings';
 $string['contrastadjusted'] = 'Adjusted to reach 7:1: {$a}';

@@ -38,4 +38,11 @@ $definitions = [
         'simpledata' => true,
         'staticacceleration' => true,
     ],
+    // The rules aiming the icons Boost Union repaints at the colour scheme's filters, per theme and theme revision.
+    'iconoverrides' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'simpledata' => true,
+        'staticacceleration' => true,
+    ],
 ];
