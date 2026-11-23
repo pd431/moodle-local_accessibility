@@ -640,7 +640,8 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     /* An icon that carries a status class, or sits inside status text, is already a shape: it takes the mark colour,
        and the text around it gets no dot (one mark per item). A Font Awesome icon draws its glyph with ::before, so the
        dot never applies to an icon, an image or a badge. */
-    html[data-a11y-colour] body:not(#la-weight) :where(.text-success, .gradepass, .text-warning, .text-danger, .gradefail, .invalid-feedback):where(i, .icon, .fa, [class*="fa-"], svg, img), html[data-a11y-colour] body:not(#la-weight) :where(.text-success, .gradepass, .text-warning, .text-danger, .gradefail, .invalid-feedback) :where(i, .icon, .fa, [class*="fa-"], svg, img) {
+    html[data-a11y-colour] body:not(#la-weight) :where(.text-success, .gradepass, .text-warning, .text-danger, .gradefail, .invalid-feedback):where(i, .icon, .fa, [class*="fa-"], svg, img),
+    html[data-a11y-colour] body:not(#la-weight) :where(.text-success, .gradepass, .text-warning, .text-danger, .gradefail, .invalid-feedback) :where(i, .icon, .fa, [class*="fa-"], svg, img) {
         color: var(--la-dot) !important; /* stylelint-disable-line declaration-no-important */
     }
     /* The dot. --la-dot-display is none inside a status cell, which already has its border, so a status word there gets
@@ -875,8 +876,10 @@ html[data-a11y-motion="on"] *::after {
     z-index: 1060;
     display: flex;
     flex-direction: column;
-    inline-size: min(clamp(380px, 50vw, 760px), calc(100vw - var(--la-rest-centre) - 1.375rem - var(--la-offset) - 1rem)); /* stylelint-disable-line csstree/validator -- CSS Values 4. */
-    max-block-size: min(80vh, calc(100vh - var(--la-panel-end) - 1rem)); /* stylelint-disable-line csstree/validator -- CSS Values 4. */
+    /* stylelint-disable-next-line csstree/validator -- CSS Values 4. */
+    inline-size: min(clamp(380px, 50vw, 760px), calc(100vw - var(--la-rest-centre) - 1.375rem - var(--la-offset) - 1rem));
+    /* stylelint-disable-next-line csstree/validator -- CSS Values 4. */
+    max-block-size: min(80vh, calc(100vh - var(--la-panel-end) - 1rem));
     overflow: auto;
     font-size: 1rem;
     text-align: start;
@@ -1415,18 +1418,28 @@ body.hasstickyfooter {
    before what it places. */
 @supports (anchor-name: --a) {
     html body:has(.local-accessibility-launcher) :is(.btn-footer-popover, #boost-union-footer-buttons #back-to-top) {
+        /* stylelint-disable-next-line csstree/validator -- CSS Anchor Positioning. */
         anchor-name: --la-corner;
     }
     html body:has(.local-accessibility-launcher) .drawer.drawer-right.show {
+        /* stylelint-disable-next-line csstree/validator -- CSS Anchor Positioning. */
         anchor-name: --la-drawer;
     }
     .btn.local-accessibility-launcher {
+        /* stylelint-disable-next-line csstree/validator -- CSS Anchor Positioning. */
         anchor-name: --la-launcher;
         --la-b: anchor(--la-corner center, var(--la-rest-centre));
+        /* stylelint-disable-next-line length-zero-no-unit -- the fallback must stay a length inside calc(). */
         --la-d: anchor(--la-drawer start, 0px);
         --la-k: calc(var(--la-offset) + 1.375rem);
         inset-block-end: calc(anchor(--la-corner top, var(--la-rest-top)) + var(--la-offset));
-        inset-inline-end: calc(max(var(--la-b), min(calc(var(--la-d) + var(--la-k)), calc(var(--la-d) + var(--la-k) - 10 * (var(--la-b) - var(--la-d))))) - 1.375rem);
+        inset-inline-end:
+            calc(
+                max(
+                    var(--la-b),
+                    min(calc(var(--la-d) + var(--la-k)), calc(var(--la-d) + var(--la-k) - 10 * (var(--la-b) - var(--la-d))))
+                ) - 1.375rem
+            );
     }
     .btn.local-accessibility-launcher.la-launcher-shifted {
         inset-block-end: calc(anchor(--la-corner top, var(--la-rest-top)) + var(--la-offset) + 4rem);
@@ -1442,6 +1455,7 @@ body.hasstickyfooter {
         }
     }
 }
+
 @supports (anchor-name: --a) {
     .local-accessibility-panel {
         inset-block-end: min(anchor(--la-launcher bottom, calc(var(--la-rest-top) + var(--la-offset))), calc(50vh - 1rem));
