@@ -563,7 +563,8 @@ class behat_local_accessibility extends behat_base {
             const mark = (el) => {
                 const s = getComputedStyle(el);
                 const dot = getComputedStyle(el, "::before");
-                const c = (dot.content === "\"\"" && dot.display !== "none" ? parse(dot.backgroundColor) : null) || parse(s.boxShadow) ||
+                const c = (dot.content === "\"\"" && dot.display !== "none" ? parse(dot.backgroundColor) : null) ||
+                    parse(s.boxShadow) ||
                     (parseFloat(s.borderInlineStartWidth) > 0 ? parse(s.borderInlineStartColor) : null);
                 return c ? over(c, behind(el)) : null;
             };
@@ -586,7 +587,8 @@ class behat_local_accessibility extends behat_base {
     private function look_helpers(): string {
         return 'const shadowsOf = (s) => String(s).split(/,(?![^(]*\\))/).filter((p) => p.trim() !== "none" && p.trim() !== "")
                 .map((p) => {
-                    const sizes = (p.replace(/rgba?\\([^)]*\\)/, "").match(/-?[0-9.]+px/g) || []).map((v) => Math.abs(parseFloat(v)));
+                    const sizes = (p.replace(/rgba?\\([^)]*\\)/, "").match(/-?[0-9.]+px/g) ||
+                        []).map((v) => Math.abs(parseFloat(v)));
                     const geo = (p.replace(/rgba?\\([^)]*\\)/, "").match(/-?[0-9.]+px/g) || []).join(" ");
                     return {inset: /inset/.test(p), colour: parse(p), geo: geo,
                         size: Math.max(sizes[0] || 0, sizes[1] || 0, (sizes[2] || 0) / 2, sizes[3] || 0)};
@@ -604,7 +606,8 @@ class behat_local_accessibility extends behat_base {
                     const icon = [...el.querySelectorAll("svg, i.icon, i.fa, .icon")].find((i) => i.checkVisibility());
                     if (icon) {
                         const is = getComputedStyle(icon);
-                        const f = icon.tagName.toLowerCase() === "svg" && is.fill && !/^(none|url)/.test(is.fill) ? is.fill : is.color;
+                        const f = icon.tagName.toLowerCase() === "svg" && is.fill && !/^(none|url)/.test(is.fill) ? is.fill :
+                            is.color;
                         if (parse(f)) {
                             fg = parse(f);
                             ink = true;
@@ -671,7 +674,8 @@ class behat_local_accessibility extends behat_base {
                     italic: s.fontStyle === "italic" || (!!is && is.fontStyle === "italic"),
                     dim: opacity <= 0.7, before: pseudo("::before"), after: pseudo("::after"), icons: icons,
                     image: s.backgroundImage !== "none" ? s.backgroundImage : "",
-                    native: /^(checkbox|radio)$/.test(el.type) && (s.appearance || s.webkitAppearance) !== "none" ? String(el.checked) : "",
+                    native: /^(checkbox|radio)$/.test(el.type) && (s.appearance || s.webkitAppearance) !== "none" ?
+                        String(el.checked) : "",
                 };
             };
             const differences = (a, b) => {
@@ -944,22 +948,30 @@ class behat_local_accessibility extends behat_base {
     public function the_main_region_contains_moodle_state_markup(): void {
         $html = '<div id="la-st">
             <nav><ul class="pagination">
-                <li class="page-item disabled"><a href="#" class="page-link" id="la-st-page-disabled" aria-disabled="true">Previous</a></li>
+                <li class="page-item disabled"><a href="#" class="page-link" id="la-st-page-disabled"
+                    aria-disabled="true">Previous</a></li>
                 <li class="page-item"><a href="#" class="page-link" id="la-st-page-other">1</a></li>
                 <li class="page-item active"><a href="#" class="page-link" id="la-st-page-current" aria-current="page">2</a></li>
             </ul></nav>
             <ol class="breadcrumb"><li class="breadcrumb-item"><a href="#" id="la-st-crumb-link">Course</a></li>
                 <li class="breadcrumb-item active"><span id="la-st-crumb-current" aria-current="page">Essay</span></li></ol>
-            <div class="list-group"><a href="#" class="list-group-item list-group-item-action active" id="la-st-list-active">Chosen</a>
+            <div class="list-group"><a href="#" class="list-group-item list-group-item-action active"
+                id="la-st-list-active">Chosen</a>
                 <a href="#" class="list-group-item list-group-item-action" id="la-st-list-other">Other</a></div>
-            <div class="btn-group"><button type="button" class="btn btn-outline-secondary active" aria-pressed="true" id="la-st-toggle-pressed">Card</button>
-                <button type="button" class="btn btn-outline-secondary" aria-pressed="false" id="la-st-toggle-unpressed">List</button></div>
-            <div class="tox"><div class="tox-toolbar"><button type="button" class="tox-tbtn tox-tbtn--enabled" aria-pressed="true" id="la-st-tox-pressed">B</button>
+            <div class="btn-group"><button type="button" class="btn btn-outline-secondary active" aria-pressed="true"
+                id="la-st-toggle-pressed">Card</button>
+                <button type="button" class="btn btn-outline-secondary" aria-pressed="false"
+                    id="la-st-toggle-unpressed">List</button></div>
+            <div class="tox"><div class="tox-toolbar"><button type="button" class="tox-tbtn tox-tbtn--enabled" aria-pressed="true"
+                id="la-st-tox-pressed">B</button>
                 <button type="button" class="tox-tbtn" aria-pressed="false" id="la-st-tox-plain">I</button>
-                <button type="button" class="tox-tbtn tox-tbtn--disabled" aria-disabled="true" id="la-st-tox-disabled">U</button></div></div>
-            <ul class="nav nav-tabs"><li class="nav-item"><a class="nav-link active" aria-current="page" href="#" id="la-st-tab-current">Current</a></li>
+                <button type="button" class="tox-tbtn tox-tbtn--disabled" aria-disabled="true"
+                    id="la-st-tox-disabled">U</button></div></div>
+            <ul class="nav nav-tabs"><li class="nav-item"><a class="nav-link active" aria-current="page" href="#"
+                id="la-st-tab-current">Current</a></li>
                 <li class="nav-item"><a class="nav-link" href="#" id="la-st-tab-other">Other</a></li>
-                <li class="nav-item"><a class="nav-link disabled" aria-disabled="true" href="#" id="la-st-tab-disabled">Disabled</a></li></ul>
+                <li class="nav-item"><a class="nav-link disabled" aria-disabled="true" href="#"
+                    id="la-st-tab-disabled">Disabled</a></li></ul>
             <table class="generaltable table"><tbody>
                 <tr class="selectedrow"><td id="la-st-row-ticked">Ticked</td><td>1</td></tr>
                 <tr class="table-active"><td id="la-st-row-active">Active</td><td>2</td></tr>
@@ -967,7 +979,8 @@ class behat_local_accessibility extends behat_base {
                 <tr class="table-warning"><td id="la-st-row-warning">Warning</td><td>4</td></tr>
                 <tr class="table-danger"><td id="la-st-row-danger">Danger</td><td>5</td></tr>
                 <tr><td id="la-st-row-plain">Plain</td><td>6</td></tr>
-                <tr><td class="quickgrademodified" id="la-st-cell-quickgrade">70</td><td class="ajaxoverridden" id="la-st-cell-overridden">80</td>
+                <tr><td class="quickgrademodified" id="la-st-cell-quickgrade">70</td><td class="ajaxoverridden"
+                    id="la-st-cell-overridden">80</td>
                     <td id="la-st-cell-plain">60</td></tr>
                 <tr><td class="gradepass" id="la-st-grade-pass">Pass 70</td><td class="gradefail" id="la-st-grade-fail">Fail 20</td>
                     <td id="la-st-grade-plain">50</td></tr>
@@ -975,9 +988,11 @@ class behat_local_accessibility extends behat_base {
             <div class="submissionstatussubmitted" id="la-st-status-submitted">Submitted for grading</div>
             <div class="submissionstatusdraft" id="la-st-status-draft">Draft (not submitted)</div>
             <div class="submissionstatus" id="la-st-status-none">No submission</div>
-            <p><span class="text-warning" id="la-st-text-warning">Warning text</span> <span class="text-danger" id="la-st-text-danger">Danger text</span>
+            <p><span class="text-warning" id="la-st-text-warning">Warning text</span> <span class="text-danger"
+                id="la-st-text-danger">Danger text</span>
                 <span class="text-success" id="la-st-text-success">Success text</span> <span id="la-st-text-plain">Plain text</span>
-                <span class="dimmed_text" id="la-st-dimmed">Hidden from students</span> <a href="#" id="la-st-link">A text link</a></p>
+                <span class="dimmed_text" id="la-st-dimmed">Hidden from students</span>
+                <a href="#" id="la-st-link">A text link</a></p>
             <div class="dropdown-menu show" style="position: static">
                 <a class="dropdown-item" href="#" id="la-st-menu-enabled">Enabled</a>
                 <button type="button" class="dropdown-item" disabled id="la-st-menu-disabled-button">Disabled button</button>
@@ -999,7 +1014,8 @@ class behat_local_accessibility extends behat_base {
                 <span class="badge bg-danger text-white" id="la-st-badge-bad">Overdue</span>
                 <span class="badge bg-secondary text-dark" id="la-st-badge-grey">Draft</span>
                 <span class="badge rounded-pill bg-warning text-dark" id="la-st-pill-warn">3</span></p>
-            <div class="progress" id="la-st-progress" style="height: 1rem"><div class="progress-bar" id="la-st-progress-bar" role="progressbar"
+            <div class="progress" id="la-st-progress" style="height: 1rem"><div class="progress-bar" id="la-st-progress-bar"
+                role="progressbar"
                 style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div></div>
         </div>';
         $this->check_script('const main = document.querySelector("#region-main");

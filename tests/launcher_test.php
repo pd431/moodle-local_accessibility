@@ -68,8 +68,15 @@ final class launcher_test extends \advanced_testcase {
         $this->assertStringContainsString('inset-block-end: calc(var(--la-rest-top) + var(--la-offset));', $css);
         $this->assertStringContainsString(':is(.btn-footer-popover, #boost-union-footer-buttons #back-to-top) {', $css);
         $this->assertStringContainsString('anchor-name: --la-corner;', $css);
-        $this->assertStringContainsString('inset-block-end: calc(anchor(--la-corner top, var(--la-rest-top)) + var(--la-offset));', $css);
-        $this->assertStringContainsString('inset-block-end: min(anchor(--la-launcher bottom,', $css, 'panel bottoms level with the launcher');
+        $this->assertStringContainsString(
+            'inset-block-end: calc(anchor(--la-corner top, var(--la-rest-top)) + var(--la-offset));',
+            $css
+        );
+        $this->assertStringContainsString(
+            'inset-block-end: min(anchor(--la-launcher bottom,',
+            $css,
+            'panel bottoms level with the launcher'
+        );
         $this->assertStringContainsString('inset-inline-end: calc(anchor(--la-launcher start,', $css, 'panel beside the launcher');
         $this->assertStringContainsString('--la-corner-size: calc(2rem + 0.25rem * (1 + var(--breakpoint-xs, -1)));', $css);
         $this->assertStringContainsString('body.hasstickyfooter {', $css);

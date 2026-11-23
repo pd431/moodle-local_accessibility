@@ -281,8 +281,16 @@ final class scheme_test extends \advanced_testcase {
             $this->assertGreaterThanOrEqual(3.0, contrast::worst($s->mark(), $s->ramp), "$id mark " . $s->mark());
             $this->assertStringContainsString('--a11y-mark:' . $s->mark() . ';', $s->css_properties(), $id);
         }
-        $this->assertSame(scheme::presets()['vscodehc']->active, scheme::presets()['vscodehc']->mark(), 'vscodehc keeps its orange');
-        $this->assertSame(scheme::presets()['highcontrast']->link, scheme::presets()['highcontrast']->mark(), 'the link colour first');
+        $this->assertSame(
+            scheme::presets()['vscodehc']->active,
+            scheme::presets()['vscodehc']->mark(),
+            'vscodehc keeps its orange'
+        );
+        $this->assertSame(
+            scheme::presets()['highcontrast']->link,
+            scheme::presets()['highcontrast']->mark(),
+            'the link colour first'
+        );
         $this->assertSame('#000000', $schemes['custom-exact-low-link']->mark(), 'the text colour when the link is too faint');
         $this->assertSame('#000000', $schemes['custom-exact-low-both']->mark(), 'black or white when both are too faint');
     }
@@ -306,8 +314,11 @@ final class scheme_test extends \advanced_testcase {
             }
             $this->assertStringNotContainsString('--a11y-ok:', $s->css_properties(), 'no status text colour');
         }
-        $this->assertSame(scheme::STATUS_MARK['dark']['bad'], scheme::presets()['highcontrast']->status_colours()['bad-mark'],
-            'a passing fixed value is kept');
+        $this->assertSame(
+            scheme::STATUS_MARK['dark']['bad'],
+            scheme::presets()['highcontrast']->status_colours()['bad-mark'],
+            'a passing fixed value is kept'
+        );
     }
 
     /**

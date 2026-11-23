@@ -155,4 +155,3 @@ Feature: Accessibility panel
       | offset |
       | 12     |
       | 24     |
-

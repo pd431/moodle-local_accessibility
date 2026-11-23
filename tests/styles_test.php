@@ -217,7 +217,10 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringContainsString('clamp(380px, 50vw, 760px)', $body);
         $this->assertStringContainsString('min(80vh, calc(100vh - var(--la-panel-end) - 1rem))', $body);
         // At very large text sizes it keeps the lower half of the viewport (its bottom never above the middle).
-        $this->assertStringContainsString('--la-panel-end: min(calc(var(--la-rest-top) + var(--la-offset)), calc(50vh - 1rem));', $body);
+        $this->assertStringContainsString(
+            '--la-panel-end: min(calc(var(--la-rest-top) + var(--la-offset)), calc(50vh - 1rem));',
+            $body
+        );
         $this->assertStringContainsString('font-size: 1rem', $body);
         // The scheme's colour first, then the Moodle Design System token (5.3), then Bootstrap's, then Boost's value.
         $this->assertStringContainsString('var(--a11y-page, var(--mds-bg-surface-default, var(--bs-body-bg, #fff)))', $body);
@@ -271,8 +274,10 @@ final class styles_test extends \advanced_testcase {
             $this->assertStringContainsString($rule, $body);
         }
         // Its place: the offset above core's resting spot, in rem and px (launcher_test).
-        $this->assertStringContainsString('inset-block-end: calc(var(--la-rest-top) + var(--la-offset));',
-            implode("\n", array_column($launcher, 1)));
+        $this->assertStringContainsString(
+            'inset-block-end: calc(var(--la-rest-top) + var(--la-offset));',
+            implode("\n", array_column($launcher, 1))
+        );
         foreach (self::rules_with('.local-accessibility-launcher') as [$selector, $declarations]) {
             $this->assertDoesNotMatchRegularExpression(
                 '/(?<![-\w])(font-size|inline-size|block-size|inset-block-end):\s*\d+(\.\d+)?px/',
@@ -529,7 +534,11 @@ final class styles_test extends \advanced_testcase {
         $focus = array_values(array_filter($token, fn($r) => str_contains($r[0], ':focus-visible')));
         $this->assertCount(3, $focus);
         $this->assertStringContainsString('outline: 2px dashed var(--a11y-focus) !important', $focus[0][1]);
-        $this->assertStringContainsString('outline-offset: var(--la-focus-offset, -2px) !important', $focus[0][1], 'the ring sits inside');
+        $this->assertStringContainsString(
+            'outline-offset: var(--la-focus-offset, -2px) !important',
+            $focus[0][1],
+            'the ring sits inside'
+        );
         $this->assertStringContainsString(':focus-visible', $focus[0][0]);
         $this->assertStringNotContainsString(':hover', implode('', array_column($token, 0)), 'the pointer gets no ring');
         $this->assertStringNotContainsString('solid var(--a11y-focus)', self::css(), 'focus is never solid');
@@ -540,10 +549,16 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringContainsString('[data-a11y-focus="thick"]', $focus[2][0]);
         $this->assertStringContainsString('outline-width: 5px !important', $focus[2][1]);
         $this->assertStringContainsString('outline-offset: -5px !important', $focus[2][1]);
-        $this->assertStringContainsString('outline-offset: var(--la-focus-offset, -2px) !important', $focus[0][1],
-            'a current item moves the ring in through the variable the chosen rule sets');
-        $this->assertCount(0, self::rules_with('body:not(#la-weight) :where(.nav-link.active, .nav-link[aria-current]'),
-            'no second list of current items');
+        $this->assertStringContainsString(
+            'outline-offset: var(--la-focus-offset, -2px) !important',
+            $focus[0][1],
+            'a current item moves the ring in through the variable the chosen rule sets'
+        );
+        $this->assertCount(
+            0,
+            self::rules_with('body:not(#la-weight) :where(.nav-link.active, .nav-link[aria-current]'),
+            'no second list of current items'
+        );
         $this->assertStringNotContainsString('outline-offset: 2px !important', implode('', array_column($token, 1)));
         $selection = self::rules_with('html[data-a11y-tokens~="selection"]');
         $this->assertCount(1, $selection);
@@ -631,7 +646,14 @@ final class styles_test extends \advanced_testcase {
     public function test_legacy_tables(): void {
         $mopup = self::rules_with('html[data-a11y-colour] body :where(#page, #page-wrapper');
         $this->assertCount(1, $mopup, 'still one rule repaints the hardcoded surfaces');
-        foreach (['.generaltable', '.generaltable tbody tr', '.generaltable td', '.generaltable th', '.generaltable .sticky-column'] as $part) {
+        $selectors = [
+            '.generaltable',
+            '.generaltable tbody tr',
+            '.generaltable td',
+            '.generaltable th',
+            '.generaltable .sticky-column',
+        ];
+        foreach ($selectors as $part) {
             $this->assertStringContainsString($part, $mopup[0][0], $part);
         }
         $hover = self::rules_with('tbody tr:hover > :is(td, th)');
@@ -641,12 +663,26 @@ final class styles_test extends \advanced_testcase {
     }
 
     /**
-     * Pagination, the gradebook, the assignment grading table and the quiz editing page paint their own cells; they take the scheme.
+     * Pagination, the gradebook, the assignment grading table and the quiz editing page paint their own cells;
+     * they take the scheme.
      */
     public function test_page_specific_tables(): void {
         $mopup = self::rules_with('html[data-a11y-colour] body :where(#page, #page-wrapper');
         $this->assertCount(1, $mopup, 'still one rule repaints the hardcoded surfaces');
-        foreach (['.page-link', '.gradeparent .cell', '.user-report-container', '.user-grade td', '.gradetree-wrapper td', '.gradingtable td', '.gradingtable th', '#page-mod-quiz-edit ul.slots li.activity', '#page-mod-quiz-edit .inplaceeditable', '.page-header-headings', '.fp-filename'] as $part) {
+        $selectors = [
+            '.page-link',
+            '.gradeparent .cell',
+            '.user-report-container',
+            '.user-grade td',
+            '.gradetree-wrapper td',
+            '.gradingtable td',
+            '.gradingtable th',
+            '#page-mod-quiz-edit ul.slots li.activity',
+            '#page-mod-quiz-edit .inplaceeditable',
+            '.page-header-headings',
+            '.fp-filename',
+        ];
+        foreach ($selectors as $part) {
             $this->assertStringContainsString($part, $mopup[0][0], $part);
         }
     }
@@ -659,7 +695,17 @@ final class styles_test extends \advanced_testcase {
         $this->assertCount(1, $panels, 'one rule for small panels');
         $this->assertStringContainsString('background-color: var(--a11y-surface2) !important', $panels[0][1]);
         $this->assertStringContainsString('color: var(--a11y-text) !important', $panels[0][1]);
-        foreach (['.submissionstatus,', '.submissionstatusdraft', '.submissionstatussubmitted', '.latesubmission', '.userinitials', '.bg-secondary', '.bg-primary-light', '.path-mod-book .btn-next'] as $part) {
+        $selectors = [
+            '.submissionstatus,',
+            '.submissionstatusdraft',
+            '.submissionstatussubmitted',
+            '.latesubmission',
+            '.userinitials',
+            '.bg-secondary',
+            '.bg-primary-light',
+            '.path-mod-book .btn-next',
+        ];
+        foreach ($selectors as $part) {
             $this->assertStringContainsString($part, $panels[0][0], $part);
         }
         $edge = self::rules_with('html[data-a11y-colour] body :where(.alert)');
@@ -703,7 +749,8 @@ final class styles_test extends \advanced_testcase {
      * A theme that forces link colours with !important does not beat the scheme: the anchor rule carries one id's weight.
      */
     public function test_anchor_rule_outranks_theme_links(): void {
-        $anchors = array_values(array_filter(self::rules(), fn($r) => str_contains($r[1], 'text-decoration: var(--la-anchor-line, underline) !important')));
+        $line = 'text-decoration: var(--la-anchor-line, underline) !important';
+        $anchors = array_values(array_filter(self::rules(), fn($r) => str_contains($r[1], $line)));
         $this->assertCount(1, $anchors);
         $this->assertStringContainsString('html[data-a11y-colour] body:not(#la-weight) :where(a:not(.btn', $anchors[0][0]);
         $highlight = self::rules_with('html[data-a11y-colour][data-a11y-links="highlight"] body:not(#la-weight)');
@@ -726,13 +773,18 @@ final class styles_test extends \advanced_testcase {
      * focused-link fill.
      */
     public function test_focus_without_token(): void {
-        $ring = self::rules_with('html[data-a11y-colour]:not([data-a11y-tokens~="focus"], [data-a11y-focus="ring"], [data-a11y-focus="thick"]) :focus-visible');
+        $ring = self::rules_with(
+            'html[data-a11y-colour]:not([data-a11y-tokens~="focus"], [data-a11y-focus="ring"], [data-a11y-focus="thick"])' .
+                ' :focus-visible'
+        );
         $this->assertCount(1, $ring);
         $this->assertStringContainsString('outline: 2px solid var(--a11y-mark) !important', $ring[0][1]);
         [, $rules] = self::state_marks();
         $this->assertContains($ring[0], $rules, 'in section 7a');
         $this->assertStringContainsString('outline-offset: var(--la-focus-offset, -2px) !important', $ring[0][1]);
-        $nofill = self::rules_with('html[data-a11y-colour]:not([data-a11y-tokens~="focus"]) body :where(a:not(.nav-link, .mds-nav-pill))');
+        $nofill = self::rules_with(
+            'html[data-a11y-colour]:not([data-a11y-tokens~="focus"]) body :where(a:not(.nav-link, .mds-nav-pill))'
+        );
         $this->assertCount(1, $nofill);
         $this->assertStringContainsString('background-color: transparent !important', $nofill[0][1]);
     }
@@ -794,17 +846,29 @@ final class styles_test extends \advanced_testcase {
         return [
             'chosen' => ['.page-item.active > .page-link', '.list-group-item.active', '.btn.active', '[aria-pressed="true"]',
                 '[data-region="chooser-option-container"])[aria-selected="true"]:not(:is([role="tree"], .courseindex) *)',
-                '[role="tab"][aria-selected="true"]:not(:is([role="tree"], .courseindex) *)', '.nav-link.active', '.mds-nav-pill--selected', '.courseindex-item.pageitem',
+                '[role="tab"][aria-selected="true"]:not(:is([role="tree"], .courseindex) *)', '.nav-link.active',
+                '.mds-nav-pill--selected', '.courseindex-item.pageitem',
                 '.dropdown-item.active', '.tox-tbtn--enabled', '.today .day-number-circle', 'tr.selectedrow > *',
                 '.breadcrumb-item:last-child > span:only-child'],
             'changed' => ['.quickgrademodified', 'td.ajaxoverridden'],
-            'disabled' => ['.btn.disabled', '.dropdown-item.disabled', '.nav-link.disabled', '.list-group-item.disabled', '.page-item.disabled > .page-link', '.tox-tbtn--disabled'],
+            'disabled' => [
+                '.btn.disabled',
+                '.dropdown-item.disabled',
+                '.nav-link.disabled',
+                '.list-group-item.disabled',
+                '.page-item.disabled > .page-link',
+                '.tox-tbtn--disabled',
+            ],
             'readonly' => ['[readonly]'],
             'status' => ['.gradepass', '.gradefail', 'td.table-success', 'td.table-warning', 'td.table-danger',
                 'tr.table-success > *', 'tr.table-warning > *', 'tr.table-danger > *'],
             'alert' => ['.alert-success', '.alert-warning', '.alert-danger', '.alert-info'],
-            'badge' => ['.badge:is(.bg-success, .badge-success, .text-bg-success)', '.badge:is(.bg-warning, .badge-warning, .text-bg-warning)',
-                '.badge:is(.bg-danger, .badge-danger, .text-bg-danger)', '.badge:is(.bg-info, .badge-info, .text-bg-info)'],
+            'badge' => [
+                '.badge:is(.bg-success, .badge-success, .text-bg-success)',
+                '.badge:is(.bg-warning, .badge-warning, .text-bg-warning)',
+                '.badge:is(.bg-danger, .badge-danger, .text-bg-danger)',
+                '.badge:is(.bg-info, .badge-info, .text-bg-info)',
+            ],
             'progress' => ['.progress-bar', '.progress'],
             'hidden' => ['.dimmed_text', '.dimmed', '.usersuspended'],
         ];
@@ -842,8 +906,11 @@ final class styles_test extends \advanced_testcase {
         $selectors = implode("\n", array_column($owners, 0));
         foreach (self::state_classes() as $kind => $classes) {
             foreach ($classes as $class) {
-                $this->assertSame(1, substr_count($selectors, $class . ',') + substr_count($selectors, $class . ')'),
-                    "$kind: $class named once");
+                $this->assertSame(
+                    1,
+                    substr_count($selectors, $class . ',') + substr_count($selectors, $class . ')'),
+                    "$kind: $class named once"
+                );
             }
         }
         foreach ($rules as [$selector]) {
@@ -865,11 +932,17 @@ final class styles_test extends \advanced_testcase {
                 if (!str_contains($r[1], $class)) {
                     continue;
                 }
-                $this->assertDoesNotMatchRegularExpression('/(^|[;\s])(box-shadow|outline|outline-color|outline-style|outline-width|opacity|font-style)\s*:/',
-                    $r[2], trim($r[1]) . " sets a mark property on $class");
+                $this->assertDoesNotMatchRegularExpression(
+                    '/(^|[;\s])(box-shadow|outline|outline-color|outline-style|outline-width|opacity|font-style)\s*:/',
+                    $r[2],
+                    trim($r[1]) . " sets a mark property on $class"
+                );
                 if (str_contains($r[1], '::before')) {
-                    $this->assertDoesNotMatchRegularExpression('/(^|[;\s])(content|background|background-color|display)\s*:/',
-                        $r[2], trim($r[1]) . " changes the status dot of $class");
+                    $this->assertDoesNotMatchRegularExpression(
+                        '/(^|[;\s])(content|background|background-color|display)\s*:/',
+                        $r[2],
+                        trim($r[1]) . " changes the status dot of $class"
+                    );
                 }
             }
         }
@@ -888,7 +961,13 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringNotContainsString('background-color', $chosen[0][1], 'VS Code keeps its own fills');
         $this->assertStringContainsString(':not([data-a11y-tokens~="active"])', $chosen[1][0]);
         $this->assertStringContainsString('background-color: var(--a11y-hover) !important', $chosen[1][1]);
-        foreach (['.mds-nav-pill--selected', '.breadcrumb-item:last-child', '.courseindex-item.pageitem', '[aria-current]'] as $nav) {
+        $selectors = [
+            '.mds-nav-pill--selected',
+            '.breadcrumb-item:last-child',
+            '.courseindex-item.pageitem',
+            '[aria-current]',
+        ];
+        foreach ($selectors as $nav) {
             $this->assertStringContainsString($nav, $chosen[0][0], $nav . ': no box');
         }
         $boxed = array_values(array_filter($rules, fn($r) => str_contains($r[0], '.tox-tbtn--enabled')
@@ -899,8 +978,18 @@ final class styles_test extends \advanced_testcase {
         foreach (['.btn.active', '[aria-pressed="true"]', '[role="option"]', '.today .day-number-circle'] as $control) {
             $this->assertStringContainsString($control, $boxed[0][0], $control . ': boxed');
         }
-        foreach (['.page-link', '.nav-link', '.mds-nav-pill', 'aria-current', '.courseindex', '.breadcrumb', '[role="tab"]'] as $nav) {
-            $this->assertStringNotContainsString($nav . '.', str_replace(':not(:is([role="tree"], .courseindex) *)', '', $boxed[0][0]), $nav);
+        $selectors = [
+            '.page-link',
+            '.nav-link',
+            '.mds-nav-pill',
+            'aria-current',
+            '.courseindex',
+            '.breadcrumb',
+            '[role="tab"]',
+        ];
+        foreach ($selectors as $nav) {
+            $boxedselector = str_replace(':not(:is([role="tree"], .courseindex) *)', '', $boxed[0][0]);
+            $this->assertStringNotContainsString($nav . '.', $boxedselector, $nav);
         }
         $this->assertStringNotContainsString('font-weight', implode('', array_column($rules, 1)), 'no bold: it shifts layout');
         $rows = array_values(array_filter($rules, fn($r) => str_contains($r[0], 'tr.selectedrow')));
@@ -908,8 +997,11 @@ final class styles_test extends \advanced_testcase {
         $this->assertStringContainsString('inset 0 2px 0 var(--a11y-mark)', $rows[0][1]);
         $dot = array_values(array_filter($rules, fn($r) => str_contains($r[0], '.mds-nav-pill__indicator')));
         $this->assertStringContainsString('display: none !important', $dot[0][1]);
-        $this->assertStringNotContainsString('--a11y-active)', file_get_contents(__DIR__ . '/../styles.css'),
-            'the mark colour replaces the active token everywhere');
+        $this->assertStringNotContainsString(
+            '--a11y-active)',
+            file_get_contents(__DIR__ . '/../styles.css'),
+            'the mark colour replaces the active token everywhere'
+        );
     }
 
     /**
@@ -942,9 +1034,16 @@ final class styles_test extends \advanced_testcase {
         foreach (['.text-success' => 'ok', '.text-warning' => 'warn', '.text-danger' => 'bad'] as $class => $kind) {
             $r = array_values(array_filter($rules, fn($x) => str_contains($x[0], ':where(' . $class)));
             $this->assertStringContainsString('--la-dot: var(--a11y-' . $kind . '-mark);', $r[0][1], $class);
-            $this->assertStringContainsString('color: var(--a11y-text) !important', $r[0][1], $class . ': the words keep the text colour');
+            $this->assertStringContainsString(
+                'color: var(--a11y-text) !important',
+                $r[0][1],
+                $class . ': the words keep the text colour'
+            );
         }
-        $dots = array_values(array_filter($rules, fn($x) => str_contains($x[0], '::before') && str_contains($x[0], '.text-success')));
+        $dots = array_values(array_filter(
+            $rules,
+            fn($x) => str_contains($x[0], '::before') && str_contains($x[0], '.text-success')
+        ));
         $this->assertCount(1, $dots, 'one dot rule');
         $this->assertStringContainsString('content: "" !important', $dots[0][1], 'nothing for assistive technology to read');
         $this->assertStringContainsString('background-color: var(--la-dot) !important', $dots[0][1]);
@@ -1020,8 +1119,8 @@ final class styles_test extends \advanced_testcase {
         $notree = '[aria-selected="true"]:not(:is([role="tree"], .courseindex) *)';
         $this->assertSame(substr_count($plain, '[aria-selected="true"]'), substr_count($plain, $notree), 'never inside a tree');
         $this->assertSame(1, substr_count($plain, '[role="tab"]' . $notree), 'a tab: navigation, no box');
-        $this->assertSame(1, substr_count($plain, ':is([role="option"], [role="gridcell"], [data-region="chooser-option-container"])'
-            . $notree), 'an option: boxed');
+        $option = ':is([role="option"], [role="gridcell"], [data-region="chooser-option-container"])';
+        $this->assertSame(1, substr_count($plain, $option . $notree), 'an option: boxed');
     }
 
     /**
@@ -1029,11 +1128,25 @@ final class styles_test extends \advanced_testcase {
      */
     public function test_state_marks_alerts(): void {
         [, $rules] = self::state_marks();
-        foreach (['.alert-success' => 'ok-mark', '.alert-warning' => 'warn-mark', '.alert-danger' => 'bad-mark', '.alert-info' => 'link'] as $class => $token) {
+        $selectors = [
+            '.alert-success' => 'ok-mark',
+            '.alert-warning' => 'warn-mark',
+            '.alert-danger' => 'bad-mark',
+            '.alert-info' => 'link',
+        ];
+        foreach ($selectors as $class => $token) {
             $r = array_values(array_filter($rules, fn($x) => str_contains($x[0], $class)));
             $this->assertCount(1, $r, $class);
-            $this->assertStringContainsString('border-inline-start: 1em solid var(--a11y-' . $token . ') !important', $r[0][1], $class);
-            $this->assertStringContainsString('.badge:is(', $r[0][0], $class . ': one rule for the alert and the badge of that type');
+            $this->assertStringContainsString(
+                'border-inline-start: 1em solid var(--a11y-' . $token . ') !important',
+                $r[0][1],
+                $class
+            );
+            $this->assertStringContainsString(
+                '.badge:is(',
+                $r[0][0],
+                $class . ': one rule for the alert and the badge of that type'
+            );
         }
     }
 
@@ -1044,15 +1157,24 @@ final class styles_test extends \advanced_testcase {
      */
     public function test_state_marks_badges(): void {
         [, $rules] = self::state_marks();
-        $shape = array_values(array_filter($rules, fn($x) => str_ends_with($x[0], ':where(.badge:is([class*="bg-"], [class*="badge-"]):not(.bg-primary, .badge-primary, .text-bg-primary, .bg-light, .badge-light, .text-bg-light, .bg-dark, .badge-dark, .text-bg-dark, .correctness))')));
+        $badges = ':where(.badge:is([class*="bg-"], [class*="badge-"]):not(.bg-primary, .badge-primary, .text-bg-primary, ' .
+            '.bg-light, .badge-light, .text-bg-light, .bg-dark, .badge-dark, .text-bg-dark, .correctness))';
+        $shape = array_values(array_filter($rules, fn($x) => str_ends_with($x[0], $badges)));
         $this->assertCount(1, $shape);
         $this->assertStringContainsString('background-color: var(--a11y-surface2) !important', $shape[0][1]);
         $this->assertStringContainsString('color: var(--a11y-text) !important', $shape[0][1]);
         $this->assertStringContainsString('border: 1px solid var(--a11y-border, var(--a11y-text)) !important', $shape[0][1]);
-        $this->assertStringNotContainsString('--la-marker-width', file_get_contents(__DIR__ . '/../styles.css'), 'one marker width, 1em');
+        $this->assertStringNotContainsString(
+            '--la-marker-width',
+            file_get_contents(__DIR__ . '/../styles.css'),
+            'one marker width, 1em'
+        );
         $raw = file_get_contents(__DIR__ . '/../styles.css');
-        $this->assertLessThan(strpos($raw, ':where(.alert-success, .badge:is('), strpos($raw, ':where(.badge:not(.bg-primary'),
-            'the badge edge comes before the marker that replaces its leading side');
+        $this->assertLessThan(
+            strpos($raw, ':where(.alert-success, .badge:is('),
+            strpos($raw, ':where(.badge:not(.bg-primary'),
+            'the badge edge comes before the marker that replaces its leading side'
+        );
     }
 
     /**
@@ -1065,23 +1187,33 @@ final class styles_test extends \advanced_testcase {
             $r = array_values(array_filter($rules, fn($x) => str_contains($x[0], $class)));
             $this->assertCount(1, $r, $class);
             $this->assertStringContainsString('--la-status: var(--a11y-' . $kind . '-mark);', $r[0][1]);
-            $this->assertStringContainsString('--la-status-w: calc(2px * (1 + var(--breakpoint-xs, -1)));', $r[0][1],
-                'a border only where core colours the cell: Bootstrap 4 defines --breakpoint-xs, Bootstrap 5 does not');
+            $this->assertStringContainsString(
+                '--la-status-w: calc(2px * (1 + var(--breakpoint-xs, -1)));',
+                $r[0][1],
+                'a border only where core colours the cell: Bootstrap 4 defines --breakpoint-xs, Bootstrap 5 does not'
+            );
             $this->assertStringContainsString('box-shadow: inset 0 0 0 var(--la-status-w) var(--la-status) !important', $r[0][1]);
             $this->assertStringContainsString('background-color: transparent !important', $r[0][1]);
         }
         $this->assertStringNotContainsString('--breakpoint-xs:', self::css(), 'the plugin never sets the signal itself');
         $rows = array_values(array_filter($rules, fn($x) => str_contains($x[0], 'tr.selectedrow')));
         foreach ($rows as $row) {
-            $this->assertStringContainsString('inset 0 0 0 calc(var(--la-status-w, 0px) * 2) var(--la-status, transparent)', $row[1],
-                'both marks in a ticked row, the cell border following its width');
+            $this->assertStringContainsString(
+                'inset 0 0 0 calc(var(--la-status-w, 0px) * 2) var(--la-status, transparent)',
+                $row[1],
+                'both marks in a ticked row, the cell border following its width'
+            );
         }
         $css = preg_replace('~/\*.*?\*/~s', '', $section);
         foreach (['dashed', 'dotted', 'double'] as $style) {
             $this->assertStringNotContainsString($style, $css, "no $style line");
         }
         $status = strpos($css, 'td.table-success');
-        $this->assertLessThan(strpos($css, 'tr.selectedrow'), $status, 'status cells come before the chosen rows that read --la-status');
+        $this->assertLessThan(
+            strpos($css, 'tr.selectedrow'),
+            $status,
+            'status cells come before the chosen rows that read --la-status'
+        );
     }
 
     /**
@@ -1102,7 +1234,9 @@ final class styles_test extends \advanced_testcase {
      * a scheme; icon buttons and coloured variants are left out.
      */
     public function test_zero_padding_controls(): void {
-        $r = self::rules_with('html[data-a11y-colour] body:not(#la-weight) :where(.btn:is(.p-0, .px-0, .dropdown-toggle[role="combobox"])');
+        $r = self::rules_with(
+            'html[data-a11y-colour] body:not(#la-weight) :where(.btn:is(.p-0, .px-0, .dropdown-toggle[role="combobox"])'
+        );
         $this->assertCount(1, $r);
         $this->assertStringContainsString('padding-inline: 0.5em !important', $r[0][1]);
         foreach (['.btn-icon', '.btn-link', '.btn-primary', '.local-accessibility-launcher'] as $out) {
