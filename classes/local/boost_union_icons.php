@@ -91,7 +91,7 @@ final class boost_union_icons {
      * theme_boost_union_get_scss_for_activity_icon_purpose()).
      *
      * @param array $modules modname => [purpose => default purpose, name => display name]
-     * @param array<string, string> $config Boost Union's settings
+     * @param array $config Boost Union's settings, name => value
      * @return string CSS
      */
     public static function rules(array $modules, array $config): string {
