@@ -52,6 +52,9 @@ status text and as solid borders and markers.
   0.5em of inline padding under a scheme, so the scheme's edge does not touch their text.
 - The navbar takes the scheme's surface under every scheme, also when the theme paints it in the brand colour.
 - Alert edges no longer use fixed hex colours.
+- A site's own forced link colour (one id with classes, such as #region-main a:link:not(.btn), with !important) no
+  longer beats the scheme's link colour, and a text field keeps its edge under a scheme where the theme's own border
+  is missing (Moodle 5.x without Bootstrap's border-width property).
 - Tests: the Behat step "should look different from" uses a 3:1 rule (it passed on any difference before), counts an
   edge or underline in another style or weight, or a shadow of another shape, as another mark, and counts Bootstrap
   5's table fills as background. A drawn pseudo-element (a status dot) counts as a mark. A new step, "should
