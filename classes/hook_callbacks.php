@@ -140,6 +140,8 @@ final class hook_callbacks {
             return;
         }
         $hook->add_html($OUTPUT->render(new output\panel()));
+        // The launcher and the panel move after the footer, so the corner buttons can anchor them (launcherplace.js).
+        $PAGE->requires->js_call_amd('local_accessibility/launcherplace', 'init');
     }
 
     /**

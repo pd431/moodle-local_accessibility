@@ -1366,51 +1366,65 @@ html[data-a11y-colour] .local-accessibility-panel {
     max-inline-size: none;
     max-block-size: none;
 }
-/* Its place: one gap (core's 0.75rem) above where core rests its footer button (2rem from the
-   bottom and the inline end, 2.25rem across), on that button's centre line, and over a sticky footer as core raises
-   its own buttons (1rem above it; theme/boost/scss/moodle/core.scss, .hasstickyfooter). Whether the "?" is shown or
-   not, the launcher never covers it. */
-.btn.local-accessibility-launcher {
-    /* The "?" is 2.25rem on Moodle 4.5 and 2rem on Moodle 5: Bootstrap 4's root token --breakpoint-xs (0, absent from
-       Bootstrap 5) tells them apart. */
+/* Its place: launcheroffset px ("Button height offset", --la-launcher-offset on the button and the panel, 12 by default)
+   above Moodle's corner button, on that button's centre line. The corner button is the topmost shown of core's footer
+   button (the "?") and Boost Union's back-to-top; with neither shown, or without anchor positioning, it is where core
+   rests the "?": 2rem from the bottom and the inline end, 2.25rem across on Moodle 4.5 and 2rem on Moodle 5 (Bootstrap
+   4's root token --breakpoint-xs, 0 and absent from Bootstrap 5, tells them apart), raised over a sticky footer as
+   core raises its own buttons (1rem above it; theme/boost/scss/moodle/core.scss, .hasstickyfooter). The launcher is
+   2.75rem across, so it is centred by standing half that in from the centre line (no transform: an anchored panel
+   would not see it). */
+:root {
     --la-corner-size: calc(2rem + 0.25rem * (1 + var(--breakpoint-xs, -1)));
-    inset-block-end: calc(2rem + var(--la-corner-size) + 0.75rem);
-    inset-inline-end: calc(2rem + var(--la-corner-size) / 2);
-    translate: 50% 0;
+    --la-rest-top: calc(2rem + var(--la-corner-size));
+    --la-rest-centre: calc(2rem + var(--la-corner-size) / 2);
 }
-.btn.local-accessibility-launcher:dir(rtl) {
-    translate: -50% 0;
+body.hasstickyfooter {
+    --la-rest-top: calc(1rem + var(--sticky-footer-total-height, max(80px, 3rem)) + var(--la-corner-size));
 }
-body.hasstickyfooter .btn.local-accessibility-launcher {
-    inset-block-end: calc(1rem + var(--sticky-footer-total-height, max(80px, 3rem)) + var(--la-corner-size) + 0.75rem);
+.btn.local-accessibility-launcher {
+    --la-offset: var(--la-launcher-offset, 12px);
+    inset-block-end: calc(var(--la-rest-top) + var(--la-offset));
+    inset-inline-end: calc(var(--la-rest-centre) - 1.375rem);
 }
 /* Keep the floating launcher off the focused element (WCAG 2.4.11, panel.js): it moves up four rows. */
 .btn.local-accessibility-launcher.la-launcher-shifted {
-    inset-block-end: 9rem;
-}
-body.hasstickyfooter .btn.local-accessibility-launcher.la-launcher-shifted {
-    inset-block-end: calc(1rem + var(--sticky-footer-total-height, max(80px, 3rem)) + 7rem);
+    inset-block-end: calc(var(--la-rest-top) + var(--la-offset) + 4rem);
 }
 /* The footer HTML lands inside #page (#region-main), so a sibling selector cannot match.
-   Boost only docks the right drawer (315px) from the lg breakpoint; below it the drawer overlays. The own launcher
-   moves left of a docked drawer with core's "?" (and stays clear of it on 5.3 pages where core leaves the "?"). */
-@media (min-width: 992px) {
-    body:has(#page.drawers.show-drawer-right) .btn.local-accessibility-launcher {
-        inset-inline-end: calc(315px + 2rem + var(--la-corner-size) / 2);
-    }
-    /* Where the browser has anchor positioning, the launcher keeps one gap clear of an open right drawer's edge
-       wherever the theme puts the drawer (Boost Union 5.3 floats it 40px in). Only while an own launcher is on the
-       page. */
-    @supports (anchor-name: --a) {
-        body:has(.local-accessibility-launcher) .drawer.drawer-right.show {
-            anchor-name: --la-drawer;
-        }
+   Boost only docks the right drawer (315px) from the lg breakpoint; below it the drawer overlays. Without anchor
+   positioning the launcher moves left of a docked drawer with core's "?". */
+@supports not (anchor-name: --a) {
+    @media (min-width: 992px) {
         body:has(#page.drawers.show-drawer-right) .btn.local-accessibility-launcher {
-            inset-inline-end: max(calc(315px + 2rem + var(--la-corner-size) / 2), calc(anchor(--la-drawer start, 0px) + 0.75rem + 1.375rem));
+            inset-inline-end: calc(315px + var(--la-rest-centre) - 1.375rem);
         }
     }
-    body:has(#page.drawers.show-drawer-right) .local-accessibility-panel {
-        inset-inline-end: calc(315px + 24px);
+}
+/* With anchor positioning the launcher follows the corner button wherever core or the theme moves it, and keeps clear
+   of an open right drawer's edge (Boost Union 5.3 floats it 40px in) only while the corner button's centre is under
+   it: B = the corner button's axis, D = the drawer's edge, k = the clearance (the offset and half the launcher);
+   max(B, min(D + k, D + k - 10 * (B - D))) is B as soon as B is past D, and D + k while B is under the drawer. The
+   anchors are named with a little more weight than a bare class, and only while the launcher is on the page. A short
+   script (local_accessibility/launcherplace) moves the launcher and panel after the footer, since an anchor must come
+   before what it places. */
+@supports (anchor-name: --a) {
+    html body:has(.local-accessibility-launcher) :is(.btn-footer-popover, #boost-union-footer-buttons #back-to-top) {
+        anchor-name: --la-corner;
+    }
+    html body:has(.local-accessibility-launcher) .drawer.drawer-right.show {
+        anchor-name: --la-drawer;
+    }
+    .btn.local-accessibility-launcher {
+        anchor-name: --la-launcher;
+        --la-b: anchor(--la-corner center, var(--la-rest-centre));
+        --la-d: anchor(--la-drawer start, 0px);
+        --la-k: calc(var(--la-offset) + 1.375rem);
+        inset-block-end: calc(anchor(--la-corner top, var(--la-rest-top)) + var(--la-offset));
+        inset-inline-end: calc(max(var(--la-b), min(calc(var(--la-d) + var(--la-k)), calc(var(--la-d) + var(--la-k) - 10 * (var(--la-b) - var(--la-d))))) - 1.375rem);
+    }
+    .btn.local-accessibility-launcher.la-launcher-shifted {
+        inset-block-end: calc(anchor(--la-corner top, var(--la-rest-top)) + var(--la-offset) + 4rem);
     }
 }
 
