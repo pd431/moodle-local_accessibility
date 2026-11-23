@@ -84,19 +84,7 @@ class panel implements \renderable, \templatable {
         $custom = preferences::custom_scheme();
         $mode = get_config('local_accessibility', 'launcher') ?: 'both';
         // Guests and secure-layout pages have no user menu, so they always get the floating launcher (R16).
-        $nomenu = preferences::uses_cookie() || $PAGE->pagelayout === 'secure';
-        $floating = $mode !== 'menu' || $nomenu;
-        // Placed by local_floatingbuttons when it is installed (its slot classes), else by this plugin's own rule.
-        // An admin who turns the launcher's slot off there keeps the user menu entry as the way in.
-        $launcherclasses = 'la-launcher-own';
-        if ($floating && class_exists(\local_floatingbuttons\api::class)) {
-            $slotted = \local_floatingbuttons\api::classes('local_accessibility', 'launcher');
-            if ($slotted !== null) {
-                $launcherclasses = $slotted;
-            } else if ($mode === 'both' && !$nomenu) {
-                $floating = false;
-            }
-        }
+        $floating = $mode !== 'menu' || preferences::uses_cookie() || $PAGE->pagelayout === 'secure';
         return [
             'tiles' => $tiles,
             'drawers' => $drawers,
@@ -105,7 +93,6 @@ class panel implements \renderable, \templatable {
             'custom' => $custom ? ['bg' => $custom->ramp['page'], 'text' => $custom->text,
                 'link' => $custom->link, 'exact' => $custom->exact] : null,
             'floating' => $floating,
-            'launcherclasses' => $launcherclasses,
             'profiles' => \local_accessibility\profiles::for_template(),
             // One SVG filter per activity purpose; each floods the icon with the scheme's --a11y-icon-<purpose>.
             'purposes' => array_map(fn(string $id): array => ['id' => $id], purpose::ids()),

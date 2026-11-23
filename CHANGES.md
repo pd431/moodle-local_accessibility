@@ -40,11 +40,9 @@ status text and as solid borders and markers.
 - Keyboard focus under a scheme without its own focus colour is drawn in the mark colour, and moves inside a current
   item's box under every scheme.
 - The page's side gutters keep one surface while a long page scrolls (on Moodle 5.3 they turned from grey to black).
-- The floating launcher stacks above Moodle's footer button (the "?") and the theme's back-to-top button instead of
-  sitting at a fixed 80px, which put it on top of the "?" on any page with a sticky footer. With local_floatingbuttons
-  installed it takes the slot an admin gives it there (slot 1 by default), placed with CSS anchor positioning so it
-  follows core and the theme; without it, it sits one gap above core's resting spot for the "?", on its centre line,
-  lifted over a sticky footer and clear of an open block drawer.
+- The floating launcher sits one gap above core's resting spot for its footer button (the "?") instead of a fixed
+  80px, which put it on top of the "?" on any page with a sticky footer: on the "?"'s centre line, lifted over a sticky
+  footer and clear of an open block drawer.
 - Plain controls Moodle draws with no side padding (the grading table's filters, an admin page's heading select) get
   0.5em of inline padding under a scheme, so the scheme's edge does not touch their text.
 - The navbar takes the scheme's surface under every scheme, also when the theme paints it in the brand colour.

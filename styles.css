@@ -332,7 +332,7 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
        padding, in em so a heading-sized select gets proportionally more. The caret (::after) keeps its own margin
        inside it. Icon buttons and the theme-coloured variants keep core's padding; with no scheme nothing changes. The
        id's weight beats .p-0's !important. */
-    html[data-a11y-colour] body:not(#la-weight) :where(.btn:is(.p-0, .px-0, .dropdown-toggle[role="combobox"]):not(.btn-primary, .btn-success, .btn-danger, .btn-warning, .btn-info, .btn-dark, .btn-link, .btn-icon, [class*="btn-outline-"], .icons-collapse-expand, .btn-footer-popover, .local-accessibility-launcher, .local-floatingbuttons-slot)) {
+    html[data-a11y-colour] body:not(#la-weight) :where(.btn:is(.p-0, .px-0, .dropdown-toggle[role="combobox"]):not(.btn-primary, .btn-success, .btn-danger, .btn-warning, .btn-info, .btn-dark, .btn-link, .btn-icon, [class*="btn-outline-"], .icons-collapse-expand, .btn-footer-popover, .local-accessibility-launcher)) {
         padding-inline: 0.5em !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Border token (data-a11y-tokens): a scheme whose surfaces share one shade, such as VS Code dark high contrast,
@@ -1346,9 +1346,7 @@ html[data-a11y-colour] .local-accessibility-panel {
 }
 
 /* 14. Launcher (.btn doubled for specificity over the theme's .btn). Sized in rem so it grows with the user's text
-   size together with Boost's footer button. z-index 777 keeps it below chat and other docked panels. Where it sits:
-   local_floatingbuttons places it when installed (its slot classes, slot 1 by default, following core's corner
-   buttons through CSS anchor positioning); otherwise .la-launcher-own below. */
+   size together with Boost's footer button. z-index 777 keeps it below chat and other docked panels. */
 .btn.local-accessibility-launcher {
     position: fixed;
     z-index: 777;
@@ -1368,11 +1366,11 @@ html[data-a11y-colour] .local-accessibility-panel {
     max-inline-size: none;
     max-block-size: none;
 }
-/* Without local_floatingbuttons: one gap (core's 0.75rem) above where core rests its footer button (2rem from the
+/* Its place: one gap (core's 0.75rem) above where core rests its footer button (2rem from the
    bottom and the inline end, 2.25rem across), on that button's centre line, and over a sticky footer as core raises
    its own buttons (1rem above it; theme/boost/scss/moodle/core.scss, .hasstickyfooter). Whether the "?" is shown or
    not, the launcher never covers it. */
-.btn.local-accessibility-launcher.la-launcher-own {
+.btn.local-accessibility-launcher {
     /* The "?" is 2.25rem on Moodle 4.5 and 2rem on Moodle 5: Bootstrap 4's root token --breakpoint-xs (0, absent from
        Bootstrap 5) tells them apart. */
     --la-corner-size: calc(2rem + 0.25rem * (1 + var(--breakpoint-xs, -1)));
@@ -1380,34 +1378,34 @@ html[data-a11y-colour] .local-accessibility-panel {
     inset-inline-end: calc(2rem + var(--la-corner-size) / 2);
     translate: 50% 0;
 }
-.btn.local-accessibility-launcher.la-launcher-own:dir(rtl) {
+.btn.local-accessibility-launcher:dir(rtl) {
     translate: -50% 0;
 }
-body.hasstickyfooter .btn.local-accessibility-launcher.la-launcher-own {
+body.hasstickyfooter .btn.local-accessibility-launcher {
     inset-block-end: calc(1rem + var(--sticky-footer-total-height, max(80px, 3rem)) + var(--la-corner-size) + 0.75rem);
 }
 /* Keep the floating launcher off the focused element (WCAG 2.4.11, panel.js): it moves up four rows. */
 .btn.local-accessibility-launcher.la-launcher-shifted {
     inset-block-end: 9rem;
 }
-body.hasstickyfooter .btn.local-accessibility-launcher.la-launcher-own.la-launcher-shifted {
+body.hasstickyfooter .btn.local-accessibility-launcher.la-launcher-shifted {
     inset-block-end: calc(1rem + var(--sticky-footer-total-height, max(80px, 3rem)) + 7rem);
 }
 /* The footer HTML lands inside #page (#region-main), so a sibling selector cannot match.
    Boost only docks the right drawer (315px) from the lg breakpoint; below it the drawer overlays. The own launcher
    moves left of a docked drawer with core's "?" (and stays clear of it on 5.3 pages where core leaves the "?"). */
 @media (min-width: 992px) {
-    body:has(#page.drawers.show-drawer-right) .btn.local-accessibility-launcher.la-launcher-own {
+    body:has(#page.drawers.show-drawer-right) .btn.local-accessibility-launcher {
         inset-inline-end: calc(315px + 2rem + var(--la-corner-size) / 2);
     }
-    /* Where the browser has anchor positioning, the own launcher keeps one gap clear of an open right drawer's edge
+    /* Where the browser has anchor positioning, the launcher keeps one gap clear of an open right drawer's edge
        wherever the theme puts the drawer (Boost Union 5.3 floats it 40px in). Only while an own launcher is on the
-       page, so it never takes the anchor name local_floatingbuttons gives the drawer. */
+       page. */
     @supports (anchor-name: --a) {
-        body:has(.la-launcher-own) .drawer.drawer-right.show {
+        body:has(.local-accessibility-launcher) .drawer.drawer-right.show {
             anchor-name: --la-drawer;
         }
-        body:has(#page.drawers.show-drawer-right) .btn.local-accessibility-launcher.la-launcher-own {
+        body:has(#page.drawers.show-drawer-right) .btn.local-accessibility-launcher {
             inset-inline-end: max(calc(315px + 2rem + var(--la-corner-size) / 2), calc(anchor(--la-drawer start, 0px) + 0.75rem + 1.375rem));
         }
     }
