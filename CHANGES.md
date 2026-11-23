@@ -1,3 +1,25 @@
+# 3.1.6
+
+Activity icons under a colour scheme start from the theme's own colours. Until now every icon started from Boost's
+six purpose colours, whatever the site's theme painted, and was held to APCA Lc 75 only.
+
+- The baseline is the colour the active theme paints for each purpose, read from the `--activity<purpose>`
+  properties in its compiled CSS (on Moodle 4.5 a filter chain, worked out on black). That covers Boost, Classic and
+  Boost Union, with colours set by Boost Union's settings or by SCSS that the theme paints from (on 4.5 Boost paints
+  from `$activity-icon-*-filter`, so a `-bg` colour alone changes nothing there, and the baseline follows the paint).
+  A purpose the theme does not declare, or a theme whose CSS is not cached yet, takes Moodle's Boost colour.
+  Cached per theme and theme revision (new cache `iconbaseline`).
+- Each colour is lifted or lowered in lightness, keeping its hue, until it reaches both APCA Lc 75 and WCAG 2 4.5:1
+  against the page and both surfaces; where no lightness does, the scheme's text colour. Every preset's icon colours
+  from Boost's table are unchanged.
+- The scheme's icon filters carry !important and two ids' weight, so a theme's !important filter on the icon does not
+  win. Icons Boost Union repaints in another purpose (activitypurpose<module>) and, on its Moodle 4.5 line, the icons
+  it tints in the timeline, upcoming events, recently accessed items and activities blocks take the scheme's colour for
+  the purpose they show (new class `local\boost_union_icons`, new cache `iconoverrides`). A module moved to "other"
+  keeps Boost Union's look. Without a scheme nothing changes.
+- Known limitations: Boost Union's flavours are not read; on Moodle 5.3 the light mode's colours are the baseline.
+- From pull request #7 (icon colours from the theme, held to APCA and WCAG 2 both), rebased onto 3.1.5.
+
 # 3.1.5
 
 States keep their mark under every colour scheme. A scheme gives a state and its neighbour the same colours, so the

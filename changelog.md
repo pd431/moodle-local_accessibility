@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.6] - 2026-11-23
+
+- Activity icons under a colour scheme start from the colours the active theme paints (Boost, Classic, Boost Union's
+  settings or Raw initial SCSS, read from the theme's compiled CSS), with Moodle's Boost colours as the fallback, and
+  are held to APCA Lc 75 and WCAG 2 4.5:1 together. Icons Boost Union repaints in another purpose, or tints in its
+  blocks, take the scheme's colour for the purpose they show. See CHANGES.md.
+
 ## [3.1.5] - 2026-11-16
 
 - States keep their mark under every colour scheme: current and chosen items are boxed, status cells and changed
