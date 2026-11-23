@@ -140,3 +140,19 @@ Feature: Accessibility panel
     And "Text size, 100%" "button" should exist
     And the page root should not have attribute "data-a11y-size"
     And the "size" stepper field should show "100"
+
+  Scenario Outline: The launcher sits the "Button height offset" above Moodle's footer button and the panel opens beside it (<offset>px)
+    Given the following config values are set as admin:
+      | launcheroffset | <offset> | local_accessibility |
+    And I log in as "student1"
+    # A page without a block drawer: on 5.x the dashboard opens it, and the launcher then moves clear of the drawer.
+    And I visit "/user/preferences.php"
+    Then the ".local-accessibility-launcher" element should sit <offset>px above the ".btn-footer-popover" element on its centre line
+    When I click on ".local-accessibility-launcher" "css_element"
+    Then the accessibility panel should open <offset>px beside the launcher
+
+    Examples:
+      | offset |
+      | 12     |
+      | 24     |
+

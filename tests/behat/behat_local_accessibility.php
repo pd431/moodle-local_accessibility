@@ -458,6 +458,43 @@ class behat_local_accessibility extends behat_base {
     }
 
     /**
+     * The first element sits the given number of pixels above the second, on its vertical centre line (1px tolerance).
+     *
+     * @Then /^the "(?P<upper>[^"]*)" element should sit (?P<px>\d+)px above the "(?P<lower>[^"]*)" element on its centre line$/
+     * @param string $upper
+     * @param string $px
+     * @param string $lower
+     */
+    public function the_element_should_sit_above(string $upper, string $px, string $lower): void {
+        $this->check_script('const u = document.querySelector(' . json_encode($upper) . ');
+            const l = document.querySelector(' . json_encode($lower) . ');
+            if (!u || !l) {
+                return "Missing element";
+            }
+            const a = u.getBoundingClientRect(), b = l.getBoundingClientRect();
+            const dy = b.top - a.bottom, dx = (a.left + a.width / 2) - (b.left + b.width / 2);
+            return Math.abs(dy - ' . (int) $px . ') <= 1 && Math.abs(dx) <= 1 ? "" :
+                "gap " + dy + "px (want ' . (int) $px . '), centre offset " + dx + "px";');
+    }
+
+    /**
+     * The panel opens beside the launcher: its inline-end edge the given pixels from the launcher's inline-start edge,
+     * bottoms level, inside the viewport (1px tolerance).
+     *
+     * @Then /^the accessibility panel should open (?P<px>\d+)px beside the launcher$/
+     * @param string $px
+     */
+    public function the_panel_should_open_beside_the_launcher(string $px): void {
+        $this->check_script('const l = document.querySelector(".local-accessibility-launcher").getBoundingClientRect();
+            const p = document.getElementById("local-accessibility-panel").getBoundingClientRect();
+            const ltr = document.documentElement.dir !== "rtl";
+            const gap = ltr ? l.left - p.right : p.left - l.right;
+            const inside = p.left >= 0 && p.top >= 0 && p.right <= document.documentElement.clientWidth && p.bottom <= innerHeight;
+            return Math.abs(gap - ' . (int) $px . ') <= 1 && Math.abs(p.bottom - l.bottom) <= 1 && inside ? "" :
+                "gap " + gap + "px (want ' . (int) $px . '), bottoms " + (p.bottom - l.bottom) + "px apart, inside " + inside;');
+    }
+
+    /**
      * Check that two elements look different, by the rule the contrast harness uses (distinct_score.js, D1): at least
      * one of these holds.
      *  - Their backgrounds differ by 3:1 or more.

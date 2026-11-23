@@ -215,7 +215,9 @@ final class styles_test extends \advanced_testcase {
         $this->assertNotEmpty($panel);
         $body = implode("\n", array_column($panel, 1));
         $this->assertStringContainsString('clamp(380px, 50vw, 760px)', $body);
-        $this->assertStringContainsString('min(80vh, calc(100vh - 120px))', $body);
+        $this->assertStringContainsString('min(80vh, calc(100vh - var(--la-panel-end) - 1rem))', $body);
+        // At very large text sizes it keeps the lower half of the viewport (its bottom never above the middle).
+        $this->assertStringContainsString('--la-panel-end: min(calc(var(--la-rest-top) + var(--la-offset)), calc(50vh - 1rem));', $body);
         $this->assertStringContainsString('font-size: 1rem', $body);
         // The scheme's colour first, then the Moodle Design System token (5.3), then Bootstrap's, then Boost's value.
         $this->assertStringContainsString('var(--a11y-page, var(--mds-bg-surface-default, var(--bs-body-bg, #fff)))', $body);
@@ -268,9 +270,9 @@ final class styles_test extends \advanced_testcase {
         foreach (['inline-size: 2.75rem;', 'block-size: 2.75rem;', 'font-size: 1.25rem;'] as $rule) {
             $this->assertStringContainsString($rule, $body);
         }
-        // Its place is local_floatingbuttons' slot, or .la-launcher-own: in rem too (floatingbuttons_test).
-        $own = array_values(array_filter(self::rules(), fn($r) => $r[0] === '.btn.local-accessibility-launcher.la-launcher-own'));
-        $this->assertStringContainsString('inset-block-end: calc(2rem + var(--la-corner-size) + 0.75rem);', $own[0][1]);
+        // Its place: the offset above core's resting spot, in rem and px (launcher_test).
+        $this->assertStringContainsString('inset-block-end: calc(var(--la-rest-top) + var(--la-offset));',
+            implode("\n", array_column($launcher, 1)));
         foreach (self::rules_with('.local-accessibility-launcher') as [$selector, $declarations]) {
             $this->assertDoesNotMatchRegularExpression(
                 '/(?<![-\w])(font-size|inline-size|block-size|inset-block-end):\s*\d+(\.\d+)?px/',
@@ -1103,7 +1105,7 @@ final class styles_test extends \advanced_testcase {
         $r = self::rules_with('html[data-a11y-colour] body:not(#la-weight) :where(.btn:is(.p-0, .px-0, .dropdown-toggle[role="combobox"])');
         $this->assertCount(1, $r);
         $this->assertStringContainsString('padding-inline: 0.5em !important', $r[0][1]);
-        foreach (['.btn-icon', '.btn-link', '.btn-primary', '.local-accessibility-launcher', '.local-floatingbuttons-slot'] as $out) {
+        foreach (['.btn-icon', '.btn-link', '.btn-primary', '.local-accessibility-launcher'] as $out) {
             $this->assertStringContainsString($out, $r[0][0], $out . ' keeps its padding');
         }
     }
