@@ -45,6 +45,14 @@ if ($hassiteconfig) {
                 'menu' => new lang_string('launcher_menu', 'local_accessibility'),
             ]
         ));
+        $page->add(new \local_accessibility\admin\setting_pixels(
+            'local_accessibility/launcheroffset',
+            new lang_string('launcheroffset', 'local_accessibility'),
+            new lang_string('launcheroffset_desc', 'local_accessibility'),
+            \local_accessibility\output\panel::LAUNCHER_OFFSET,
+            0,
+            200
+        ));
         $page->add(new admin_setting_configcheckbox(
             'local_accessibility/shortcut',
             new lang_string('shortcut', 'local_accessibility'),
