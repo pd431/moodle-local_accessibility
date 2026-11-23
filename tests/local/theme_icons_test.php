@@ -82,6 +82,39 @@ final class theme_icons_test extends \advanced_testcase {
     }
 
     /**
+     * The colours measured on the test sites (23 November 2026), read back as each theme paints them: Boost Union's
+     * colour setting on Moodle 4.5 becomes a filter chain from its solver (painted #2e7c32 for #2e7d32); on 5.x the
+     * setting and Raw initial SCSS give the colour itself; Classic declares Boost's.
+     *
+     * @dataProvider measured_provider
+     * @param string $css the declaration as compiled
+     * @param string $painted the colour Chromium paints the icon in
+     */
+    public function test_parse_measured(string $css, string $painted): void {
+        $this->assertSame($painted, theme_icons::parse(':root{' . $css . '}')['content']);
+    }
+
+    /**
+     * Declarations from the compiled themes and the colour each paints.
+     *
+     * @return array<string, array{string, string}>
+     */
+    public static function measured_provider(): array {
+        return [
+            '4.5 Boost, Boost Union and Classic' => [
+                '--activitycontent:invert(49%) sepia(52%) saturate(4675%) hue-rotate(156deg) brightness(89%) contrast(102%)',
+                '#0098aa',
+            ],
+            '4.5 Boost Union setting #2e7d32' => [
+                '--activitycontent:invert(34%) sepia(63%) saturate(544%) hue-rotate(73deg) brightness(99%) contrast(84%)',
+                '#2e7c32',
+            ],
+            '5.3 Boost Union setting #2e7d32' => ['--activitycontent:#2e7d32', '#2e7d32'],
+            '5.3 Boost Union Raw initial SCSS #6a1b9a' => ['--activitycontent:#6a1b9a', '#6a1b9a'],
+        ];
+    }
+
+    /**
      * With the theme's CSS in core's cache the baseline is what it declares, Boost filling any purpose left out, and
      * the result is kept in the plugin's cache under the theme and revision.
      */

@@ -336,6 +336,34 @@ final class scheme_test extends \advanced_testcase {
     }
 
     /**
+     * Every preset's six purposes reach APCA Lc 75 and 4.5:1 on its page and surfaces, from Boost's colours (4.5, 5.2
+     * and 5.3 declare the same) and from the theme colours measured on the test sites, in the theme's hue.
+     */
+    public function test_every_preset_with_theme_baselines(): void {
+        $baselines = [
+            'Boost' => purpose::BOOST,
+            '4.5 Boost Union setting' => ['content' => '#2e7c32'] + purpose::BOOST,
+            '5.x Boost Union setting' => ['content' => '#2e7d32'] + purpose::BOOST,
+            '5.x Raw initial SCSS' => ['content' => '#6a1b9a'] + purpose::BOOST,
+        ];
+        foreach (scheme::presets() as $id => $s) {
+            $surfaces = [$s->ramp['page'], $s->ramp['surface1'], $s->ramp['surface2']];
+            foreach ($baselines as $name => $baseline) {
+                foreach ($s->icon_colours($baseline) as $p => $hex) {
+                    if ($hex === $s->text) {
+                        continue;       // No lightness of that hue reaches both: the scheme's text colour.
+                    }
+                    $this->assertGreaterThanOrEqual(1.0, contrast::dual_worst($hex, $surfaces), "$id $name $p $hex");
+                    [, , $h] = oklch::from_hex($hex);
+                    [, , $baseh] = oklch::from_hex($baseline[$p]);
+                    $diff = abs($h - $baseh);
+                    $this->assertLessThan(3, min($diff, 360 - $diff), "$id $name $p keeps the theme's hue");
+                }
+            }
+        }
+    }
+
+    /**
      * A theme's own purpose colours are the baseline: kept exactly where they already pass both measures, moved in
      * lightness but not hue where they do not, with Boost's table filling any purpose the theme leaves out.
      */
