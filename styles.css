@@ -293,11 +293,15 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     }
     /* Text-entry fields only: buttons, checkboxes, radios and switches keep the theme's look (their state colours).
        A field's edge is the scheme's border colour, or its text colour where the scheme has none: Bootstrap 4's grey
-       edge is faint on a dark field. An input group's add-on (.input-group-text) is part of the field. */
+       edge is faint on a dark field. An input group's add-on (.input-group-text) is part of the field. The edge's
+       style and width are stated here too (the theme's width, else 1px), so a field has an edge wherever the theme's
+       own border is missing; a theme utility that removes it (.border-0, !important) still wins. */
     html[data-a11y-colour] body :where(.form-control, .form-select, .custom-select, .input-group-text, select, textarea, input:not([type="submit"], [type="button"], [type="reset"], [type="image"], [type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"], .btn, .form-check-input)):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
         background-color: var(--a11y-field) !important; /* stylelint-disable-line declaration-no-important */
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
         border-color: var(--a11y-border, var(--a11y-text)) !important; /* stylelint-disable-line declaration-no-important */
+        border-style: solid;
+        border-width: var(--bs-border-width, 1px);
     }
     html[data-a11y-colour] body :where(#page-content, #region-main, .main-inner):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
         background-color: var(--a11y-page) !important; /* stylelint-disable-line declaration-no-important */
