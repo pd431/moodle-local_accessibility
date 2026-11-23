@@ -38,7 +38,7 @@ Feature: Links are coloured by purpose under a colour scheme
       | user     | preference                 | value    |
       | student1 | local_accessibility_colour | vscodehc |
     And I am on the "Page 1" "page activity" page logged in as "student1"
-    Then the computed "color" of "#region-main .no-overflow a" should be "rgb(139, 202, 255)"
+    Then the computed "color" of "#region-main .no-overflow a" should be "rgb(163, 213, 255)"
     And the computed "text-decoration-line" of "#region-main .no-overflow a" should be "underline"
     And the "#region-main .no-overflow a" element should have a text contrast of at least 7:1
 
@@ -53,9 +53,9 @@ Feature: Links are coloured by purpose under a colour scheme
     And the computed "color" of "#t-card" should be "rgb(255, 255, 255)"
     And the computed "color" of "#t-b" should be "rgb(255, 255, 255)"
     And the computed "color" of "#t-th" should be "rgb(255, 255, 255)"
-    And the computed "color" of "#t-td" should be "rgb(139, 202, 255)"
+    And the computed "color" of "#t-td" should be "rgb(163, 213, 255)"
     And the computed "color" of "#la-test-controls .page-item:not(.active) .page-link" should be "rgb(255, 255, 255)"
-    And the computed "color" of "#la-test-link" should be "rgb(139, 202, 255)"
+    And the computed "color" of "#la-test-link" should be "rgb(163, 213, 255)"
     And the "#la-test-page" element should have a text contrast of at least 4.5:1
 
   Scenario Outline: The split holds and stays readable under <colour>

@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.1.5] - 2026-11-16
+
+- States keep their mark under every colour scheme: current and chosen items are boxed, status cells and changed
+  grades have a solid border in the status colour, alerts, badges and pills a solid marker in their type's colour, status text has a
+  coloured dot before it, disabled controls are faded, read-only fields have a heavier edge, hidden items are italic, and keyboard focus is
+  drawn in the scheme's mark colour. See CHANGES.md.
+
+## [3.1.4] - 2026-11-13
+
+- Standard Moodle components keep their contrast under a colour scheme: tables, pagination, the gradebook, the
+  assignment grading table, the quiz editing page, alerts, menus, link-styled buttons, fields and the text editor's
+  toolbar. Keyboard focus shows under every scheme. Dark image icons are lightened under dark schemes. A site's own
+  forced link colours no longer beat the scheme. See CHANGES.md.
+
 ## [3.1.3] - 2026-11-05
 
 ### Changed

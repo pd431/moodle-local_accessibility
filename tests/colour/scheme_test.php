@@ -71,8 +71,8 @@ final class scheme_test extends \advanced_testcase {
         $this->assertSame('#000000', $s->ramp['surface1']);
         $this->assertSame('#000000', $s->ramp['field']);
         $this->assertSame('#ffffff', $s->text);
-        $this->assertSame('#8bcaff', $s->link);
-        $this->assertGreaterThanOrEqual(70, contrast::apca_worst($s->link, $s->ramp), 'link Lc 70 on every shade');
+        $this->assertSame('#a3d5ff', $s->link);
+        $this->assertGreaterThanOrEqual(75, contrast::apca_worst($s->link, $s->ramp), 'link Lc 75 on every shade');
         $this->assertSame('#6fc3df', $s->border);
         $this->assertSame('#f38518', $s->focus);
         $this->assertSame('#f38518', $s->active);
@@ -263,6 +263,74 @@ final class scheme_test extends \advanced_testcase {
         $grey = ['page' => '#808080', 'surface1' => '#808080', 'surface2' => '#808080'];
         foreach (purpose::colours($grey, '#101010') as $p => $hex) {
             $this->assertSame('#101010', $hex, "$p falls back to the text colour on mid grey");
+        }
+    }
+
+    /**
+     * Every scheme has a mark colour that reaches 3:1 on every shade (WCAG 1.4.11): the built-in presets, VS Code's
+     * own orange, and a spread of custom schemes, auto-adjusted and exact.
+     */
+    public function test_mark_meets_floor(): void {
+        $schemes = scheme::presets();
+        $schemes['custom-dark'] = scheme::custom('#101820', '#f0f0f0', '#80c0ff', false);
+        $schemes['custom-light'] = scheme::custom('#fffbe6', '#202020', '#0050a0', false);
+        $schemes['custom-mid'] = scheme::custom('#777777', '#ffffff', '#ffff00', false);
+        $schemes['custom-exact-low-link'] = scheme::custom('#ffffff', '#000000', '#999999', true);
+        $schemes['custom-exact-low-both'] = scheme::custom('#ffffff', '#888888', '#999999', true);
+        foreach ($schemes as $id => $s) {
+            $this->assertGreaterThanOrEqual(3.0, contrast::worst($s->mark(), $s->ramp), "$id mark " . $s->mark());
+            $this->assertStringContainsString('--a11y-mark:' . $s->mark() . ';', $s->css_properties(), $id);
+        }
+        $this->assertSame(
+            scheme::presets()['vscodehc']->active,
+            scheme::presets()['vscodehc']->mark(),
+            'vscodehc keeps its orange'
+        );
+        $this->assertSame(
+            scheme::presets()['highcontrast']->link,
+            scheme::presets()['highcontrast']->mark(),
+            'the link colour first'
+        );
+        $this->assertSame('#000000', $schemes['custom-exact-low-link']->mark(), 'the text colour when the link is too faint');
+        $this->assertSame('#000000', $schemes['custom-exact-low-both']->mark(), 'black or white when both are too faint');
+    }
+
+    /**
+     * Status mark colours reach 3:1 on every shade of every built-in scheme and of a spread of custom ones; a built-in
+     * scheme keeps the fixed value wherever it already passes, and only lightness moves where it does not. No status
+     * text colour is emitted: status text keeps the scheme's text colour.
+     */
+    public function test_status_colours_meet_floors(): void {
+        $schemes = scheme::presets();
+        $schemes['custom-dark'] = scheme::custom('#101820', '#f0f0f0', '#80c0ff', false);
+        $schemes['custom-light'] = scheme::custom('#fffbe6', '#202020', '#0050a0', false);
+        $schemes['custom-mid'] = scheme::custom('#777777', '#ffffff', '#ffff00', false);
+        foreach ($schemes as $id => $s) {
+            $colours = $s->status_colours();
+            $this->assertSame(['ok-mark', 'warn-mark', 'bad-mark'], array_keys($colours), $id);
+            foreach ($colours as $name => $hex) {
+                $this->assertGreaterThanOrEqual(3.0, contrast::worst($hex, $s->ramp), "$id $name");
+                $this->assertStringContainsString('--a11y-' . $name . ':' . $hex . ';', $s->css_properties());
+            }
+            $this->assertStringNotContainsString('--a11y-ok:', $s->css_properties(), 'no status text colour');
+        }
+        $this->assertSame(
+            scheme::STATUS_MARK['dark']['bad'],
+            scheme::presets()['highcontrast']->status_colours()['bad-mark'],
+            'a passing fixed value is kept'
+        );
+    }
+
+    /**
+     * A current navigation item has no box: it is shown by the hover surface (or, on VS Code, the surface it keeps), so
+     * its text must reach 4.5:1 on that fill under every built-in scheme. The presets hold their text at 7:1 on every
+     * shade of the ramp, the hover surface included, so no fill needs moving.
+     */
+    public function test_current_item_text_on_its_fill(): void {
+        foreach (scheme::presets() as $id => $s) {
+            foreach (['hover', 'surface2', 'page'] as $tier) {
+                $this->assertGreaterThanOrEqual(4.5, contrast::ratio($s->text, $s->ramp[$tier]), "$id text on $tier");
+            }
         }
     }
 }

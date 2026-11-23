@@ -23,6 +23,7 @@
 
     Context variables required for this template:
     * floating - whether to show the floating launcher button
+    * launcheroffset - px between the launcher and the corner button below it, and between the launcher and the panel
     * state - JSON: per enabled feature its value, default, tile, kind, locked and options (value, label, css)
     * tiles - one per tile (see local_accessibility/tile)
     * drawers - one per enabled short-list feature (see local_accessibility/drawer)
@@ -35,6 +36,7 @@
     Example context (json):
     {
         "floating": true,
+        "launcheroffset": 12,
         "state": "{\"align\":{\"value\":\"center\",\"default\":\"default\",\"tile\":\"align\",\"kind\":\"drawer\",\"locked\":false,\"options\":[]} }",
         "tiles": [
             {"id": "size", "label": "Text size", "icon": "fa-text-height", "kind": "detail", "isdrawer": false,
@@ -85,14 +87,14 @@
 {{/purposes}}
 </svg>
 {{#floating}}
-<button type="button" class="local-accessibility-launcher btn btn-primary"
+<button type="button" class="local-accessibility-launcher btn btn-primary" style="--la-launcher-offset: {{launcheroffset}}px"
         aria-expanded="false" aria-controls="local-accessibility-panel"
         title="{{#str}} accessibilitysettings, local_accessibility {{/str}}">
     <i class="icon fa fa-universal-access" aria-hidden="true"></i>
     <span class="la-visually-hidden">{{#str}} accessibilitysettings, local_accessibility {{/str}}</span>
 </button>
 {{/floating}}
-<div id="local-accessibility-panel" class="local-accessibility-panel" role="dialog" aria-modal="true"
+<div id="local-accessibility-panel" class="local-accessibility-panel" style="--la-launcher-offset: {{launcheroffset}}px" role="dialog" aria-modal="true"
      aria-labelledby="local-accessibility-title" data-state="{{state}}" hidden>
     <div class="la-head">
         <h2 id="local-accessibility-title" class="la-title">{{#str}} pluginname, local_accessibility {{/str}}</h2>

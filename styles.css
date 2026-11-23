@@ -189,14 +189,23 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
        clickable). Every other anchor is a link: link colour and underline, on every page.
        The control list is stated once, as --la-anchor, and the one anchor rule below reads it. Buttons keep
        their own rules, and the current page in pagination and the active menu item keep the theme's white on
-       primary (5.36:1). */
+       primary (5.36:1). A site's own SCSS may force link colours with !important and a heavy selector (course page
+       link colours are a common customisation), usually one id with classes and pseudo-classes, such as
+       #region-main a:link:not(.btn); :not(#la-weight) on both html and body adds two ids' weight, so the scheme still
+       wins over any rule of one id. */
     html[data-a11y-colour] body :where(nav, [role="navigation"], [role="menu"], [role="menubar"], [role="tablist"], [role="tree"], [role="toolbar"], h1, h2, h3, h4, h5, h6, thead th, .activity-item .activityname, a:is([role="button"], [role="tab"], [role="menuitem"], .dropdown-item, .page-link, .nav-link, .badge, .courseindex-link), a:has(> :is(h1, h2, h3, h4, h5, h6))) {
         --la-anchor: var(--a11y-text);
         --la-anchor-line: none;
     }
-    html[data-a11y-colour] body :where(a:not(.btn, .qnbutton, .nav-link.active, .page-item.active .page-link, .dropdown-item.active, .dropdown-item:active)):where(:not(.la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
+    html[data-a11y-colour]:not(#la-weight) body:not(#la-weight) :where(a:not(.btn, .qnbutton, .nav-link.active, .page-item.active .page-link, .dropdown-item.active, .dropdown-item:active)):where(:not(.la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
         color: var(--la-anchor, var(--a11y-link)) !important; /* stylelint-disable-line declaration-no-important */
         text-decoration: var(--la-anchor-line, underline) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* Link-styled buttons (.btn-link: Show more, Expand all, move and info icons) are controls painted as links. The
+       anchor rule leaves .btn out, and Boost paints them in the brand colour (black when hovered), so they read the
+       same purpose colour here, with no forced underline: the underline is the mark of a link in text. */
+    html[data-a11y-colour] body :where(.btn-link):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
+        color: var(--la-anchor, var(--a11y-link)) !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Activity icons: Boost paints each monologo icon with a filter chain that yields a purpose colour (Lc 13 to 43
        on black by APCA). Under a scheme the icon takes the panel's SVG filter for its purpose instead, which floods
@@ -220,9 +229,50 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     html[data-a11y-colour] body .activityiconcontainer.interactivecontent:not(.isbranded) :is(.activityicon, .icon):not(.nofilter) {
         filter: url("#la-icon-interactivecontent");
     }
-    /* Mop-up: hardcoded surfaces (spec §6.4). Grows during Task 22's manual pass. */
-    html[data-a11y-colour] body :where(#page, #page-wrapper, .drawer, .navbar, .card, .card-header, .card-footer, .list-group-item, .dropdown-menu, .modal-content, .popover, .table, .form-control, .form-select, .custom-select, .activity-item, .activity-header, .course-content .section, .bg-white, .bg-light, .bg-body, #page-footer, .footer-dark, .secondary-navigation, .secondary-navigation .navigation, .nav-tabs, .nav-tabs .nav-link.active, .section-item, .section-content-inner):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
+    /* Other image icons (the icon beside each plugin on Plugins overview, gradebook item and aggregation icons, the
+       group mode icon) are dark monochrome artwork with no purpose colour. Under a dark scheme, which carries
+       data-bs-theme="dark", they are inverted with the hue kept, so a dark icon reads light and a coloured one keeps
+       its colour family. Activity icons keep their purpose filters above; user pictures and .nofilter icons are left. */
+    html[data-a11y-colour][data-bs-theme="dark"] body :where(img.icon:not(.nofilter, .userpicture), img.pluginicon, img.itemicon):where(:not(.activityiconcontainer *, .la-guide *)) {
+        filter: invert(1) hue-rotate(180deg) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* Mop-up: hardcoded surfaces (spec §6.4). Grows during Task 22's manual pass. Boost's .generaltable (a table
+       without Bootstrap's .table class) carries its own text colour, striped rows and sticky columns on Moodle 4.5,
+       so the table, its rows and its cells are named here. */
+    html[data-a11y-colour] body :where(#page, #page-wrapper, .drawer, .navbar, .card, .card-header, .card-footer, .list-group-item, .dropdown-menu, .modal-content, .popover, .table, .form-control, .form-select, .custom-select, .activity-item, .activity-header, .course-content .section, .bg-white, .bg-light, .bg-body, #page-footer, .footer-dark, .secondary-navigation, .secondary-navigation .navigation, .nav-tabs, .nav-tabs .nav-link.active, .section-item, .section-content-inner, .generaltable, .generaltable thead th, .generaltable tbody tr, .generaltable td, .generaltable th, .generaltable .sticky-column, .page-header-headings, .fp-filename, .page-link, .gradeparent tr, .gradeparent .cell, .user-report-container, .user-grade tbody tr, .user-grade td, .user-grade th, .gradetree-wrapper, .gradetree-wrapper td, .gradetree-wrapper th, .gradingtable td, .gradingtable th, #page-mod-quiz-edit ul.slots li.section .content, #page-mod-quiz-edit ul.slots li.activity, #page-mod-quiz-edit .section .activity .actions, #page-mod-quiz-edit .instancemaxmarkcontainer, #page-mod-quiz-edit .inplaceeditable):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
         background-color: var(--a11y-surface1) !important; /* stylelint-disable-line declaration-no-important */
+        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* Hover surfaces: a hovered table row, and a hovered day in the calendar, take the scheme's hover surface. The
+       cells are named because the mop-up rule paints each cell. */
+    html[data-a11y-colour] body :where(.generaltable, .gradingtable, .gradeparent) tbody tr:hover > :is(td, th),
+    html[data-a11y-colour] body .maincalendar .calendarmonth .clickable:hover {
+        background-color: var(--a11y-hover) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* Small panels and chips take the second surface: alerts and the plugin update panel (a pale panel under a dark
+       scheme put the scheme's light link colour on a light background), an assignment submission's status (its
+       words say it; core's fills are under 3:1, so they are not marked as states),
+       user initials, grey badges and buttons, the book's previous and next buttons and the pale dialog panel. An alert
+       keeps a leading edge in its type's colour, since its fill no longer says what kind it is. */
+    html[data-a11y-colour] body :where(.alert, .pluginupdateinfo, .environmenttable .warn, .submissionstatus, .submissionstatusdraft, .submissionstatussubmitted, .submissionlocked, .submissionreopened, .submissiongraded, .latesubmission, .earlysubmission, .userinitials, .bg-secondary, .text-bg-secondary, .bg-primary-light, .path-mod-book .btn-previous, .path-mod-book .btn-next):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
+        background-color: var(--a11y-surface2) !important; /* stylelint-disable-line declaration-no-important */
+        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-colour] body :where(.alert) {
+        border-color: var(--a11y-border, var(--a11y-text)) !important; /* stylelint-disable-line declaration-no-important */
+        border-inline-start: 4px solid var(--a11y-link) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* Moodle 5.3's dark mode repaints .bg-white, .bg-light and .bg-body with an !important rule of more weight than
+       the mop-up rule, which left dark grey panels on a black page. body:not(#la-weight) adds one id's weight, as for
+       the navbar rules. */
+    html[data-a11y-colour] body:not(#la-weight) :where(.bg-white, .bg-light, .bg-body):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
+        background-color: var(--a11y-surface1) !important; /* stylelint-disable-line declaration-no-important */
+        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* A grey button (the footer's help button) turns pale again when hovered or focused, through a theme rule with
+       !important and more weight than the small-panels rule; it keeps the second surface. */
+    html[data-a11y-colour] body:not(#la-weight) :where(a.bg-secondary:hover, a.bg-secondary:focus, button.bg-secondary:hover, button.bg-secondary:focus) {
+        background-color: var(--a11y-surface2) !important; /* stylelint-disable-line declaration-no-important */
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Boost multiplies completion badges, and the badge and icon of a hidden or hovered activity card, into the grey
@@ -233,10 +283,25 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     html[data-a11y-colour] body :where(.drawer, .navbar, .secondary-navigation):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
         background-color: var(--a11y-surface2) !important; /* stylelint-disable-line declaration-no-important */
     }
-    /* Text-entry fields only: buttons, checkboxes, radios and switches keep the theme's look (their state colours). */
-    html[data-a11y-colour] body :where(.form-control, .form-select, .custom-select, select, textarea, input:not([type="submit"], [type="button"], [type="reset"], [type="image"], [type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"], .btn, .form-check-input)):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
+    /* A navbar the theme paints with the brand colour (Boost Union's coloured navbar, .navbar.bg-primary, with
+       !important) takes the scheme's surface too, under every scheme, so the scheme's text, icons and focus ring sit
+       on the scheme's own colours: on a light scheme they were dark on the brand colour. body:not(#la-weight) adds one
+       id's weight, as for the navbar controls. */
+    html[data-a11y-colour] body:not(#la-weight) :where(.navbar) {
+        background-color: var(--a11y-surface2) !important; /* stylelint-disable-line declaration-no-important */
+        background-image: none !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* Text-entry fields only: buttons, checkboxes, radios and switches keep the theme's look (their state colours).
+       A field's edge is the scheme's border colour, or its text colour where the scheme has none: Bootstrap 4's grey
+       edge is faint on a dark field. An input group's add-on (.input-group-text) is part of the field. The edge's
+       style and width are stated here too (the theme's width, else 1px), so a field has an edge wherever the theme's
+       own border is missing; a theme utility that removes it (.border-0, !important) still wins. */
+    html[data-a11y-colour] body :where(.form-control, .form-select, .custom-select, .input-group-text, select, textarea, input:not([type="submit"], [type="button"], [type="reset"], [type="image"], [type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"], .btn, .form-check-input)):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
         background-color: var(--a11y-field) !important; /* stylelint-disable-line declaration-no-important */
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+        border-color: var(--a11y-border, var(--a11y-text)) !important; /* stylelint-disable-line declaration-no-important */
+        border-style: solid;
+        border-width: var(--bs-border-width, 1px);
     }
     html[data-a11y-colour] body :where(#page-content, #region-main, .main-inner):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
         background-color: var(--a11y-page) !important; /* stylelint-disable-line declaration-no-important */
@@ -245,6 +310,14 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     html[data-a11y-colour] body {
         background-color: var(--a11y-page) !important; /* stylelint-disable-line declaration-no-important */
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* Behind the page: #page-wrapper (painted with #page by the mop-up rule) is one viewport tall and the document
+       scrolls past it, so where the page has one, html and body take its surface too. Otherwise the gutters beside a
+       floating drawer (Boost Union on Moodle 5.3) turn from the surface to the page colour as the page scrolls, with
+       the edge between them travelling up the screen. */
+    html[data-a11y-colour]:has(#page-wrapper),
+    html[data-a11y-colour]:has(#page-wrapper) body {
+        background-color: var(--a11y-surface1) !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Theme-coloured controls (Task 22 browser pass): secondary, outline and icon buttons take the scheme, and so
        does a plain .btn with no variant class (drawer and user menu toggles, the activity Completion dropdown),
@@ -257,6 +330,15 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
     }
     html[data-a11y-colour] body :where(.btn-secondary, .btn-light, .btn-outline-secondary, .btn-outline-primary, .btn-icon, .btn-footer-popover, .icons-collapse-expand, .mds-nav-pill--selected, .mds-nav-pill.active, .btn:not(.btn-primary, .btn-success, .btn-danger, .btn-warning, .btn-info, .btn-dark, .btn-link, [class*="btn-outline-"])):where(:hover, :focus, .active, [aria-expanded="true"]):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
         background-color: var(--a11y-hover) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* Plain controls that core draws with no inline padding and a transparent edge, so they read as text: core's
+       combobox toggles (the grading table's filters, the admin pages' heading select: div.btn.dropdown-toggle with
+       role="combobox", zeroed by .p-0 or by the tertiary navigation's own rule) and other plain .btn.p-0 controls. The rules above give them the scheme's edge, which then sat against the text: they take 0.5em of inline
+       padding, in em so a heading-sized select gets proportionally more. The caret (::after) keeps its own margin
+       inside it. Icon buttons and the theme-coloured variants keep core's padding; with no scheme nothing changes. The
+       id's weight beats .p-0's !important. */
+    html[data-a11y-colour] body:not(#la-weight) :where(.btn:is(.p-0, .px-0, .dropdown-toggle[role="combobox"]):not(.btn-primary, .btn-success, .btn-danger, .btn-warning, .btn-info, .btn-dark, .btn-link, .btn-icon, [class*="btn-outline-"], .icons-collapse-expand, .btn-footer-popover, .local-accessibility-launcher)) {
+        padding-inline: 0.5em !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Border token (data-a11y-tokens): a scheme whose surfaces share one shade, such as VS Code dark high contrast,
        tells them apart by a 1px edge in its border colour on every surface, field, table cell and control. Schemes
@@ -290,28 +372,19 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
         box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
     }
-    /* Active token: the current item, boxed in the scheme's active colour (VS Code's contrastActiveBorder), text in
-       the text colour. The box is the token's one addition: a menu item or tab keeps the scheme's hover surface and its
-       underline in the text colour (the navigation menus rule below). Drawn inside with a shadow, so nothing moves and
-       the keyboard focus outline, which sits outside, shows on top. Every "current" mark Moodle makes gets it, so
-       they agree: the top and secondary nav, the course index, a dropdown's current item and pagination. */
-    html[data-a11y-tokens~="active"] body :where(.nav-link.active, .nav-link[aria-current], .mds-nav-pill--selected, .mds-nav-pill.active, .courseindex-item.pageitem, .courseindex-item.active, .dropdown-item[aria-current], .page-item.active .page-link) {
-        box-shadow: inset 0 0 0 2px var(--a11y-active) !important; /* stylelint-disable-line declaration-no-important */
+    /* Hardcoded theme text colours (Task 22): muted text and the active navigation item; Bootstrap 4 text that carries
+       its own colour (.text-dark, plain text and headers in menus, menu buttons); and page-specific greys and blacks on
+       the course page, the gradebook, the assignment grading table, the quiz editing page and Plugins overview. */
+    html[data-a11y-colour] body :where(.text-muted, .text-secondary, .text-body-secondary, .dimmed_text, .categoryname, .progress-text, .collapsemenu-text, .mds-switch-label, .nav-link.active, .text-dark:not(.badge), .dropdown-item-text, .dropdown-header, button.dropdown-item, .activity-dates, .completion-dialog, .form-autocomplete-downarrow, .submissionnotgraded, .submissiongraded, #plugins-control-panel .componentname, #plugins-control-panel .versionnumber, #plugins-control-panel .requiredby, a.toggle-category, a.toggle-category i, .gradeitemheader, .btn-outline-dark, #page-mod-quiz-edit .questionname, #page-mod-quiz-edit .questiontext, .path-mod-book .btn-previous .icon, .path-mod-book .btn-next .icon, .task-class, .moremenu .dropdown-item[aria-current="true"]):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
     }
-    /* Moodle 5.3 draws the current navigation pill with a fill and a dot; the box is the one mark. */
-    html[data-a11y-tokens~="active"] body :where(.mds-nav-pill__indicator, .mds-nav-pill.active::before) {
-        display: none !important; /* stylelint-disable-line declaration-no-important */
-    }
-    /* The current tab under both tokens: its edge turns orange and the inset line drops to 1px, so one 2px orange box
-       and no cyan around it. */
-    html[data-a11y-tokens~="border"][data-a11y-tokens~="active"] body .nav-tabs .nav-link.active {
-        border-color: var(--a11y-active) !important; /* stylelint-disable-line declaration-no-important */
-        box-shadow: inset 0 0 0 1px var(--a11y-active) !important; /* stylelint-disable-line declaration-no-important */
-    }
-    /* Hardcoded theme text colours (Task 22): muted text and the active navigation item. */
-    html[data-a11y-colour] body :where(.text-muted, .text-secondary, .text-body-secondary, .dimmed_text, .categoryname, .progress-text, .collapsemenu-text, .mds-switch-label, .nav-link.active):where(:not(img, video, picture, svg, canvas, iframe, .activityiconcontainer, .activityiconcontainer *, .mediaplugin, .mediaplugin *, .MathJax, .MathJax *, mjx-container, mjx-container *, .qnbutton, .qnbutton *, .filemanager-thumbnail, .la-sample, .la-sample *, .la-swatch, .la-swatch *, .la-preview, .la-preview *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-guide, .la-guide *)) {
+    /* A search term marked in results (.highlight: site administration search, course search, forum search) is
+       Boost's info teal, which is APCA Lc 30 on a black page whatever its WCAG ratio says. Under a scheme the term
+       takes the text colour on the hover surface, underlined, so it is marked by more than colour. */
+    html[data-a11y-colour] body :where(.highlight) {
+        background-color: var(--a11y-hover) !important; /* stylelint-disable-line declaration-no-important */
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+        text-decoration: underline !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Navigation menus (issue #4): Boost paints a hovered, focused or current item of its menus (.moremenu: the top
        navbar and the course tabs) with a hard-coded light grey, which under a dark scheme left the scheme's link colour
@@ -393,6 +466,16 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
         color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
         opacity: 0.8;
     }
+    /* The text editor (TinyMCE) on Moodle 4.5 paints its menu bar, toolbar and status bar white. They take the second
+       surface and the text colour; its icons are SVG and take the text colour as their fill. The editing area is an
+       iframe and keeps the author's own colours. */
+    html[data-a11y-colour] body :where(.tox .tox-editor-header, .tox .tox-menubar, .tox .tox-toolbar, .tox .tox-toolbar__primary, .tox .tox-toolbar__overflow, .tox .tox-toolbar-overlord, .tox .tox-statusbar, .tox .tox-tbtn, .tox .tox-mbtn, .tox .tox-statusbar a, .tox .tox-statusbar__path-item, .tox .tox-statusbar__wordcount) {
+        background-color: var(--a11y-surface2) !important; /* stylelint-disable-line declaration-no-important */
+        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-colour] body .tox :where(.tox-tbtn svg, .tox-statusbar svg) {
+        fill: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+    }
     /* Exclusions (spec §6.4): media, icons, maths and quiz state are never matched, via the :not() guard below. */
     /* Pasted content colours lose to the scheme (spec §6.2, CSS only): inline colours and backgrounds (the shorthand
        too) and legacy <font color> and bgcolor, in the main region and in authored text anywhere (HTML blocks). */
@@ -403,6 +486,215 @@ html[data-a11y-narrow] #region-main :where(p, blockquote, dd, li:not([class]), .
 }
 
 /* stylelint-enable selector-type-no-unknown */
+/* 7a. State marks. A colour scheme gives a state and its neighbour the same colours (section 7), so every state
+   Moodle shows by colour gets a mark that is not hue, in the scheme's mark colour (--a11y-mark: its link colour, else
+   its text colour, at least 3:1 on every shade; VS Code's orange). Each kind of state has one rule here, and this is
+   the only place a state class is named. The marks are edges (inset shadow, outline), opacity and font style, which
+   section 7 never sets, so these rules add them without undoing section 7; where a state needs another fill the rule
+   wins by coming later with an id's weight. Never in forced colours, where the system draws states. */
+@media (forced-colors: none) {
+    /* Status cells: a coloured table cell or row. Each cell drops
+       the theme's fill (Bootstrap 5 paints it with an inset shadow), keeps the scheme's text colour and takes a solid
+       2px border all round, inside its edge, in the status mark colour (classes/colour/scheme.php). The border colour
+       is --la-status and its width --la-status-w, so a cell in a ticked row shows both the row's box and its own border
+       (the chosen rows below).
+       The border shows only where core colours the cell: Bootstrap 4 (Moodle 4.5) fills a success, warning or danger
+       cell; Moodle 5's tables make a cell inherit its row's background, which Bootstrap 5 leaves transparent, so core
+       shows no colour there and neither does the scheme. The signal is Bootstrap 4's own root token --breakpoint-xs
+       (0, and absent from Bootstrap 5): 2px * (1 + 0) on Bootstrap 4, 2px * (1 - 1) = 0 on Bootstrap 5. */
+    html[data-a11y-colour] body:not(#la-weight) :where(td.table-success, th.table-success, tr.table-success > *) {
+        --la-status: var(--a11y-ok-mark);
+        --la-dot-display: none;
+        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+        --la-status-w: calc(2px * (1 + var(--breakpoint-xs, -1)));
+        background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: inset 0 0 0 var(--la-status-w) var(--la-status) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-colour] body:not(#la-weight) :where(td.table-warning, th.table-warning, tr.table-warning > *) {
+        --la-status: var(--a11y-warn-mark);
+        --la-dot-display: none;
+        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+        --la-status-w: calc(2px * (1 + var(--breakpoint-xs, -1)));
+        background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: inset 0 0 0 var(--la-status-w) var(--la-status) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-colour] body:not(#la-weight) :where(td.table-danger, th.table-danger, tr.table-danger > *) {
+        --la-status: var(--a11y-bad-mark);
+        --la-dot-display: none;
+        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+        --la-status-w: calc(2px * (1 + var(--breakpoint-xs, -1)));
+        background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: inset 0 0 0 var(--la-status-w) var(--la-status) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* Changed: a grade typed but not saved (quick grading) or overridden in the gradebook. The same border as a status
+       cell, in the warning mark colour. */
+    html[data-a11y-colour] body:not(#la-weight) :where(.quickgrademodified, td.ajaxoverridden) {
+        --la-status: var(--a11y-warn-mark);
+        --la-status-w: 2px;
+        --la-dot-display: none;
+        box-shadow: inset 0 0 0 var(--la-status-w) var(--la-status) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* Chosen and current: the current page, breadcrumb (Moodle marks the current one only by being plain text at the
+       end, in a span), tab, pill, menu and list item, a pressed toggle or editor button, a selected option, a ticked or
+       active row, today in the calendar. aria-selected counts only on a tab, a listbox or grid option and an activity
+       chooser option: a tree (the course index) sets it on the node the arrow keys start from, which is not chosen, so
+       the course index's one chosen item is its page item. Every chosen item takes the scheme's text colour on the hover
+       surface (the twin rule after these two).
+       Navigation and links (the current page link, breadcrumb, navigation and tab item, list, menu and course index
+       item) have no box: that is all they show. */
+    html[data-a11y-colour] body:not(#la-weight) :where(.page-item.active > .page-link, .breadcrumb-item.active:not(:has([aria-current])), .breadcrumb-item:last-child > span:only-child, [aria-current]:not([aria-current="false"]), .list-group-item.active, [role="tab"][aria-selected="true"]:not(:is([role="tree"], .courseindex) *), .nav-link.active, .mds-nav-pill--selected, .mds-nav-pill.active, .courseindex-item.pageitem, .courseindex-item.active, .dropdown-item.active) {
+        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* Pressed and selected controls (a toggle, an editor button, a listbox, grid or activity chooser option) and today
+       in the calendar keep a 2px box inside the item's edge in the mark colour, so nothing moves and the keyboard focus
+       ring, which sits outside, shows on top. A focused boxed item draws its focus ring 4px in, inside the box
+       (--la-focus-offset, read by the focus rules). */
+    html[data-a11y-colour] body:not(#la-weight) :where(.btn.active, [aria-pressed="true"], :is([role="option"], [role="gridcell"], [data-region="chooser-option-container"])[aria-selected="true"]:not(:is([role="tree"], .courseindex) *), .tox-tbtn--enabled, .today .day-number-circle) {
+        box-shadow: inset 0 0 0 2px var(--a11y-mark) !important; /* stylelint-disable-line declaration-no-important */
+        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+        --la-focus-offset: -4px;
+    }
+    /* The hover surface behind a chosen item, on every scheme without its own active colour. This repeats the chosen
+       list on purpose: VS Code dark high contrast keeps the fills it already gives each of these (the hover surface on a
+       4.5 tab, the second surface on a 5.3 pill), and CSS cannot say "leave the earlier value" through a variable. */
+    html[data-a11y-colour]:not([data-a11y-tokens~="active"]) body:not(#la-weight) :where(.page-item.active > .page-link, .breadcrumb-item.active:not(:has([aria-current])), .breadcrumb-item:last-child > span:only-child, [aria-current]:not([aria-current="false"]), .list-group-item.active, .btn.active, [aria-pressed="true"], :is([role="tab"], [role="option"], [role="gridcell"], [data-region="chooser-option-container"])[aria-selected="true"]:not(:is([role="tree"], .courseindex) *), .nav-link.active, .mds-nav-pill--selected, .mds-nav-pill.active, .courseindex-item.pageitem, .courseindex-item.active, .dropdown-item.active, .tox-tbtn--enabled, .today .day-number-circle) {
+        background-color: var(--a11y-hover) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* A chosen row: an edge above and below each cell, and at the row's two ends, so the row reads as one box. A
+       status cell in the row keeps its own border inside the box (--la-status and --la-status-w, set by the status cell
+       rules above; no border where the width is 0). */
+    html[data-a11y-colour] body:not(#la-weight) :where(tr.selectedrow > *, tr.table-active > *, .table-active > td) {
+        box-shadow: inset 0 2px 0 var(--a11y-mark), inset 0 -2px 0 var(--a11y-mark), inset 0 0 0 calc(var(--la-status-w, 0px) * 2) var(--la-status, transparent) !important; /* stylelint-disable-line declaration-no-important */
+        background-color: var(--a11y-hover) !important; /* stylelint-disable-line declaration-no-important */
+        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-colour] body:not(#la-weight) :where(tr.selectedrow > :first-child, tr.table-active > :first-child) {
+        box-shadow: inset 2px 2px 0 var(--a11y-mark), inset 0 -2px 0 var(--a11y-mark), inset 0 0 0 calc(var(--la-status-w, 0px) * 2) var(--la-status, transparent) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-colour] body:not(#la-weight) :where(tr.selectedrow > :last-child, tr.table-active > :last-child) {
+        box-shadow: inset -2px 2px 0 var(--a11y-mark), inset 0 -2px 0 var(--a11y-mark), inset 0 0 0 calc(var(--la-status-w, 0px) * 2) var(--la-status, transparent) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* Moodle 5.3 draws the current navigation pill with a fill and a dot; the box is the one mark. */
+    html[data-a11y-colour] body:not(#la-weight) :where(.mds-nav-pill__indicator, .mds-nav-pill.active::before) {
+        display: none !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* Disabled: a control that cannot be used. Section 7 gives it the same text colour as the enabled control beside
+       it, so it is faded to 0.6, as Bootstrap fades a disabled button (WCAG asks no contrast of an inactive control).
+       Not a text field, textarea or select: its text is still read, so it takes the read-only look (the next rule). */
+    html[data-a11y-colour] body:not(#la-weight) :where(:is(button, .btn, input:is([type="checkbox"], [type="radio"], [type="button"], [type="submit"], [type="reset"], [type="image"], [type="range"], [type="color"])):disabled, .btn.disabled, .dropdown-item.disabled, .nav-link.disabled, .list-group-item.disabled, .page-item.disabled > .page-link, :is(a, button, .btn, [role="button"], [role="menuitem"], [role="tab"])[aria-disabled="true"], .tox-tbtn--disabled) {
+        opacity: 0.6 !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* Read only and disabled text fields, textareas and selects: one look for both, since their text is content and
+       WCAG 1.4.3 asks contrast of it either way. Not faded: the field colour, text in the scheme's text colour at full
+       strength (Moodle 4.5 fades a disabled select to 0.7) and a solid 2px edge in the text colour, against an editable
+       field's 1px. */
+    html[data-a11y-colour] body:not(#la-weight) :where(:is(.form-control, .form-select, .custom-select, textarea, select, input:not([type="checkbox"], [type="radio"], [type="button"], [type="submit"], [type="reset"], [type="image"], [type="range"], [type="color"], [type="hidden"])):is([readonly], :disabled)) {
+        background-color: var(--a11y-field) !important; /* stylelint-disable-line declaration-no-important */
+        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+        border: 2px solid var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+        opacity: 1 !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* Badges and pills, painted like alerts: every badge that has a colour class (bg-*, badge-*, text-bg-*; an
+       uncoloured badge, such as an empty activity badge, stays as Moodle draws it), but the primary, light and dark ones and the quiz's
+       correctness badges (which Moodle colours by its own .correct, .partiallycorrect and .incorrect) takes the second surface,
+       the scheme's text colour and a 1px edge in the border colour (else the text colour), so a pill still reads as a
+       pill on a surface of its own shade; VS Code's border-token edge is the same edge, not a second one. Its links
+       and icons take the text colour. A coloured badge's leading edge is its marker (below): this rule carries no
+       weight beyond the id's (all in :where), so the marker rule after it wins. Navigation pills are not badges. */
+    html[data-a11y-colour] body:not(#la-weight) :where(.badge:is([class*="bg-"], [class*="badge-"]):not(.bg-primary, .badge-primary, .text-bg-primary, .bg-light, .badge-light, .text-bg-light, .bg-dark, .badge-dark, .text-bg-dark, .correctness)) {
+        background-color: var(--a11y-surface2) !important; /* stylelint-disable-line declaration-no-important */
+        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+        border: 1px solid var(--a11y-border, var(--a11y-text)) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-colour] body:not(#la-weight) :where(.badge:is([class*="bg-"], [class*="badge-"]):not(.bg-primary, .badge-primary, .text-bg-primary, .bg-light, .badge-light, .text-bg-light, .bg-dark, .badge-dark, .text-bg-dark, .correctness)) :where(a, i, .icon, svg) {
+        color: inherit !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* Alerts and coloured badges: section 7 gives every alert the second surface and the text colour; the type shows
+       as a solid marker 1em wide at the leading edge in the type's mark colour (info in the link colour), in place of
+       that side's edge, on an alert and on a badge alike. On a pill the thick leading border follows the rounded end and
+       runs a little past it. */
+    html[data-a11y-colour] body:not(#la-weight) :where(.alert-success, .badge:is(.bg-success, .badge-success, .text-bg-success)) {
+        border-inline-start: 1em solid var(--a11y-ok-mark) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-colour] body:not(#la-weight) :where(.alert-warning, .environmenttable .warn, .badge:is(.bg-warning, .badge-warning, .text-bg-warning)) {
+        border-inline-start: 1em solid var(--a11y-warn-mark) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-colour] body:not(#la-weight) :where(.alert-danger, .badge:is(.bg-danger, .badge-danger, .text-bg-danger)) {
+        border-inline-start: 1em solid var(--a11y-bad-mark) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-colour] body:not(#la-weight) :where(.alert-info, .badge:is(.bg-info, .badge-info, .text-bg-info)) {
+        border-inline-start: 1em solid var(--a11y-link) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* Status text: a passing or failing grade, success, warning and danger text, an error message. The words keep the
+       scheme's text colour, at full contrast; a dot before them, in the status mark colour (3:1 on every shade:
+       classes/colour/scheme.php), carries the status. The dot is a ::before with no content, so assistive technology
+       reads nothing, sized in em and set inline, so the line keeps its height. Each kind sets --la-dot; the two rules
+       after them read it. */
+    html[data-a11y-colour] body:not(#la-weight) :where(.text-success, .gradepass) {
+        --la-dot: var(--a11y-ok-mark);
+        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-colour] body:not(#la-weight) :where(.text-warning) {
+        --la-dot: var(--a11y-warn-mark);
+        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-colour] body:not(#la-weight) :where(.text-danger, .gradefail, .invalid-feedback) {
+        --la-dot: var(--a11y-bad-mark);
+        color: var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* An icon that carries a status class, or sits inside status text, is already a shape: it takes the mark colour,
+       and the text around it gets no dot (one mark per item). A Font Awesome icon draws its glyph with ::before, so the
+       dot never applies to an icon, an image or a badge. */
+    html[data-a11y-colour] body:not(#la-weight) :where(.text-success, .gradepass, .text-warning, .text-danger, .gradefail, .invalid-feedback):where(i, .icon, .fa, [class*="fa-"], svg, img),
+    html[data-a11y-colour] body:not(#la-weight) :where(.text-success, .gradepass, .text-warning, .text-danger, .gradefail, .invalid-feedback) :where(i, .icon, .fa, [class*="fa-"], svg, img) {
+        color: var(--la-dot) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* The dot. --la-dot-display is none inside a status cell, which already has its border, so a status word there gets
+       no second mark. */
+    html[data-a11y-colour] body:not(#la-weight) :where(.text-success, .gradepass, .text-warning, .text-danger, .gradefail, .invalid-feedback):not(i, .icon, .fa, [class*="fa-"], svg, img, .badge, :has(i, .icon, .fa, [class*="fa-"], svg, img))::before {
+        content: "" !important; /* stylelint-disable-line declaration-no-important */
+        display: var(--la-dot-display, inline-block) !important; /* stylelint-disable-line declaration-no-important */
+        width: 0.75em !important; /* stylelint-disable-line declaration-no-important */
+        height: 0.75em !important; /* stylelint-disable-line declaration-no-important */
+        margin-inline-end: 0.35em !important; /* stylelint-disable-line declaration-no-important */
+        border-radius: 50% !important; /* stylelint-disable-line declaration-no-important */
+        vertical-align: -0.05em !important; /* stylelint-disable-line declaration-no-important */
+        background-color: var(--la-dot) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-colour] body:not(#la-weight) :where(.is-invalid) {
+        border-color: var(--a11y-bad-mark) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* Progress: a bar's fill in the mark colour on a track of the second surface with a 1px edge in the text colour,
+       so the filled part stands out from the empty part and the track from the page. */
+    html[data-a11y-colour] body:not(#la-weight) :where(.progress-bar) {
+        background-color: var(--a11y-mark) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-colour] body:not(#la-weight) :where(.progress) {
+        background-color: var(--a11y-surface2) !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: inset 0 0 0 1px var(--a11y-text) !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* Hidden and dimmed: an item hidden from students, a hidden course, a suspended user. Moodle greys it, which a
+       scheme replaces with its full text colour; it is set in italic instead, at full contrast. */
+    html[data-a11y-colour] body:not(#la-weight) :where(.dimmed_text, .dimmed, .usersuspended) {
+        font-style: italic !important; /* stylelint-disable-line declaration-no-important */
+        opacity: 1 !important; /* stylelint-disable-line declaration-no-important */
+    }
+    /* Keyboard focus under a scheme without its own focus colour, where the Focus ring tile is off: the theme's ring is
+       mixed from the brand colour, which can vanish on the scheme's surfaces, so focus is a 2px solid outline in the
+       mark colour inside the item's edge. A focused plain link also loses the theme's pale fill and shadow (the
+       scheme's link colour on Boost's pale fill was yellow on cyan under High contrast); a chosen item keeps its box,
+       because the chosen rule above carries more weight. VS Code's dashed focus token (section 11a) is unchanged. */
+    html[data-a11y-colour]:not([data-a11y-tokens~="focus"], [data-a11y-focus="ring"], [data-a11y-focus="thick"]) :focus-visible {
+        outline: 2px solid var(--a11y-mark) !important; /* stylelint-disable-line declaration-no-important */
+        outline-offset: var(--la-focus-offset, -2px) !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
+    }
+    html[data-a11y-colour]:not([data-a11y-tokens~="focus"]) body :where(a:not(.nav-link, .mds-nav-pill)):where(:focus, .focus) {
+        background-color: transparent !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
+    }
+}
+/* 7a end */
 /* 8. Links: no layout shift; never the panel or the readbar. "outline" is underline plus outline. "highlight" keeps a
    dark text colour (#1d2125 on #fff3b0 is 14:1) rather than inheriting, which on a dark surface would be light on
    light; under a scheme it uses the scheme's own surface and link colours. */
@@ -431,7 +723,7 @@ html[data-a11y-links="highlight"] body:not(#la-weight) :where(a:not(.btn, .qnbut
 html[data-a11y-links="highlight"] body:not(#la-weight) :where(a.nav-link:is(.active, [aria-current="true"], [aria-current="page"])):where(:not(.local-accessibility-panel, .local-accessibility-panel *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-readbar, .la-readbar *, .la-guide, .la-guide *)) {
     border-bottom-color: currentcolor !important; /* stylelint-disable-line declaration-no-important */
 }
-html[data-a11y-colour][data-a11y-links="highlight"] body :where(a:not(.btn, .qnbutton)):where(:not(.local-accessibility-panel, .local-accessibility-panel *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-readbar, .la-readbar *, .la-guide, .la-guide *)) {
+html[data-a11y-colour][data-a11y-links="highlight"]:not(#la-weight) body:not(#la-weight) :where(a:not(.btn, .qnbutton)):where(:not(.local-accessibility-panel, .local-accessibility-panel *, .local-accessibility-launcher, .local-accessibility-launcher *, .la-readbar, .la-readbar *, .la-guide, .la-guide *)) {
     background-color: var(--a11y-surface2) !important; /* stylelint-disable-line declaration-no-important */
     color: var(--a11y-link) !important; /* stylelint-disable-line declaration-no-important */
 }
@@ -507,13 +799,15 @@ html[data-a11y-focus="thick"] :focus-visible {
 /* 11a. Focus token (data-a11y-tokens): the scheme's own focus colour, dashed so it is never mistaken for the active
    token's solid box, on keyboard focus. The pointer gets no ring: a hovered item takes the scheme's hover surface, as
    under every scheme. The ring is drawn inside the item's edge, on its own surface, so it needs no halo: 2px where the
-   Focus ring tile is off; "ring" and "thick" keep their thickness. A current item carries the active token's solid box
-   inside its edge, so the ring moves in by 4px to sit inside that box rather than over it. Never in forced colours,
+   Focus ring tile is off; "ring" and "thick" keep their thickness. The theme's focus shadow goes (Boost 4.5's blue ring on a
+   navigation link). A pressed or selected control carries the chosen box inside its edge (section 7a, which outweighs
+   this rule), and sets --la-focus-offset so the ring moves in by 4px to sit inside that box. Never in forced colours,
    where the system draws focus. */
 @media (forced-colors: none) {
     html[data-a11y-tokens~="focus"] :focus-visible {
         outline: 2px dashed var(--a11y-focus) !important; /* stylelint-disable-line declaration-no-important */
-        outline-offset: -2px !important; /* stylelint-disable-line declaration-no-important */
+        outline-offset: var(--la-focus-offset, -2px) !important; /* stylelint-disable-line declaration-no-important */
+        box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
     }
     html[data-a11y-tokens~="focus"][data-a11y-focus="ring"] :focus-visible {
         outline-width: 3px !important; /* stylelint-disable-line declaration-no-important */
@@ -524,9 +818,6 @@ html[data-a11y-focus="thick"] :focus-visible {
         outline-width: 5px !important; /* stylelint-disable-line declaration-no-important */
         outline-offset: -5px !important; /* stylelint-disable-line declaration-no-important */
         box-shadow: none !important; /* stylelint-disable-line declaration-no-important */
-    }
-    html[data-a11y-tokens~="focus"][data-a11y-tokens~="active"] body :where(.nav-link.active, .nav-link[aria-current], .mds-nav-pill--selected, .mds-nav-pill.active, .courseindex-item.pageitem, .courseindex-item.active, .dropdown-item[aria-current], .page-item.active .page-link):focus-visible {
-        outline-offset: -4px !important; /* stylelint-disable-line declaration-no-important */
     }
     /* Selection token: selected text in the scheme's own pair. */
     html[data-a11y-tokens~="selection"] ::selection {
@@ -580,13 +871,20 @@ html[data-a11y-motion="on"] *::after {
 /* D10: never taller than the viewport above its 104px offset, so the sticky header always stays on screen. */
 .local-accessibility-panel {
     position: fixed;
-    inset-block-end: 104px;
-    inset-inline-end: 24px;
+    /* Beside the launcher (section 14): launcheroffset px from its inline-start edge, bottoms level, and never past the
+       viewport's top or inline-start edge (1rem margin). Its bottom edge never rises past the middle of the viewport, so
+       at very large text sizes (the launcher is sized in rem) it keeps half the viewport, not a sliver above the launcher. */
+    --la-offset: var(--la-launcher-offset, 12px);
+    --la-panel-end: min(calc(var(--la-rest-top) + var(--la-offset)), calc(50vh - 1rem));
+    inset-block-end: var(--la-panel-end);
+    inset-inline-end: calc(var(--la-rest-centre) + 1.375rem + var(--la-offset));
     z-index: 1060;
     display: flex;
     flex-direction: column;
-    inline-size: clamp(380px, 50vw, 760px); /* stylelint-disable-line csstree/validator -- CSS Values 4. */
-    max-block-size: min(80vh, calc(100vh - 120px)); /* stylelint-disable-line csstree/validator -- CSS Values 4. */
+    /* stylelint-disable-next-line csstree/validator -- CSS Values 4. */
+    inline-size: min(clamp(380px, 50vw, 760px), calc(100vw - var(--la-rest-centre) - 1.375rem - var(--la-offset) - 1rem));
+    /* stylelint-disable-next-line csstree/validator -- CSS Values 4. */
+    max-block-size: min(80vh, calc(100vh - var(--la-panel-end) - 1rem));
     overflow: auto;
     font-size: 1rem;
     text-align: start;
@@ -1060,13 +1358,10 @@ html[data-a11y-colour] .local-accessibility-panel {
     }
 }
 
-/* 14. Launcher (.btn doubled for specificity over the theme's .btn). Sized and placed in rem so it grows with the
-   user's text size together with Boost's footer button (bottom: 2rem) under it, and keeps its place above that button
-   (44px, 80px from the bottom, at 100%). z-index 777 keeps it below chat and other docked panels. */
+/* 14. Launcher (.btn doubled for specificity over the theme's .btn). Sized in rem so it grows with the user's text
+   size together with Boost's footer button. z-index 777 keeps it below chat and other docked panels. */
 .btn.local-accessibility-launcher {
     position: fixed;
-    inset-block-end: 5rem;
-    inset-inline-end: 24px;
     z-index: 777;
     inline-size: 2.75rem;
     block-size: 2.75rem;
@@ -1084,15 +1379,92 @@ html[data-a11y-colour] .local-accessibility-panel {
     max-inline-size: none;
     max-block-size: none;
 }
+/* Its place: launcheroffset px ("Button height offset", --la-launcher-offset on the button and the panel, 12 by default)
+   above Moodle's corner button, on that button's centre line. The corner button is the topmost shown of core's footer
+   button (the "?") and Boost Union's back-to-top; with neither shown, or without anchor positioning, it is where core
+   rests the "?": 2rem from the bottom and the inline end, 2.25rem across on Moodle 4.5 and 2rem on Moodle 5 (Bootstrap
+   4's root token --breakpoint-xs, 0 and absent from Bootstrap 5, tells them apart), raised over a sticky footer as
+   core raises its own buttons (1rem above it; theme/boost/scss/moodle/core.scss, .hasstickyfooter). The launcher is
+   2.75rem across, so it is centred by standing half that in from the centre line (no transform: an anchored panel
+   would not see it). */
+:root {
+    --la-corner-size: calc(2rem + 0.25rem * (1 + var(--breakpoint-xs, -1)));
+    --la-rest-top: calc(2rem + var(--la-corner-size));
+    --la-rest-centre: calc(2rem + var(--la-corner-size) / 2);
+}
+body.hasstickyfooter {
+    --la-rest-top: calc(1rem + var(--sticky-footer-total-height, max(80px, 3rem)) + var(--la-corner-size));
+}
+.btn.local-accessibility-launcher {
+    --la-offset: var(--la-launcher-offset, 12px);
+    inset-block-end: calc(var(--la-rest-top) + var(--la-offset));
+    inset-inline-end: calc(var(--la-rest-centre) - 1.375rem);
+}
+/* Keep the floating launcher off the focused element (WCAG 2.4.11, panel.js): it moves up four rows. */
 .btn.local-accessibility-launcher.la-launcher-shifted {
-    inset-block-end: 9rem;
+    inset-block-end: calc(var(--la-rest-top) + var(--la-offset) + 4rem);
 }
 /* The footer HTML lands inside #page (#region-main), so a sibling selector cannot match.
-   Boost only docks the right drawer (315px) from the lg breakpoint; below it the drawer overlays. */
-@media (min-width: 992px) {
-    body:has(#page.drawers.show-drawer-right) .local-accessibility-launcher,
-    body:has(#page.drawers.show-drawer-right) .local-accessibility-panel {
-        inset-inline-end: calc(315px + 24px);
+   Boost only docks the right drawer (315px) from the lg breakpoint; below it the drawer overlays. Without anchor
+   positioning the launcher moves left of a docked drawer with core's "?". */
+@supports not (anchor-name: --a) {
+    @media (min-width: 992px) {
+        body:has(#page.drawers.show-drawer-right) .btn.local-accessibility-launcher {
+            inset-inline-end: calc(315px + var(--la-rest-centre) - 1.375rem);
+        }
+    }
+}
+/* With anchor positioning the launcher follows the corner button wherever core or the theme moves it, and keeps clear
+   of an open right drawer's edge (Boost Union 5.3 floats it 40px in) only while the corner button's centre is under
+   it: B = the corner button's axis, D = the drawer's edge, k = the clearance (the offset and half the launcher);
+   max(B, min(D + k, D + k - 10 * (B - D))) is B as soon as B is past D, and D + k while B is under the drawer. The
+   anchors are named with a little more weight than a bare class, and only while the launcher is on the page. A short
+   script (local_accessibility/launcherplace) moves the launcher and panel after the footer, since an anchor must come
+   before what it places. */
+@supports (anchor-name: --a) {
+    html body:has(.local-accessibility-launcher) :is(.btn-footer-popover, #boost-union-footer-buttons #back-to-top) {
+        /* stylelint-disable-next-line csstree/validator -- CSS Anchor Positioning. */
+        anchor-name: --la-corner;
+    }
+    html body:has(.local-accessibility-launcher) .drawer.drawer-right.show {
+        /* stylelint-disable-next-line csstree/validator -- CSS Anchor Positioning. */
+        anchor-name: --la-drawer;
+    }
+    .btn.local-accessibility-launcher {
+        /* stylelint-disable-next-line csstree/validator -- CSS Anchor Positioning. */
+        anchor-name: --la-launcher;
+        --la-b: anchor(--la-corner center, var(--la-rest-centre));
+        /* stylelint-disable-next-line length-zero-no-unit -- the fallback must stay a length inside calc(). */
+        --la-d: anchor(--la-drawer start, 0px);
+        --la-k: calc(var(--la-offset) + 1.375rem);
+        inset-block-end: calc(anchor(--la-corner top, var(--la-rest-top)) + var(--la-offset));
+        inset-inline-end:
+            calc(
+                max(
+                    var(--la-b),
+                    min(calc(var(--la-d) + var(--la-k)), calc(var(--la-d) + var(--la-k) - 10 * (var(--la-b) - var(--la-d))))
+                ) - 1.375rem
+            );
+    }
+    .btn.local-accessibility-launcher.la-launcher-shifted {
+        inset-block-end: calc(anchor(--la-corner top, var(--la-rest-top)) + var(--la-offset) + 4rem);
+    }
+}
+
+/* The panel beside the launcher. Without anchor positioning it moves left of a docked drawer with the launcher; with
+   it, it follows the launcher wherever the launcher goes. */
+@supports not (anchor-name: --a) {
+    @media (min-width: 992px) {
+        body:has(#page.drawers.show-drawer-right) .local-accessibility-panel {
+            inset-inline-end: calc(315px + var(--la-rest-centre) + 1.375rem + var(--la-offset));
+        }
+    }
+}
+
+@supports (anchor-name: --a) {
+    .local-accessibility-panel {
+        inset-block-end: min(anchor(--la-launcher bottom, calc(var(--la-rest-top) + var(--la-offset))), calc(50vh - 1rem));
+        inset-inline-end: calc(anchor(--la-launcher start, calc(var(--la-rest-centre) + 1.375rem)) + var(--la-offset));
     }
 }
 

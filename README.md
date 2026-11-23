@@ -98,8 +98,14 @@ Nothing is stored on the server for them. Logged-in users' settings are stored a
 - Images covers background images only when they are set in the page itself (as Tiles and the Dashboard course
   cards do). A background image set in a theme's or plugin's stylesheet is not hidden or dimmed.
 - The Moodle mobile app does not load the plugin.
+- Under a colour scheme, status text (success, warning, danger) keeps the scheme's text colour with a coloured dot
+  before it; one status differs from another by the dot's hue alone. Status cells and alerts carry a solid border or
+  marker. Coloured badges keep their words and the theme's colours.
 - The colour contrast guarantee covers only the surfaces the plugin recolours. Content with its own
   colours, such as images or embedded media, is not guaranteed.
+- Under a colour scheme the text editor's editing area keeps the author's own colours; its toolbar takes the scheme.
+- Pages of other plugins that paint their own tables or panels are only covered where they use Moodle's standard
+  components.
 - At 200% text with extra spacing on a very narrow screen (320 px), some Moodle controls that never wrap
   (dropdown buttons, badges, Timeline event names on the Dashboard) can make the page scroll sideways.
 - Read aloud uses the browser's own voices. In a browser with no voices installed the tile is hidden.

@@ -203,7 +203,8 @@ final class scheme {
             // Visual Studio Code's Dark High Contrast theme (vscode: themes/hc_black.json and the hcDark defaults of
             // platform/theme/common/colors): black everywhere, told apart by contrastBorder; textLink, focusBorder,
             // the editor selection colours, and contrastActiveBorder (the same orange) around the current item. The
-            // link is textLink (#21a6ff, APCA Lc 51 on black) lifted in lightness to Lc 70, the same hue.
+            // link is textLink (#21a6ff, APCA Lc 51 on black) lifted in lightness to Lc 77, the same hue:
+            // Lc 75 is what link text at Moodle's paragraph size needs.
             // Floating widgets take editorWidget.background; hover is a 7% white, the
             // most that keeps the link at 7:1 (VS Code's own list hover is 10%).
             'vscodehc' => self::fixed(
@@ -211,7 +212,7 @@ final class scheme {
                 ['page' => '#000000', 'surface1' => '#000000', 'surface2' => '#0c141f', 'field' => '#000000',
                     'hover' => '#111111'],
                 '#ffffff',
-                '#8bcaff',
+                '#a3d5ff',
                 '#6fc3df',
                 '#f38518',
                 '#f3f518',
@@ -300,6 +301,48 @@ final class scheme {
     }
 
     /**
+     * The colour that marks a state (current, chosen, changed, a focus ring) under this scheme: the scheme's own
+     * active colour if it declares one, else its link colour if that reaches 3:1 on every shade, else its text colour
+     * if that does, else black or white. Styles read it as --a11y-mark.
+     *
+     * @return string normalised colour
+     */
+    public function mark(): string {
+        if ($this->active !== null) {
+            return $this->active;
+        }
+        foreach ([$this->link, $this->text] as $hex) {
+            if (contrast::worst($hex, $this->ramp) >= 3.0) {
+                return $hex;
+            }
+        }
+        return self::best_bw($this->ramp);
+    }
+
+    /** @var array<string, array<string, string>> Status mark colours (cell borders, alert markers) by mode, 3:1 floor. */
+    public const STATUS_MARK = [
+        'dark' => ['ok' => '#5cb85c', 'warn' => '#f0ad4e', 'bad' => '#ff6b6b'],
+        'light' => ['ok' => '#2e7d32', 'warn' => '#b26a00', 'bad' => '#c62828'],
+    ];
+
+    /**
+     * Status mark colours under this scheme (the dot before status text, a status cell's border, an alert's marker):
+     * ok, warn and bad, each at least 3:1 on every shade. Each starts from the fixed set for the scheme's mode (light or
+     * dark); where a fixed value falls short on this scheme's shades, its lightness is moved until it passes (hue kept),
+     * and if no lightness of that hue passes, the scheme's text colour stands in. Styles read them as --a11y-ok-mark,
+     * --a11y-warn-mark and --a11y-bad-mark. Status text itself keeps the scheme's text colour.
+     *
+     * @return array<string, string> ['ok-mark' => '#5cb85c', 'warn-mark' => ..., 'bad-mark' => ...]
+     */
+    public function status_colours(): array {
+        $out = [];
+        foreach (self::STATUS_MARK[$this->mode] as $name => $hex) {
+            $out[$name . '-mark'] = adjust::towards($hex, $this->ramp, 3.0) ?? $this->text;
+        }
+        return $out;
+    }
+
+    /**
      * Activity purpose colours under this scheme (see purpose).
      *
      * @return array<string, string> purpose => normalised colour
@@ -317,7 +360,7 @@ final class scheme {
     public function css_properties(): string {
         $props = $this->ramp + ['text' => $this->text, 'link' => $this->link, 'border' => $this->border,
             'focus' => $this->focus, 'selection' => $this->selection, 'selection-text' => $this->selectiontext,
-            'active' => $this->active];
+            'active' => $this->active, 'mark' => $this->mark()] + $this->status_colours();
         foreach ($this->icon_colours() as $id => $hex) {
             $props['icon-' . $id] = $hex;
         }

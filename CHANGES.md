@@ -1,3 +1,101 @@
+# 3.1.5
+
+States keep their mark under every colour scheme. A scheme gives a state and its neighbour the same colours, so the
+current page, a ticked row, a disabled button or a failing grade looked like the items around it. Found by checking
+97 states on Moodle 4.5, 5.2 and 5.3 under every scheme, against upstream 3.0.9 and under core Boost and Boost Union.
+Revised after review on 16 November: no dashed, dotted or double lines; status shows in colour again, as a dot before
+status text and as solid borders and markers.
+
+- Every scheme has a mark colour: its link colour, or its text colour where the link is under 3:1 on a surface. VS Code
+  dark high contrast keeps its orange.
+- Every scheme has status mark colours for ok, warning and bad, 3:1 on every surface, from two fixed sets (the 3.1.4
+  colours for dark schemes, darker ones of the same tone for light schemes), with lightness moved where a value falls
+  short.
+- Chosen and current items (the current page, tab, pill, breadcrumb (also the plain last item Moodle shows), menu and
+  list item, a pressed toggle or editor button, a ticked or active row, today in the calendar) are boxed in the mark
+  colour on the hover surface. Before, only VS Code dark high contrast boxed them. aria-selected counts only on tabs,
+  listbox and grid options and activity chooser options: in the course index the current page's item is the one
+  chosen item (Moodle's tree marks the section keyboard navigation starts from as selected, and that is not boxed).
+  Navigation and links (the current page link, breadcrumb item, navigation pill, tab, list, menu and course index item)
+  have no box under any scheme, VS Code's included: the scheme's text colour on the hover surface, at 4.5:1 or more,
+  shown by that fill alone as in core. Pressed toggles and editor buttons, selected options and today keep the box.
+- Status cells (a coloured table cell or row) drop the theme's fill and have a solid 2px border in the status mark
+  colour where core colours them: on Moodle 4.5 (Bootstrap 4), not on Moodle 5, whose table cells show no colour for a
+  success, warning or danger row. An assignment submission's status (draft, submitted, graded, early, late) is not marked: its words say it,
+  core's fills are under 3:1, and every status block takes the second surface and the text colour. A changed quick grade or an overridden grade has the same
+  border in the warning colour. A status cell in a ticked row shows both marks.
+- Alerts show their type as a solid marker 1em wide at the leading edge, in the type's colour (info in the link
+  colour). Badges and pills are painted the same way: the second surface, the scheme's text colour, a 1px edge, and for a
+  success, warning, danger or info badge a marker 1em wide in place of its leading edge. Primary, light and dark badges
+  keep the theme's colours.
+  Coloured buttons are not painted yet.
+- Status text (success, warning and danger text, passing and failing grades, error messages) keeps the scheme's text
+  colour, with a dot before it in the status mark colour. An icon that carries a status takes the mark colour instead.
+  A field with an error takes an edge in the danger colour.
+- Disabled menu items, buttons, checkboxes, radios, switches, tabs, page links and editor buttons are faded to 0.6.
+  Read-only and disabled text fields, textareas and selects look the same: full contrast (their text is still read,
+  WCAG 1.4.3) and a solid 2px edge in the text colour.
+- A progress bar's fill is in the mark colour, on a track with an edge.
+- Hidden items, hidden courses and suspended users are set in italic, at full contrast.
+- Keyboard focus under a scheme without its own focus colour is drawn in the mark colour, and moves inside a current
+  item's box under every scheme.
+- The page's side gutters keep one surface while a long page scrolls (on Moodle 5.3 they turned from grey to black).
+- The floating launcher sits a set distance above Moodle's corner button, the "Button height offset" setting
+  (launcheroffset, in px, default 12, from 0 to 200), instead of a fixed 80px, which put it on top of the "?" on any
+  page with a sticky footer. The corner button is the topmost shown of core's footer button (the "?") and the theme's
+  back-to-top; the launcher follows it on its centre line with CSS anchor positioning, wherever core or the theme moves
+  it. With neither shown, or without anchor positioning, it sits the same distance above core's resting spot for the
+  "?", lifted over a sticky footer and clear of an open block drawer. RTL mirrors.
+- The settings panel opens beside the launcher, the same distance from its inline-start edge, with their bottom edges
+  level and the panel kept inside the viewport; below 768px it stays a full-width bottom sheet.
+- Plain controls Moodle draws with no side padding (the grading table's filters, an admin page's heading select) get
+  0.5em of inline padding under a scheme, so the scheme's edge does not touch their text.
+- The navbar takes the scheme's surface under every scheme, also when the theme paints it in the brand colour.
+- Alert edges no longer use fixed hex colours.
+- A site's own forced link colour (one id with classes, such as #region-main a:link:not(.btn), with !important) no
+  longer beats the scheme's link colour, and a text field keeps its edge under a scheme where the theme's own border
+  is missing (Moodle 5.x without Bootstrap's border-width property).
+- Tests: the Behat step "should look different from" uses a 3:1 rule (it passed on any difference before), counts an
+  edge or underline in another style or weight, or a shadow of another shape, as another mark, and counts Bootstrap
+  5's table fills as background. A drawn pseudo-element (a status dot) counts as a mark. A new step, "should
+  differ in hue from", records one status against another, told apart by hue alone. A new feature, state_marks, covers each state. active_item_box expects the box under every scheme;
+  link_purpose and vscode_scheme expect VS Code's link colour since 3.1.4 (#a3d5ff).
+
+# 3.1.4
+
+Contrast of standard Moodle components under a colour scheme, found by measuring 70 pages on Moodle 4.5 and 5.3 at
+rest, hovered, focused and with menus open.
+
+- Tables that use Moodle's own table style without Bootstrap's (most admin tables, the participants list, the user
+  list) take the scheme on Moodle 4.5: before, their text stayed dark on a dark page and every other row stayed white.
+  Hovered rows take the scheme's hover surface.
+- Pagination, the gradebook (grader report, user report, grade setup), the assignment grading table and the quiz
+  editing page take the scheme. Before, their cells stayed white or pale grey under the scheme's light text.
+- Alerts and other small pale panels (the plugin update panel, status cells, user initials, grey badges) take the
+  scheme's second surface. An alert keeps an edge in its type's colour, since its fill no longer shows its type.
+- Text the theme colours itself takes the scheme's text colour: `.text-dark`, plain text, headers and buttons in menus,
+  activity dates, grade category toggles, "Not marked", question names on the quiz editing page, and the grey
+  component names on Plugins overview.
+- A search term marked in results (site administration search, course search) takes the text colour on the hover
+  surface, underlined. Before, it kept Boost's teal, which is APCA Lc 30 on a black page.
+- Link-styled buttons (Show more, Expand all, move and info icons) take the link colour. Before, they kept the theme's
+  brand colour, and turned black when hovered.
+- A site's own forced link colours (an `!important` rule in a theme's custom SCSS) no longer beat the scheme.
+- Keyboard focus shows under every scheme. A scheme without its own focus colour draws a solid ring in its text colour
+  inside the control, and a focused link loses the theme's pale fill there too. Before, High contrast relied on the
+  theme's ring, which is mixed from the brand colour and can vanish on a dark page. The Focus ring tile's Ring and
+  Extra thick are unchanged.
+- Fields and selects have an edge in the scheme's border or text colour, and an input group's add-on takes the field
+  colour.
+- White and light utility panels follow the scheme on Moodle 5.3, where core's dark mode repainted them dark grey.
+- The text editor's menu bar, toolbar and status bar take the scheme on Moodle 4.5. The editing area keeps the
+  author's own colours.
+- Dark image icons (the icon beside each plugin on Plugins overview, gradebook item icons, the group mode icon) are
+  lightened under a dark scheme.
+- Dark high contrast (VS Code): links are lighter, #a3d5ff, APCA Lc 77 on every surface of the scheme (was #8bcaff, Lc
+  70). Lc 75 is what link text at Moodle's paragraph size needs.
+- An ARCHITECTURE.md table says which rule owns which concern and which test guards it.
+
 # 3.1.3
 
 - Merges upstream 3.0.8 (Adam Jenkins): the panel stays open while you try settings, Site default comes first in

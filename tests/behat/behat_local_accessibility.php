@@ -233,15 +233,36 @@ class behat_local_accessibility extends behat_base {
                 const p = m[1].split(/[\s,\/]+/).filter((v) => v !== "").map(Number);
                 return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1];
             };
+            // Bootstrap 5 paints striped, hovered, active and coloured table cells with an inset box-shadow of 9999px
+            // over the cell, not with a background colour: a shadow at least half the size of the element is a fill.
+            const fills = (e) => {
+                const out = [];
+                const r = e.getBoundingClientRect();
+                const half = Math.min(r.width, r.height) / 2;
+                const parts = String(getComputedStyle(e).boxShadow).split(/,(?![^(]*\))/);
+                for (const part of parts) {
+                    if (!/inset/.test(part) || half <= 0) {
+                        continue;
+                    }
+                    const c = parse(part);
+                    const sizes = part.replace(/rgba?\([^)]*\)/, "").match(/-?[0-9.]+px/g) || [];
+                    const spread = sizes.length > 3 ? Math.abs(parseFloat(sizes[3])) : 0;
+                    if (c && c[3] > 0 && spread >= half) {
+                        out.push(c);
+                    }
+                }
+                return out.reverse();
+            };
             const behind = (el) => {
                 const layers = [];
                 for (let e = el; e; e = e.parentElement) {
+                    layers.push(...fills(e));
                     const c = parse(getComputedStyle(e).backgroundColor);
                     if (c && c[3] > 0) {
                         layers.push(c);
-                        if (c[3] >= 1) {
-                            break;
-                        }
+                    }
+                    if (layers.length && layers[layers.length - 1][3] >= 1) {
+                        break;
                     }
                 }
                 let out = [255, 255, 255];
@@ -366,6 +387,26 @@ class behat_local_accessibility extends behat_base {
     }
 
     /**
+     * Check that two elements have the same computed value of one property.
+     *
+     * @Then /^the computed "(?P<property>[^"]*)" of "(?P<css>[^"]*)" should match that of "(?P<other>[^"]*)"$/
+     * @param string $property
+     * @param string $css
+     * @param string $other
+     */
+    public function the_computed_style_should_match(string $property, string $css, string $other): void {
+        $this->check_script('const a = document.querySelector(' . json_encode($css) . ');
+            const b = document.querySelector(' . json_encode($other) . ');
+            if (!a || !b) {
+                return "Missing element: " + (a ? ' . json_encode($other) . ' : ' . json_encode($css) . ');
+            }
+            const p = ' . json_encode($property) . ';
+            const va = getComputedStyle(a).getPropertyValue(p);
+            const vb = getComputedStyle(b).getPropertyValue(p);
+            return va === vb ? "" : p + ": " + va + " against " + vb;');
+    }
+
+    /**
      * Check that a checked box or radio is distinguishable from an unchecked one. A natively drawn control (Bootstrap 4,
      * Moodle 4.5) shows its own check mark; a restyled one (appearance: none, Bootstrap 5) must differ in background.
      *
@@ -392,22 +433,269 @@ class behat_local_accessibility extends behat_base {
     }
 
     /**
-     * Check that two elements differ visibly: colours, borders, outline, shadow or background image.
+     * Where core colours a success, warning or danger table row (Bootstrap 4, Moodle 4.5, whose root defines
+     * --breakpoint-xs), the row must look different from a plain one; where it does not (Moodle 5), the row must carry
+     * no status edge either.
      *
-     * @Then /^the "(?P<css>[^"]*)" element should look different from the "(?P<other>[^"]*)" element$/
+     * @Then /^the "(?P<css>[^"]*)" element should look different from the "(?P<other>[^"]*)" element if core colours table rows$/
      * @param string $css
      * @param string $other
      */
-    public function the_element_should_look_different_from(string $css, string $other): void {
-        $this->check_script('const props = ["background-color", "background-image", "border-top-color", "border-top-width",
-                "border-top-style", "outline-style", "outline-width", "outline-color", "box-shadow"];
-            const a = document.querySelector(' . json_encode($css) . ');
+    public function the_element_should_look_different_if_core_colours_rows(string $css, string $other): void {
+        $bootstrap4 = $this->evaluate_script('return getComputedStyle(document.documentElement)' .
+            '.getPropertyValue("--breakpoint-xs").trim() !== "";');
+        if ($bootstrap4) {
+            $this->the_element_should_look_different_from($css, '', $other);
+            return;
+        }
+        $this->check_script('const a = document.querySelector(' . json_encode($css) . ');
+            if (!a) {
+                return "Missing element: " + ' . json_encode($css) . ';
+            }
+            const s = getComputedStyle(a).boxShadow;
+            return s === "none" || !/[1-9][0-9.]*px inset/.test(s.replace(/0px 0px 0px /g, "")) ? "" :
+                "A status edge where core shows no colour: " + s;');
+    }
+
+    /**
+     * The first element sits the given number of pixels above the second, on its vertical centre line (1px tolerance).
+     *
+     * @Then /^the "(?P<upper>[^"]*)" element should sit (?P<px>\d+)px above the "(?P<lower>[^"]*)" element on its centre line$/
+     * @param string $upper
+     * @param string $px
+     * @param string $lower
+     */
+    public function the_element_should_sit_above(string $upper, string $px, string $lower): void {
+        $this->check_script('const u = document.querySelector(' . json_encode($upper) . ');
+            const l = document.querySelector(' . json_encode($lower) . ');
+            if (!u || !l) {
+                return "Missing element";
+            }
+            const a = u.getBoundingClientRect(), b = l.getBoundingClientRect();
+            const dy = b.top - a.bottom, dx = (a.left + a.width / 2) - (b.left + b.width / 2);
+            return Math.abs(dy - ' . (int) $px . ') <= 1 && Math.abs(dx) <= 1 ? "" :
+                "gap " + dy + "px (want ' . (int) $px . '), centre offset " + dx + "px";');
+    }
+
+    /**
+     * The panel opens beside the launcher: its inline-end edge the given pixels from the launcher's inline-start edge,
+     * bottoms level, inside the viewport (1px tolerance).
+     *
+     * @Then /^the accessibility panel should open (?P<px>\d+)px beside the launcher$/
+     * @param string $px
+     */
+    public function the_panel_should_open_beside_the_launcher(string $px): void {
+        $this->check_script('const l = document.querySelector(".local-accessibility-launcher").getBoundingClientRect();
+            const p = document.getElementById("local-accessibility-panel").getBoundingClientRect();
+            const ltr = document.documentElement.dir !== "rtl";
+            const gap = ltr ? l.left - p.right : p.left - l.right;
+            const inside = p.left >= 0 && p.top >= 0 && p.right <= document.documentElement.clientWidth && p.bottom <= innerHeight;
+            return Math.abs(gap - ' . (int) $px . ') <= 1 && Math.abs(p.bottom - l.bottom) <= 1 && inside ? "" :
+                "gap " + gap + "px (want ' . (int) $px . '), bottoms " + (p.bottom - l.bottom) + "px apart, inside " + inside;');
+    }
+
+    /**
+     * Check that two elements look different, by the rule the contrast harness uses (distinct_score.js, D1): at least
+     * one of these holds.
+     *  - Their backgrounds differ by 3:1 or more.
+     *  - Their text colours differ by 3:1 or more, when both carry text. An element with no text that holds an icon
+     *    counts the icon's ink (an SVG's fill, a font icon's colour) as its text colour.
+     *  - One has an edge the other lacks, 3:1 from its own background: a border side or an inset shadow against the
+     *    element's background; an outline or an outer shadow ring against the background around it. An edge drawn in
+     *    another style (solid, dotted, dashed, double), at another weight (under 1.5px against 1.5px or more) or, for a
+     *    shadow, in another shape counts as a different edge.
+     *  - An underline differs, in presence or in style.
+     *  - A mark that is not colour differs: underline, weight (600+ against less), italic, opacity 0.7 or less against
+     *    more, a ::before or ::after, an icon, a background image, or a native checkbox or radio's checked drawing.
+     * Hue alone never counts: a colour scheme is chosen to remove it.
+     *
+     * @Then /^the "(?P<css>[^"]*)" element should (?P<not>not )?look different from the "(?P<other>[^"]*)" element$/
+     * @param string $css
+     * @param string $not "not " to check that the two look the same by that rule
+     * @param string $other
+     */
+    public function the_element_should_look_different_from(string $css, string $not, string $other): void {
+        $this->check_script($this->look_helpers() . 'const a = document.querySelector(' . json_encode($css) . ');
             const b = document.querySelector(' . json_encode($other) . ');
             if (!a || !b) {
                 return "Missing element: " + (a ? ' . json_encode($other) . ' : ' . json_encode($css) . ');
             }
-            const look = (el) => props.map((p) => p + ": " + getComputedStyle(el).getPropertyValue(p)).join("; ");
-            return look(a) === look(b) ? "Both look the same: " + look(a) : "";');
+            const how = differences(look(a), look(b));
+            const want = ' . json_encode($not === '') . ';
+            if (want) {
+                return how.length ? "" : "They look the same: " + JSON.stringify(look(a)) + " and " + JSON.stringify(look(b));
+            }
+            return how.length ? "They look different: " + how.join("; ") : "";');
+    }
+
+    /**
+     * Check that two elements' text colours, or their status marks (the dot before them, the first shadow or the
+     * leading border), differ in hue and
+     * lightness by a CIE76 Delta E of 15 or more. This is not
+     * the look-different rule: it records a state Moodle and the plugin tell apart by colour alone (status text against
+     * plain text, one status against another), which is accepted for status colours. The look-different step still
+     * fails such a pair.
+     *
+     * @Then /^the "(?P<css>[^"]*)" element should differ in hue from the "(?P<other>[^"]*)" element$/
+     * @param string $css
+     * @param string $other
+     */
+    public function the_element_should_differ_in_hue_from(string $css, string $other): void {
+        $this->check_script('const a = document.querySelector(' . json_encode($css) . ');
+            const b = document.querySelector(' . json_encode($other) . ');
+            if (!a || !b) {
+                return "Missing element: " + (a ? ' . json_encode($other) . ' : ' . json_encode($css) . ');
+            }
+            const lab = (rgb) => {
+                const f = (v) => {
+                    v /= 255;
+                    return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+                };
+                const [r, g, bl] = rgb.map(f);
+                const x = (r * 0.4124 + g * 0.3576 + bl * 0.1805) / 0.95047;
+                const y = r * 0.2126 + g * 0.7152 + bl * 0.0722;
+                const z = (r * 0.0193 + g * 0.1192 + bl * 0.9505) / 1.08883;
+                const t = (v) => v > 0.008856 ? Math.cbrt(v) : 7.787 * v + 16 / 116;
+                return [116 * t(y) - 16, 500 * (t(x) - t(y)), 200 * (t(y) - t(z))];
+            };
+            const ink = (el) => over(parse(getComputedStyle(el).color), behind(el));
+            // A status mark: the colour of the dot before it, else of the first shadow, else of the leading border.
+            const mark = (el) => {
+                const s = getComputedStyle(el);
+                const dot = getComputedStyle(el, "::before");
+                const c = (dot.content === "\"\"" && dot.display !== "none" ? parse(dot.backgroundColor) : null) ||
+                    parse(s.boxShadow) ||
+                    (parseFloat(s.borderInlineStartWidth) > 0 ? parse(s.borderInlineStartColor) : null);
+                return c ? over(c, behind(el)) : null;
+            };
+            const de = (x, y) => {
+                const p = lab(x);
+                const q = lab(y);
+                return Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]);
+            };
+            const best = Math.max(de(ink(a), ink(b)), mark(a) && mark(b) ? de(mark(a), mark(b)) : 0);
+            return best >= 15 ? "" : "Delta E " + best.toFixed(1) + " between " + ' . json_encode($css) . ' + " and " +
+                ' . json_encode($other) . ';');
+    }
+
+    /**
+     * JavaScript for the look-different step: look(el) reads an element's colours, edges and marks; differences(a, b)
+     * lists how two looks differ by the D1 rule. Needs the colour helpers.
+     *
+     * @return string JavaScript declaring look() and differences()
+     */
+    private function look_helpers(): string {
+        return 'const shadowsOf = (s) => String(s).split(/,(?![^(]*\\))/).filter((p) => p.trim() !== "none" && p.trim() !== "")
+                .map((p) => {
+                    const sizes = (p.replace(/rgba?\\([^)]*\\)/, "").match(/-?[0-9.]+px/g) ||
+                        []).map((v) => Math.abs(parseFloat(v)));
+                    const geo = (p.replace(/rgba?\\([^)]*\\)/, "").match(/-?[0-9.]+px/g) || []).join(" ");
+                    return {inset: /inset/.test(p), colour: parse(p), geo: geo,
+                        size: Math.max(sizes[0] || 0, sizes[1] || 0, (sizes[2] || 0) / 2, sizes[3] || 0)};
+                });
+            const look = (el) => {
+                const s = getComputedStyle(el);
+                const back = behind(el);
+                const out = el.parentElement ? behind(el.parentElement) : [255, 255, 255];
+                const r = el.getBoundingClientRect();
+                const half = Math.min(r.width, r.height) / 2;
+                const text = (el.innerText || el.value || "").trim();
+                let fg = parse(s.color);
+                let ink = false;
+                if (!text) {
+                    const icon = [...el.querySelectorAll("svg, i.icon, i.fa, .icon")].find((i) => i.checkVisibility());
+                    if (icon) {
+                        const is = getComputedStyle(icon);
+                        const f = icon.tagName.toLowerCase() === "svg" && is.fill && !/^(none|url)/.test(is.fill) ? is.fill :
+                            is.color;
+                        if (parse(f)) {
+                            fg = parse(f);
+                            ink = true;
+                        }
+                    }
+                }
+                const edges = new Set();
+                for (const side of ["Top", "Right", "Bottom", "Left"]) {
+                    const c = parse(s["border" + side + "Color"]);
+                    if (parseFloat(s["border" + side + "Width"]) >= 0.5 && !/none|hidden/.test(s["border" + side + "Style"]) &&
+                            c && c[3] > 0 && ratio(over(c, out), back) >= 3) {
+                        edges.add(side.toLowerCase() + ":" + s["border" + side + "Style"] + ":" +
+                            (parseFloat(s["border" + side + "Width"]) >= 1.5 ? "thick" : "thin"));
+                    }
+                }
+                const oc = parse(s.outlineColor);
+                if (s.outlineStyle !== "none" && parseFloat(s.outlineWidth) >= 0.5 && oc && oc[3] > 0 &&
+                        ratio(over(oc, out), parseFloat(s.outlineOffset) < 0 ? back : out) >= 3) {
+                    edges.add("outline:" + s.outlineStyle + ":" + (parseFloat(s.outlineWidth) >= 1.5 ? "thick" : "thin"));
+                }
+                for (const sh of shadowsOf(s.boxShadow)) {
+                    if (sh.size < 0.75 || !sh.colour || sh.colour[3] === 0 || (sh.inset && sh.size >= half)) {
+                        continue;
+                    }
+                    const against = sh.inset ? back : out;
+                    if (ratio(over(sh.colour, against), against) >= 3) {
+                        edges.add((sh.inset ? "inset:" : "ring:") + sh.geo);
+                    }
+                }
+                let opacity = 1;
+                for (let e = el; e; e = e.parentElement) {
+                    opacity *= parseFloat(getComputedStyle(e).opacity);
+                }
+                const inner = el.querySelector("a, span, strong, b, em, i:not(.icon)");
+                const is = inner ? getComputedStyle(inner) : null;
+                const pseudo = (which) => {
+                    const p = getComputedStyle(el, which);
+                    if (!p.content || p.content === "none" || p.content === "normal") {
+                        return "";
+                    }
+                    if (p.display === "none") {
+                        return "";
+                    }
+                    const c = parse(p.backgroundColor);
+                    if (p.content === "\"\"") {
+                        // An empty pseudo-element is a mark only when it is drawn: a filled shape with a size, 3:1
+                        // against what is behind the element.
+                        const size = parseFloat(p.width) > 0 && parseFloat(p.height) > 0;
+                        const filled = c && c[3] > 0 && ratio(over(c, back), back) >= 3;
+                        // Its shape counts as a mark, not its colour: two dots of different hues are the same mark.
+                        return size && (filled || p.backgroundImage !== "none" || parseFloat(p.borderTopWidth) > 0) ?
+                            "shape " + p.width + " " + p.height + " " + p.borderRadius : "";
+                    }
+                    return p.content;
+                };
+                const icons = [...el.querySelectorAll("i.icon, i.fa, .icon, img, svg")].filter((i) => i.checkVisibility())
+                    .map((i) => i.tagName === "IMG" ? "img" : (i.getAttribute("class") || i.tagName).split(/\s+/)
+                        .filter((c) => /^fa-(?!fw|solid|regular)|^icon$/.test(c)).join(".")).join(" ");
+                return {
+                    text: !!text, ink: ink, fg: fg ? over(fg, back) : back, bg: back, edges: [...edges].sort().join(","),
+                    underline: /underline/.test(s.textDecorationLine) ? s.textDecorationStyle :
+                        (!!is && /underline/.test(is.textDecorationLine) ? is.textDecorationStyle : ""),
+                    bold: Math.max(parseFloat(s.fontWeight), is ? parseFloat(is.fontWeight) : 0) >= 600,
+                    italic: s.fontStyle === "italic" || (!!is && is.fontStyle === "italic"),
+                    dim: opacity <= 0.7, before: pseudo("::before"), after: pseudo("::after"), icons: icons,
+                    image: s.backgroundImage !== "none" ? s.backgroundImage : "",
+                    native: /^(checkbox|radio)$/.test(el.type) && (s.appearance || s.webkitAppearance) !== "none" ?
+                        String(el.checked) : "",
+                };
+            };
+            const differences = (a, b) => {
+                const how = [];
+                if (ratio(a.bg, b.bg) >= 3) {
+                    how.push("background " + ratio(a.bg, b.bg).toFixed(2) + ":1");
+                }
+                if ((a.text || a.ink) && (b.text || b.ink) && ratio(a.fg, b.fg) >= 3) {
+                    how.push("text colour " + ratio(a.fg, b.fg).toFixed(2) + ":1");
+                }
+                if (a.edges !== b.edges) {
+                    how.push("edges [" + a.edges + "] against [" + b.edges + "]");
+                }
+                for (const k of ["underline", "bold", "italic", "dim", "before", "after", "icons", "image", "native"]) {
+                    if (a[k] !== b[k]) {
+                        how.push(k);
+                    }
+                }
+                return how;
+            };';
     }
 
     /**
@@ -616,8 +904,9 @@ class behat_local_accessibility extends behat_base {
 
     /**
      * Add core-style controls to the main region: a link, a plain list item, a moodleform submit input, checkboxes,
-     * radios, a text field, pagination with a current page, a menu with an active item and a MathJax span, marked up as
-     * core's templates render them.
+     * radios, a text field, a select, pagination with a current page, a menu with an active item and a MathJax span,
+     * marked up as core's templates render them. Steps name the fixture's own controls (#la-test-select), since
+     * #region-main also holds the plugin's hidden read-aloud bar and whatever the page has.
      *
      * @Given the main region contains core controls
      */
@@ -631,6 +920,7 @@ class behat_local_accessibility extends behat_base {
             <input type="radio" class="form-check-input" name="la-test-r" id="la-test-radio" checked>
             <input type="radio" class="form-check-input" name="la-test-r2" id="la-test-radio-off">
             <input type="text" class="form-control" id="la-test-text" value="Typed text">
+            <select class="custom-select form-select" id="la-test-select"><option>One</option><option>Two</option></select>
             <nav><ul class="pagination">
                 <li class="page-item"><a href="#" class="page-link">1</a></li>
                 <li class="page-item active"><a href="#" class="page-link" id="la-test-page" aria-current="page">2</a></li>
@@ -640,6 +930,95 @@ class behat_local_accessibility extends behat_base {
                 <a class="dropdown-item active" id="la-test-menuitem" href="#" aria-current="true">Two</a>
             </div>
             <span class="MathJax"><span id="la-test-maths">x</span></span>
+        </div>';
+        $this->check_script('const main = document.querySelector("#region-main");
+            if (!main) {
+                return "No #region-main on this page";
+            }
+            main.insertAdjacentHTML("afterbegin", ' . json_encode($html) . ');
+            return "";');
+    }
+
+    /**
+     * Add Moodle's state markup to the main region, each state beside a neighbour without it, marked up as core's
+     * templates render them: current, chosen and pressed items (a pressed editor button too, as TinyMCE marks it);
+     * changed and overridden grades; disabled controls; coloured and grey badges and a pill;
+     * statuses; a progress bar; hidden items; and a text link to focus. Ids start la-st-.
+     *
+     * @Given the main region contains Moodle state markup
+     */
+    public function the_main_region_contains_moodle_state_markup(): void {
+        $html = '<div id="la-st">
+            <nav><ul class="pagination">
+                <li class="page-item disabled"><a href="#" class="page-link" id="la-st-page-disabled"
+                    aria-disabled="true">Previous</a></li>
+                <li class="page-item"><a href="#" class="page-link" id="la-st-page-other">1</a></li>
+                <li class="page-item active"><a href="#" class="page-link" id="la-st-page-current" aria-current="page">2</a></li>
+            </ul></nav>
+            <ol class="breadcrumb"><li class="breadcrumb-item"><a href="#" id="la-st-crumb-link">Course</a></li>
+                <li class="breadcrumb-item active"><span id="la-st-crumb-current" aria-current="page">Essay</span></li></ol>
+            <div class="list-group"><a href="#" class="list-group-item list-group-item-action active"
+                id="la-st-list-active">Chosen</a>
+                <a href="#" class="list-group-item list-group-item-action" id="la-st-list-other">Other</a></div>
+            <div class="btn-group"><button type="button" class="btn btn-outline-secondary active" aria-pressed="true"
+                id="la-st-toggle-pressed">Card</button>
+                <button type="button" class="btn btn-outline-secondary" aria-pressed="false"
+                    id="la-st-toggle-unpressed">List</button></div>
+            <div class="tox"><div class="tox-toolbar"><button type="button" class="tox-tbtn tox-tbtn--enabled" aria-pressed="true"
+                id="la-st-tox-pressed">B</button>
+                <button type="button" class="tox-tbtn" aria-pressed="false" id="la-st-tox-plain">I</button>
+                <button type="button" class="tox-tbtn tox-tbtn--disabled" aria-disabled="true"
+                    id="la-st-tox-disabled">U</button></div></div>
+            <ul class="nav nav-tabs"><li class="nav-item"><a class="nav-link active" aria-current="page" href="#"
+                id="la-st-tab-current">Current</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" id="la-st-tab-other">Other</a></li>
+                <li class="nav-item"><a class="nav-link disabled" aria-disabled="true" href="#"
+                    id="la-st-tab-disabled">Disabled</a></li></ul>
+            <table class="generaltable table"><tbody>
+                <tr class="selectedrow"><td id="la-st-row-ticked">Ticked</td><td>1</td></tr>
+                <tr class="table-active"><td id="la-st-row-active">Active</td><td>2</td></tr>
+                <tr class="table-success"><td id="la-st-row-success">Success</td><td>3</td></tr>
+                <tr class="table-warning"><td id="la-st-row-warning">Warning</td><td>4</td></tr>
+                <tr class="table-danger"><td id="la-st-row-danger">Danger</td><td>5</td></tr>
+                <tr><td id="la-st-row-plain">Plain</td><td>6</td></tr>
+                <tr><td class="quickgrademodified" id="la-st-cell-quickgrade">70</td><td class="ajaxoverridden"
+                    id="la-st-cell-overridden">80</td>
+                    <td id="la-st-cell-plain">60</td></tr>
+                <tr><td class="gradepass" id="la-st-grade-pass">Pass 70</td><td class="gradefail" id="la-st-grade-fail">Fail 20</td>
+                    <td id="la-st-grade-plain">50</td></tr>
+            </tbody></table>
+            <div class="submissionstatussubmitted" id="la-st-status-submitted">Submitted for grading</div>
+            <div class="submissionstatusdraft" id="la-st-status-draft">Draft (not submitted)</div>
+            <div class="submissionstatus" id="la-st-status-none">No submission</div>
+            <p><span class="text-warning" id="la-st-text-warning">Warning text</span> <span class="text-danger"
+                id="la-st-text-danger">Danger text</span>
+                <span class="text-success" id="la-st-text-success">Success text</span> <span id="la-st-text-plain">Plain text</span>
+                <span class="dimmed_text" id="la-st-dimmed">Hidden from students</span>
+                <a href="#" id="la-st-link">A text link</a></p>
+            <div class="dropdown-menu show" style="position: static">
+                <a class="dropdown-item" href="#" id="la-st-menu-enabled">Enabled</a>
+                <button type="button" class="dropdown-item" disabled id="la-st-menu-disabled-button">Disabled button</button>
+                <a class="dropdown-item disabled" aria-disabled="true" href="#" id="la-st-menu-disabled-link">Disabled link</a>
+            </div>
+            <form class="mform"><label for="la-st-field-editable" id="la-st-label">Name</label>
+                <input type="text" class="form-control" id="la-st-field-editable" value="Editable">
+                <input type="text" class="form-control is-invalid" id="la-st-field-invalid" value="Wrong">
+                <div class="invalid-feedback d-block" id="la-st-error">Required</div>
+                <input type="text" class="form-control" id="la-st-field-disabled" value="Disabled" disabled>
+                <input type="text" class="form-control" id="la-st-field-readonly" value="Read only" readonly>
+                <select class="form-select custom-select" id="la-st-select-editable"><option>Editable</option></select>
+                <select class="form-select custom-select" id="la-st-select-disabled" disabled><option>Disabled</option></select>
+                <textarea class="form-control" id="la-st-area-disabled" disabled>Disabled</textarea>
+                <button type="button" class="btn btn-secondary" id="la-st-btn-disabled" disabled>Save</button>
+                <button type="button" class="btn btn-secondary" id="la-st-btn-enabled">Save</button>
+            </form>
+            <p><span class="badge bg-success text-white" id="la-st-badge-ok">Done</span>
+                <span class="badge bg-danger text-white" id="la-st-badge-bad">Overdue</span>
+                <span class="badge bg-secondary text-dark" id="la-st-badge-grey">Draft</span>
+                <span class="badge rounded-pill bg-warning text-dark" id="la-st-pill-warn">3</span></p>
+            <div class="progress" id="la-st-progress" style="height: 1rem"><div class="progress-bar" id="la-st-progress-bar"
+                role="progressbar"
+                style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div></div>
         </div>';
         $this->check_script('const main = document.querySelector("#region-main");
             if (!main) {

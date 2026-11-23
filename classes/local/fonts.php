@@ -116,8 +116,8 @@ final class fonts {
             } else if ($out[$id]['label'] !== $parsed['family']) {
                 continue;       // A second family with the same slug: the first one wins.
             }
-            $slot = $parsed['weight'] . ' ' . $parsed['style'] . ' ' . $parsed['format'];
-            if (isset($best[$id][$slot]) && $best[$id][$slot]['rank'] <= $parsed['rank']) {
+            $variant = $parsed['weight'] . ' ' . $parsed['style'] . ' ' . $parsed['format'];
+            if (isset($best[$id][$variant]) && $best[$id][$variant]['rank'] <= $parsed['rank']) {
                 continue;       // A file at least as good for this face came first.
             }
             // The item id is a content revision, so a replaced file gets a new URL despite immutable caching.
@@ -129,7 +129,7 @@ final class fonts {
                 '/',
                 $file->get_filename()
             );
-            $best[$id][$slot] = [
+            $best[$id][$variant] = [
                 'rank' => $parsed['rank'],
                 'face' => [
                     'url' => $url->out(false),

@@ -32,6 +32,9 @@ use local_accessibility\preferences;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class panel implements \renderable, \templatable {
+    /** @var int Default distance, in px, of the launcher above Moodle's corner button, and of the panel beside it. */
+    public const LAUNCHER_OFFSET = 12;
+
     /** @var string[] Text size quick picks in the size view (spec §3). */
     private const QUICK_SIZES = ['100', '125', '150', '200', '250', '300'];
 
@@ -83,6 +86,10 @@ class panel implements \renderable, \templatable {
         }
         $custom = preferences::custom_scheme();
         $mode = get_config('local_accessibility', 'launcher') ?: 'both';
+        // Guests and secure-layout pages have no user menu, so they always get the floating launcher (R16).
+        $floating = $mode !== 'menu' || preferences::uses_cookie() || $PAGE->pagelayout === 'secure';
+        $offset = get_config('local_accessibility', 'launcheroffset');
+        $offset = ($offset === false || $offset === '') ? self::LAUNCHER_OFFSET : max(0, min(200, (int) $offset));
         return [
             'tiles' => $tiles,
             'drawers' => $drawers,
@@ -90,8 +97,9 @@ class panel implements \renderable, \templatable {
             'state' => self::state($enabled, $values),
             'custom' => $custom ? ['bg' => $custom->ramp['page'], 'text' => $custom->text,
                 'link' => $custom->link, 'exact' => $custom->exact] : null,
-            // Guests and secure-layout pages have no user menu, so they always get the floating launcher (R16).
-            'floating' => $mode !== 'menu' || preferences::uses_cookie() || $PAGE->pagelayout === 'secure',
+            'floating' => $floating,
+            // The launcher's distance above the corner button and its gap to the panel (launcheroffset), in px.
+            'launcheroffset' => $offset,
             'profiles' => \local_accessibility\profiles::for_template(),
             // One SVG filter per activity purpose; each floods the icon with the scheme's --a11y-icon-<purpose>.
             'purposes' => array_map(fn(string $id): array => ['id' => $id], purpose::ids()),
